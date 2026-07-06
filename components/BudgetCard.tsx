@@ -12,14 +12,15 @@ type Props = {
   onClick?: () => void;
 };
 
+function activeCategories(group: CategoryWithChildren) {
+  return group.categories.filter((category) => category.is_active);
+}
+
 function groupBudget(group: CategoryWithChildren, daysInMonth: number, currentDay: number) {
-  const groupLimit = adjustedMonthlyLimit(group.average_monthly_budget, daysInMonth, group.budget_period);
-  const groupPlan = plannedUntilCurrentDay(group.average_monthly_budget, currentDay, group.budget_period);
-  const childLimit = group.categories.reduce((sum, category) => sum + adjustedMonthlyLimit(category.average_monthly_budget, daysInMonth, category.budget_period), 0);
-  const childPlan = group.categories.reduce((sum, category) => sum + plannedUntilCurrentDay(category.average_monthly_budget, currentDay, category.budget_period), 0);
+  const categories = activeCategories(group);
   return {
-    limit: Math.max(groupLimit, childLimit),
-    plan: Math.max(groupPlan, childPlan)
+    limit: categories.reduce((sum, category) => sum + adjustedMonthlyLimit(category.average_monthly_budget, daysInMonth, category.budget_period), 0),
+    plan: categories.reduce((sum, category) => sum + plannedUntilCurrentDay(category.average_monthly_budget, currentDay, category.budget_period), 0)
   };
 }
 
@@ -39,12 +40,12 @@ export function BudgetCard({ group, transactions, daysInMonth, currentDay, expan
   return (
     <article className={`budget-card ${expanded ? "expanded" : ""}`} style={{ ["--accent" as string]: group.color }}>
       <button className="budget-main" onClick={onClick} type="button">
-        <div className="budget-card-header">
+        <div className="budget-card-header compact-budget-head">
           <div>
             <p className="card-title">{group.name}</p>
-            <p className="muted small">{formatEuro(remaining)}</p>
+            <p className="muted small">{formatEuro(spent)} / {formatEuro(budget.limit)}</p>
           </div>
-          <strong>{formatEuro(spent)}</strong>
+          <strong className={remaining < 0 ? "negative" : ""}>{remaining < 0 ? "+" : ""}{formatEuro(Math.abs(remaining))}</strong>
         </div>
 
         <div className="budget-bar" aria-label={`${group.name} Budgetfortschritt`}>
@@ -55,18 +56,21 @@ export function BudgetCard({ group, transactions, daysInMonth, currentDay, expan
 
       {expanded && (
         <div className="subcategory-panel">
-          {group.categories.map((category) => {
+          {activeCategories(group).map((category) => {
             const categorySpent = spentFor(transactions, category.id);
             const limit = adjustedMonthlyLimit(category.average_monthly_budget, daysInMonth, category.budget_period);
+            const plan = plannedUntilCurrentDay(category.average_monthly_budget, currentDay, category.budget_period);
             const percent = limit > 0 ? Math.min(120, (categorySpent / limit) * 100) : 0;
+            const planPercentInner = limit > 0 ? Math.min(100, (plan / limit) * 100) : 0;
             return (
               <div className="subcategory-row" key={category.id}>
                 <div className="subcategory-head">
                   <span>{category.name}</span>
-                  <b>{formatEuro(categorySpent)} / {formatEuro(limit)}</b>
+                  <b>{formatEuro(categorySpent)} / {formatEuro(plan)}</b>
                 </div>
                 <div className="mini-bar">
                   <div style={{ width: `${percent}%` }} />
+                  <i style={{ left: `${planPercentInner}%` }} />
                 </div>
               </div>
             );

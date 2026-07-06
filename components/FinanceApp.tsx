@@ -10,14 +10,19 @@ import { BudgetCard } from "@/components/BudgetCard";
 import { MonthClosingModal } from "@/components/MonthClosingModal";
 import { defaultAccounts, defaultCategoryGroups } from "@/lib/defaults";
 import { applyDeltas, transactionDeltas } from "@/lib/finance";
-import { dateForMonthDay, dayOfMonth, daysInMonth, formatEuro, formatMonthTitle, getMonthRange, monthKey, previousMonthKey } from "@/lib/date";
-import type { Account, Category, CategoryGroup, CategoryWithChildren, RecurringTransaction, Transaction } from "@/lib/types";
+import { dateForMonthDay, dayOfMonth, daysInMonth, formatEuro, getMonthRange, monthKey, previousMonthKey } from "@/lib/date";
+import type { Account, Category, CategoryGroup, CategoryWithChildren, Debt, RecurringTransaction, Transaction } from "@/lib/types";
+
+function categoriesBudgetSum(group: CategoryWithChildren) {
+  return group.categories.filter((category) => category.is_active).reduce((sum, category) => sum + Number(category.average_monthly_budget), 0);
+}
 
 export function FinanceApp() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [bootstrapping, setBootstrapping] = useState(false);
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const [debts, setDebts] = useState<Debt[]>([]);
   const [groups, setGroups] = useState<CategoryWithChildren[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [bookingOpen, setBookingOpen] = useState(false);
@@ -28,21 +33,23 @@ export function FinanceApp() {
 
   const load = useCallback(async (userId: string) => {
     const range = getMonthRange(currentMonth);
-    const [accountsRes, groupsRes, categoriesRes, transactionsRes] = await Promise.all([
+    const [accountsRes, debtsRes, groupsRes, categoriesRes, transactionsRes] = await Promise.all([
       supabase.from("accounts").select("*").eq("user_id", userId).order("created_at"),
+      supabase.from("debts").select("*").eq("user_id", userId).eq("is_active", true).order("created_at"),
       supabase.from("category_groups").select("*").eq("user_id", userId).eq("is_active", true).order("sort_order"),
       supabase.from("categories").select("*").eq("user_id", userId).eq("is_active", true).order("sort_order"),
       supabase.from("transactions").select("*").eq("user_id", userId).gte("date", range.start).lte("date", range.end).order("date", { ascending: false }).order("created_at", { ascending: false })
     ]);
 
-    if (accountsRes.error || groupsRes.error || categoriesRes.error || transactionsRes.error) {
-      console.error(accountsRes.error || groupsRes.error || categoriesRes.error || transactionsRes.error);
+    if (accountsRes.error || debtsRes.error || groupsRes.error || categoriesRes.error || transactionsRes.error) {
+      console.error(accountsRes.error || debtsRes.error || groupsRes.error || categoriesRes.error || transactionsRes.error);
       return;
     }
 
     const categoryRows = (categoriesRes.data ?? []) as Category[];
     const groupRows = (groupsRes.data ?? []) as CategoryGroup[];
     setAccounts((accountsRes.data ?? []) as Account[]);
+    setDebts((debtsRes.data ?? []) as Debt[]);
     setGroups(groupRows.map((group) => ({ ...group, categories: categoryRows.filter((category) => category.group_id === group.id) })));
     setTransactions((transactionsRes.data ?? []) as Transaction[]);
   }, [currentMonth]);
@@ -57,13 +64,14 @@ export function FinanceApp() {
     const { data: existingGroups } = await supabase.from("category_groups").select("id").eq("user_id", userId).limit(1);
     if (!existingGroups?.length) {
       for (const [index, group] of defaultCategoryGroups.entries()) {
+        const groupBudget = group.categories.reduce((sum, category) => sum + Number(category.average_monthly_budget), 0);
         const { data: insertedGroup, error } = await supabase
           .from("category_groups")
           .insert({
             user_id: userId,
             kind: group.kind,
             name: group.name,
-            average_monthly_budget: group.average_monthly_budget,
+            average_monthly_budget: groupBudget,
             budget_period: group.budget_period,
             color: group.color,
             sort_order: index
@@ -151,18 +159,8 @@ export function FinanceApp() {
     const expenses = transactions.filter((t) => t.type === "expense").reduce((sum, t) => sum + Number(t.amount), 0);
     const income = transactions.filter((t) => t.type === "income").reduce((sum, t) => sum + Number(t.amount), 0);
     const investments = transactions.filter((t) => t.type === "investment").reduce((sum, t) => sum + Number(t.amount), 0);
-    const available = accounts
-      .filter((a) => a.is_active && a.include_in_available_net_worth)
-      .reduce((sum, a) => sum + Number(a.balance), 0);
-    const bound = accounts
-      .filter((a) => a.is_active && !a.include_in_available_net_worth && a.type === "bound")
-      .reduce((sum, a) => sum + Number(a.balance), 0);
-    const depot = accounts
-      .filter((a) => a.is_active && a.type === "investment")
-      .reduce((sum, a) => sum + Number(a.balance), 0);
-
-    return { expenses, income, investments, available, bound, depot };
-  }, [transactions, accounts]);
+    return { expenses, income, investments, untracked: income - expenses - investments };
+  }, [transactions]);
 
   const expenseGroups = groups.filter((g) => g.kind === "expense");
   const currentDay = dayOfMonth();
@@ -176,22 +174,15 @@ export function FinanceApp() {
 
   return (
     <AppShell>
-      <main className="dashboard">
-        <section className="month-head">
-          <div>
-            <h1>{formatMonthTitle(currentMonth)}</h1>
-          </div>
-          <span className="month-pill">{currentDay}/{monthDays}</span>
-        </section>
-
+      <main className="dashboard start-dashboard">
         <button className="big-add" onClick={() => setBookingOpen(true)}>+ Buchung</button>
 
         <section>
-          <div className="cards-stack">
+          <div className="cards-stack compact-cards">
             {expenseGroups.map((group) => (
               <BudgetCard
                 key={group.id}
-                group={group}
+                group={{ ...group, average_monthly_budget: categoriesBudgetSum(group) }}
                 transactions={transactions.filter((transaction) => transaction.group_id === group.id)}
                 daysInMonth={monthDays}
                 currentDay={currentDay}
@@ -199,19 +190,32 @@ export function FinanceApp() {
                 onClick={() => setSelectedGroupId((current) => current === group.id ? null : group.id)}
               />
             ))}
+
+            <article className="budget-card outing-card" style={{ ["--accent" as string]: "#F97316" }}>
+              <div className="budget-card-header compact-budget-head">
+                <div>
+                  <p className="card-title">Ausgehen</p>
+                  <p className="muted small">Einnahmen − Ausgaben − Investieren</p>
+                </div>
+                <strong className={stats.untracked < 0 ? "negative" : ""}>{formatEuro(stats.untracked)}</strong>
+              </div>
+              <div className="budget-bar outing-bar">
+                <div className="budget-fill" style={{ width: `${stats.income > 0 ? Math.min(100, ((stats.expenses + stats.investments) / stats.income) * 100) : 0}%` }} />
+              </div>
+            </article>
           </div>
         </section>
 
         <section>
-          <div className="list-card">
-            {transactions.slice(0, 8).map((transaction) => {
+          <div className="list-card recent-list compact-list">
+            {transactions.slice(0, 6).map((transaction) => {
               const group = groups.find((g) => g.id === transaction.group_id);
               const account = accounts.find((a) => a.id === transaction.account_id || a.id === transaction.from_account_id || a.id === transaction.to_account_id);
               return (
                 <div className="list-row" key={transaction.id}>
                   <div>
                     <strong>{transaction.note || group?.name || (transaction.type === "investment" ? "Investition" : "Umbuchung")}</strong>
-                    <span>{transaction.date} · {account?.name ?? ""}</span>
+                    <span>{account?.name ?? ""}</span>
                   </div>
                   <b>{transaction.type === "income" ? "+" : transaction.type === "expense" || transaction.type === "investment" ? "-" : ""}{formatEuro(Number(transaction.amount))}</b>
                 </div>
@@ -236,6 +240,7 @@ export function FinanceApp() {
         month={prevMonth}
         userId={session.user.id}
         accounts={accounts}
+        debts={debts}
         onClose={() => setClosingOpen(false)}
         onSaved={async () => {
           setClosingOpen(false);

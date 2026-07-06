@@ -25,7 +25,7 @@ export function AccountsManager() {
 
   const sums = useMemo(() => {
     return {
-      available: accounts.filter((a) => a.include_in_available_net_worth).reduce((sum, a) => sum + Number(a.balance), 0),
+      available: accounts.filter((a) => a.type === "active" && a.include_in_available_net_worth).reduce((sum, a) => sum + Number(a.balance), 0),
       bound: accounts.filter((a) => !a.include_in_available_net_worth && a.type === "bound").reduce((sum, a) => sum + Number(a.balance), 0),
       investment: accounts.filter((a) => a.type === "investment").reduce((sum, a) => sum + Number(a.balance), 0)
     };
@@ -41,6 +41,8 @@ export function AccountsManager() {
       include_in_available_net_worth: type === "active",
       is_default: shouldBeDefault,
       balance: Number(balance.replace(",", ".")) || 0,
+      cost_basis: 0,
+      tax_reserve: 0,
       color: type === "active" ? "#38BDF8" : type === "bound" ? "#F59E0B" : "#A855F7"
     });
     setName("");
@@ -72,6 +74,12 @@ export function AccountsManager() {
     await updateAccount(account, { is_active: false });
   }
 
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    window.location.href = "/";
+  }
+
   if (loading) return <main className="loading-page">Laden...</main>;
   if (!session) return <AuthGate />;
 
@@ -82,7 +90,7 @@ export function AccountsManager() {
           <h1>{formatEuro(sums.available)}</h1>
           <div className="summary-grid">
             <div><span>Gebunden</span><strong>{formatEuro(sums.bound)}</strong></div>
-            <div><span>Investment</span><strong>{formatEuro(sums.investment)}</strong></div>
+            <div><span>Depot</span><strong>{formatEuro(sums.investment)}</strong></div>
           </div>
         </section>
 
@@ -92,7 +100,7 @@ export function AccountsManager() {
             <article className="account-card" key={account.id} style={{ ["--accent" as string]: account.color }}>
               <div>
                 <strong>{account.name}</strong>
-                <span>{account.type === "active" ? "Aktiv" : account.type === "bound" ? "Gebunden" : "Investment"}{!account.is_active ? " · inaktiv" : ""}</span>
+                <span>{account.type === "active" ? "Aktiv" : account.type === "bound" ? "Gebunden" : "Depot"}{!account.is_active ? " · inaktiv" : ""}</span>
               </div>
               <input
                 defaultValue={String(account.balance)}
@@ -130,10 +138,14 @@ export function AccountsManager() {
           <select value={type} onChange={(e) => setType(e.target.value as AccountType)}>
             <option value="active">Aktiv</option>
             <option value="bound">Gebunden</option>
-            <option value="investment">Investment</option>
+            <option value="investment">Depot</option>
           </select>
           <input value={balance} onChange={(e) => setBalance(e.target.value)} inputMode="decimal" placeholder="Stand" />
           <button className="primary" onClick={addAccount}>Hinzufügen</button>
+        </section>
+
+        <section className="form-card logout-card">
+          <button className="mini-button danger logout-button" onClick={signOut}>Logout</button>
         </section>
       </main>
     </AppShell>

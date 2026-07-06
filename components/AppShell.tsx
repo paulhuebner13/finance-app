@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 
 const nav = [
   { href: "/", label: "Start" },
   { href: "/transactions", label: "Buchungen" },
   { href: "/wealth", label: "Geld" },
+  { href: "/debts", label: "Schulden" },
   { href: "/accounts", label: "Konten" },
   { href: "/categories", label: "Budgets" },
   { href: "/recurring", label: "Regeln" },
@@ -18,17 +18,8 @@ const nav = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  async function signOut() {
-    await supabase.auth.signOut();
-    window.location.href = "/";
-  }
-
   return (
-    <div className="app-shell">
-      <header className="topbar">
-        <Link href="/" className="brand">Finance</Link>
-        <button className="ghost" onClick={signOut}>Logout</button>
-      </header>
+    <div className="app-shell no-topbar">
       <div className="page-wrap">{children}</div>
       <nav className="bottom-nav">
         {nav.map((item) => (

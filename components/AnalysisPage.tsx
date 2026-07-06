@@ -35,12 +35,13 @@ export function AnalysisPage() {
 
   const byGroup = useMemo(() => {
     return groups.filter((g) => g.kind === "expense").map((group) => {
+      const groupCategories = categories.filter((category) => category.group_id === group.id && category.is_active);
       const spent = transactions.filter((t) => t.type === "expense" && t.group_id === group.id).reduce((sum, t) => sum + Number(t.amount), 0);
-      const limit = adjustedMonthlyLimit(Number(group.average_monthly_budget), monthDays);
-      const plan = plannedUntilCurrentDay(Number(group.average_monthly_budget), currentDay);
+      const limit = groupCategories.reduce((sum, category) => sum + adjustedMonthlyLimit(Number(category.average_monthly_budget), monthDays, category.budget_period), 0);
+      const plan = groupCategories.reduce((sum, category) => sum + plannedUntilCurrentDay(Number(category.average_monthly_budget), currentDay, category.budget_period), 0);
       return { group, spent, limit, plan, percent: limit > 0 ? Math.min(120, (spent / limit) * 100) : 0 };
     });
-  }, [groups, transactions, monthDays, currentDay]);
+  }, [groups, categories, transactions, monthDays, currentDay]);
 
   const bySubcategory = useMemo(() => {
     return categories.map((category) => {

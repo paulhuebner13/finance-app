@@ -360,3 +360,59 @@ input, select, textarea {
   .subcategory-edit-row select, .subcategory-edit-row button { grid-column: span 1; }
   .edit-budget-pair { grid-template-columns: 1fr 1fr; }
 }
+
+/* Product pass: no header, compact start, clearer budget markers, debts/depot */
+.app-shell.no-topbar { padding-bottom: 5.35rem; }
+.no-topbar .page-wrap { padding-top: 0; }
+.start-dashboard { gap: 0.72rem; padding-top: 0.75rem; }
+.start-dashboard .big-add { min-height: 3.55rem; padding: 0.85rem 1rem; }
+.compact-cards { gap: 0.62rem; }
+.compact-cards .budget-card { padding: 0.72rem 0.82rem; border-radius: 22px; }
+.compact-cards .budget-bar { height: 14px; margin: 0.68rem 0 0.1rem; }
+.compact-budget-head { align-items: center; }
+.compact-budget-head .card-title { font-size: 1.02rem; }
+.compact-budget-head strong { font-size: 1.02rem; }
+.negative { color: #ffd2d8; }
+.recent-list { padding: 0.7rem 0.85rem; }
+.compact-list .list-row { padding: 0.62rem 0; }
+.outing-card { cursor: default; }
+.outing-bar { margin-bottom: 0 !important; }
+.mini-bar { position: relative; }
+.mini-bar > i {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.16);
+  border-radius: 999px;
+}
+.group-period-select { width: 120px; padding: 0.7rem; border-radius: 14px; }
+.debt-card, .depot-card {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent, #38BDF8) 20%, transparent), transparent 58%),
+    var(--panel);
+  border: 2px solid color-mix(in srgb, var(--accent, #38BDF8) 58%, rgba(255,255,255,0.12));
+  border-radius: 24px;
+  padding: 0.9rem;
+  display: grid;
+  gap: 0.75rem;
+}
+.debt-card.is-disabled { opacity: 0.48; }
+.debt-grid { display: grid; grid-template-columns: minmax(110px, 1fr) 90px 126px; gap: 0.5rem; align-items: center; }
+.debt-grid input:last-child { grid-column: 1 / -1; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.65rem; }
+.add-depot-row { display: grid; grid-template-columns: 1fr auto; gap: 0.65rem; margin-top: 0.85rem; }
+.logout-card { background: transparent; border-color: transparent; box-shadow: none; padding-top: 0; }
+.logout-button { width: 100%; padding: 0.8rem 1rem; }
+.bottom-nav { grid-template-columns: repeat(9, minmax(78px, 1fr)); overflow-x: auto; }
+.bottom-nav::-webkit-scrollbar { height: 5px; }
+.bottom-nav::-webkit-scrollbar-track { background: transparent; }
+.bottom-nav::-webkit-scrollbar-thumb { background: rgba(203, 213, 225, 0.55); border-radius: 999px; }
+@media (min-width: 521px) { .bottom-nav { grid-template-columns: repeat(9, 1fr); } }
+@media (max-width: 520px) {
+  .bottom-nav { grid-template-columns: repeat(9, minmax(74px, 1fr)); }
+  .debt-grid { grid-template-columns: 1fr 92px; }
+  .debt-grid select, .debt-grid input:last-child { grid-column: 1 / -1; }
+  .grid-3, .add-depot-row { grid-template-columns: 1fr; }
+}

@@ -11,7 +11,21 @@ create table if not exists public.accounts (
   include_in_available_net_worth boolean not null default true,
   is_default boolean not null default false,
   balance numeric(12,2) not null default 0,
+  cost_basis numeric(12,2) not null default 0,
+  tax_reserve numeric(12,2) not null default 0,
   color text not null default '#38BDF8',
+  is_active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+
+create table if not exists public.debts (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  person text not null,
+  kind text not null check (kind in ('i_owe', 'owed_to_me')),
+  amount numeric(12,2) not null default 0,
+  note text,
   is_active boolean not null default true,
   created_at timestamptz not null default now()
 );
@@ -90,21 +104,35 @@ create table if not exists public.month_closing_balances (
   unique(closing_id, account_id)
 );
 
+
+create table if not exists public.month_closing_debts (
+  id uuid primary key default gen_random_uuid(),
+  closing_id uuid not null references public.month_closings(id) on delete cascade,
+  debt_id uuid not null references public.debts(id) on delete cascade,
+  actual_amount numeric(12,2) not null default 0,
+  created_at timestamptz not null default now(),
+  unique(closing_id, debt_id)
+);
+
 create index if not exists accounts_user_idx on public.accounts(user_id);
+create index if not exists debts_user_idx on public.debts(user_id);
 create unique index if not exists accounts_one_default_idx on public.accounts(user_id) where is_default;
 create index if not exists category_groups_user_idx on public.category_groups(user_id);
 create index if not exists categories_user_idx on public.categories(user_id);
 create index if not exists transactions_user_date_idx on public.transactions(user_id, date);
 create index if not exists recurring_user_idx on public.recurring_transactions(user_id);
 create index if not exists closings_user_month_idx on public.month_closings(user_id, month);
+create index if not exists closing_debts_closing_idx on public.month_closing_debts(closing_id);
 
 alter table public.accounts enable row level security;
+alter table public.debts enable row level security;
 alter table public.category_groups enable row level security;
 alter table public.categories enable row level security;
 alter table public.transactions enable row level security;
 alter table public.recurring_transactions enable row level security;
 alter table public.month_closings enable row level security;
 alter table public.month_closing_balances enable row level security;
+alter table public.month_closing_debts enable row level security;
 
 -- Drop old policies if this file is re-run.
 drop policy if exists "accounts_select_own" on public.accounts;
@@ -116,6 +144,18 @@ create policy "accounts_select_own" on public.accounts for select using (auth.ui
 create policy "accounts_insert_own" on public.accounts for insert with check (auth.uid() = user_id);
 create policy "accounts_update_own" on public.accounts for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "accounts_delete_own" on public.accounts for delete using (auth.uid() = user_id);
+
+
+drop policy if exists "debts_select_own" on public.debts;
+drop policy if exists "debts_insert_own" on public.debts;
+drop policy if exists "debts_update_own" on public.debts;
+drop policy if exists "debts_delete_own" on public.debts;
+
+create policy "debts_select_own" on public.debts for select using (auth.uid() = user_id);
+create policy "debts_insert_own" on public.debts for insert with check (auth.uid() = user_id);
+create policy "debts_update_own" on public.debts for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "debts_delete_own" on public.debts for delete using (auth.uid() = user_id);
+
 
 drop policy if exists "category_groups_select_own" on public.category_groups;
 drop policy if exists "category_groups_insert_own" on public.category_groups;
@@ -184,5 +224,26 @@ create policy "closing_balances_update_own" on public.month_closing_balances for
   exists (select 1 from public.month_closings c where c.id = closing_id and c.user_id = auth.uid())
 );
 create policy "closing_balances_delete_own" on public.month_closing_balances for delete using (
+  exists (select 1 from public.month_closings c where c.id = closing_id and c.user_id = auth.uid())
+);
+
+
+drop policy if exists "closing_debts_select_own" on public.month_closing_debts;
+drop policy if exists "closing_debts_insert_own" on public.month_closing_debts;
+drop policy if exists "closing_debts_update_own" on public.month_closing_debts;
+drop policy if exists "closing_debts_delete_own" on public.month_closing_debts;
+
+create policy "closing_debts_select_own" on public.month_closing_debts for select using (
+  exists (select 1 from public.month_closings c where c.id = closing_id and c.user_id = auth.uid())
+);
+create policy "closing_debts_insert_own" on public.month_closing_debts for insert with check (
+  exists (select 1 from public.month_closings c where c.id = closing_id and c.user_id = auth.uid())
+);
+create policy "closing_debts_update_own" on public.month_closing_debts for update using (
+  exists (select 1 from public.month_closings c where c.id = closing_id and c.user_id = auth.uid())
+) with check (
+  exists (select 1 from public.month_closings c where c.id = closing_id and c.user_id = auth.uid())
+);
+create policy "closing_debts_delete_own" on public.month_closing_debts for delete using (
   exists (select 1 from public.month_closings c where c.id = closing_id and c.user_id = auth.uid())
 );

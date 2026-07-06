@@ -2,6 +2,7 @@ export type EntryType = "expense" | "income" | "transfer" | "investment";
 export type CategoryKind = "expense" | "income" | "investment";
 export type AccountType = "active" | "bound" | "investment";
 export type BudgetPeriod = "daily" | "monthly";
+export type DebtKind = "i_owe" | "owed_to_me";
 
 export type Account = {
   id: string;
@@ -11,7 +12,20 @@ export type Account = {
   include_in_available_net_worth: boolean;
   is_default: boolean;
   balance: number;
+  cost_basis: number;
+  tax_reserve: number;
   color: string;
+  is_active: boolean;
+  created_at: string;
+};
+
+export type Debt = {
+  id: string;
+  user_id: string;
+  person: string;
+  kind: DebtKind;
+  amount: number;
+  note: string | null;
   is_active: boolean;
   created_at: string;
 };

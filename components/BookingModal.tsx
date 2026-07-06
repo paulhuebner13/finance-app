@@ -41,7 +41,7 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
   const activeAccounts = accounts.filter((a) => a.is_active);
   const paymentAccounts = activeAccounts.filter((a) => a.type !== "investment");
   const investmentAccounts = activeAccounts.filter((a) => a.type === "investment");
-  const defaultAccount = activeAccounts.find((a) => a.is_default) ?? activeAccounts.find((a) => a.type === "active") ?? activeAccounts[0];
+  const defaultAccount = activeAccounts.find((a) => a.is_default && a.type === "active") ?? activeAccounts.find((a) => a.type === "active") ?? activeAccounts[0];
   const defaultPaymentAccount = paymentAccounts.find((a) => a.is_default) ?? paymentAccounts.find((a) => a.type === "active") ?? paymentAccounts[0];
   const defaultInvestmentAccount = investmentAccounts[0];
 
@@ -117,7 +117,7 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
   function validate(numericAmount: number) {
     if (!numericAmount || numericAmount <= 0) return "Bitte Betrag eingeben.";
     if (type === "transfer" && (!fromAccountId || !toAccountId || fromAccountId === toAccountId)) return "Bitte zwei unterschiedliche Konten auswählen.";
-    if (type === "investment" && (!groupId || !fromAccountId || !toAccountId || fromAccountId === toAccountId)) return "Bitte Kategorie, Zahlungskonto und Investmentkonto auswählen.";
+    if (type === "investment" && (!groupId || !fromAccountId || !toAccountId || fromAccountId === toAccountId)) return "Bitte Kategorie, Zahlungskonto und Depot auswählen.";
     if ((type === "expense" || type === "income") && (!groupId || !accountId)) return "Bitte Kategorie und Konto auswählen.";
     return "";
   }
@@ -215,7 +215,7 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
                 </select>
               </label>
               <label>
-                Investmentkonto
+                Depot
                 <select value={toAccountId} onChange={(e) => setToAccountId(e.target.value)}>
                   <option value="">Auswählen</option>
                   {investmentAccounts.map((account) => <option key={account.id} value={account.id}>{account.name}</option>)}
@@ -223,7 +223,7 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
               </label>
             </div>
             <label>
-              Investment-Kategorie
+              Kategorie
               <select value={groupId} onChange={(e) => { setGroupId(e.target.value); setCategoryId(""); }}>
                 <option value="">Auswählen</option>
                 {relevantGroups.map((group) => <option key={group.id} value={group.id}>{group.name}</option>)}

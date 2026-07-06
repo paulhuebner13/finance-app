@@ -24,7 +24,6 @@ export function CategoriesManager() {
   const [groups, setGroups] = useState<CategoryWithChildren[]>([]);
   const [newName, setNewName] = useState("");
   const [newKind, setNewKind] = useState<CategoryKind>("expense");
-  const [newBudget, setNewBudget] = useState("");
   const [newPeriod, setNewPeriod] = useState<BudgetPeriod>("daily");
 
   const load = useCallback(async () => {
@@ -40,7 +39,14 @@ export function CategoriesManager() {
 
   useEffect(() => { load(); }, [load]);
 
-  const totalExpenseBudget = useMemo(() => groups.filter((g) => g.kind === "expense" && g.is_active).reduce((sum, group) => sum + Math.max(Number(group.average_monthly_budget), childBudgetSum(group)), 0), [groups]);
+  const totalExpenseBudget = useMemo(() => groups.filter((g) => g.kind === "expense" && g.is_active).reduce((sum, group) => sum + childBudgetSum(group), 0), [groups]);
+
+  async function syncGroupBudget(group: CategoryWithChildren, nextCategories?: Category[]) {
+    if (!session?.user.id) return;
+    const categories = nextCategories ?? group.categories;
+    const sum = categories.filter((c) => c.is_active).reduce((total, c) => total + Number(c.average_monthly_budget), 0);
+    await supabase.from("category_groups").update({ average_monthly_budget: sum }).eq("id", group.id).eq("user_id", session.user.id);
+  }
 
   async function addGroup() {
     if (!session?.user.id || !newName.trim()) return;
@@ -49,7 +55,7 @@ export function CategoriesManager() {
       user_id: session.user.id,
       kind: newKind,
       name: newName.trim(),
-      average_monthly_budget: parseBudget(newBudget),
+      average_monthly_budget: 0,
       budget_period: newPeriod,
       color,
       sort_order: groups.length
@@ -66,28 +72,13 @@ export function CategoriesManager() {
       });
     }
     setNewName("");
-    setNewBudget("");
     await load();
   }
 
   async function updateGroup(group: CategoryWithChildren, patch: Partial<CategoryGroup>) {
     if (!session?.user.id) return;
-    const childSum = childBudgetSum(group);
-    const nextPatch = { ...patch };
-    if (patch.average_monthly_budget !== undefined) {
-      nextPatch.average_monthly_budget = Math.max(Number(patch.average_monthly_budget), childSum);
-    }
-    await supabase.from("category_groups").update(nextPatch).eq("id", group.id).eq("user_id", session.user.id);
+    await supabase.from("category_groups").update(patch).eq("id", group.id).eq("user_id", session.user.id);
     await load();
-  }
-
-  async function ensureGroupMinimum(group: CategoryWithChildren, nextCategories?: Category[]) {
-    if (!session?.user.id) return;
-    const categories = nextCategories ?? group.categories;
-    const sum = categories.filter((c) => c.is_active).reduce((total, c) => total + Number(c.average_monthly_budget), 0);
-    if (Number(group.average_monthly_budget) < sum) {
-      await supabase.from("category_groups").update({ average_monthly_budget: sum }).eq("id", group.id).eq("user_id", session.user.id);
-    }
   }
 
   async function addSubcategory(group: CategoryWithChildren) {
@@ -108,8 +99,9 @@ export function CategoriesManager() {
   async function updateCategory(group: CategoryWithChildren, category: Category, patch: Partial<Category>) {
     if (!session?.user.id) return;
     const nextCategory = { ...category, ...patch };
+    const nextCategories = group.categories.map((item) => item.id === category.id ? nextCategory : item);
     await supabase.from("categories").update(patch).eq("id", category.id).eq("user_id", session.user.id);
-    await ensureGroupMinimum(group, group.categories.map((item) => item.id === category.id ? nextCategory : item));
+    await syncGroupBudget(group, nextCategories);
     await load();
   }
 
@@ -146,14 +138,12 @@ export function CategoriesManager() {
               <option value="monthly">monatlich</option>
             </select>
           </div>
-          <input value={newBudget} onChange={(e) => setNewBudget(e.target.value)} inputMode="decimal" placeholder="Budget" />
           <button className="primary" onClick={addGroup}>Hinzufügen</button>
         </section>
 
         <section className="cards-stack">
           {groups.map((group) => {
-            const minimum = childBudgetSum(group);
-            const effective = Math.max(Number(group.average_monthly_budget), minimum);
+            const effective = childBudgetSum(group);
             return (
               <article className="category-edit-card" key={group.id} style={{ ["--accent" as string]: group.color }}>
                 <div className="budget-card-header">
@@ -161,18 +151,10 @@ export function CategoriesManager() {
                     <input className="plain-input" defaultValue={group.name} onBlur={(e) => e.target.value.trim() && updateGroup(group, { name: e.target.value.trim() })} />
                     <p className="muted small">{formatEuro(effective)}</p>
                   </div>
-                  <div className="edit-budget-pair">
-                    <input
-                      className="budget-input"
-                      inputMode="decimal"
-                      defaultValue={String(group.average_monthly_budget)}
-                      onBlur={(e) => updateGroup(group, { average_monthly_budget: parseBudget(e.target.value) })}
-                    />
-                    <select value={group.budget_period} onChange={(e) => updateGroup(group, { budget_period: e.target.value as BudgetPeriod })}>
-                      <option value="daily">täglich</option>
-                      <option value="monthly">monatlich</option>
-                    </select>
-                  </div>
+                  <select className="group-period-select" value={group.budget_period} onChange={(e) => updateGroup(group, { budget_period: e.target.value as BudgetPeriod })}>
+                    <option value="daily">täglich</option>
+                    <option value="monthly">monatlich</option>
+                  </select>
                 </div>
 
                 <div className="subcategory-edit-list">

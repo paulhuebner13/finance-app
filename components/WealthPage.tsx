@@ -5,39 +5,55 @@ import { AppShell } from "@/components/AppShell";
 import { AuthGate } from "@/components/AuthGate";
 import { formatEuro } from "@/lib/date";
 import { supabase } from "@/lib/supabase";
-import type { Account } from "@/lib/types";
+import type { Account, Debt } from "@/lib/types";
 import { useSession } from "@/lib/useSession";
 
 export function WealthPage() {
   const { session, loading } = useSession();
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const [debts, setDebts] = useState<Debt[]>([]);
 
   const load = useCallback(async () => {
     if (!session?.user.id) return;
-    const { data } = await supabase
-      .from("accounts")
-      .select("*")
-      .eq("user_id", session.user.id)
-      .eq("is_active", true)
-      .order("created_at");
-    setAccounts((data ?? []) as Account[]);
+    const [accountsRes, debtsRes] = await Promise.all([
+      supabase
+        .from("accounts")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .eq("is_active", true)
+        .order("created_at"),
+      supabase
+        .from("debts")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .eq("is_active", true)
+        .order("created_at")
+    ]);
+    setAccounts((accountsRes.data ?? []) as Account[]);
+    setDebts((debtsRes.data ?? []) as Debt[]);
   }, [session?.user.id]);
 
   useEffect(() => { load(); }, [load]);
 
   const sums = useMemo(() => {
-    const available = accounts
-      .filter((account) => account.include_in_available_net_worth)
+    const active = accounts
+      .filter((account) => account.type === "active" && account.include_in_available_net_worth)
       .reduce((sum, account) => sum + Number(account.balance), 0);
     const bound = accounts
-      .filter((account) => !account.include_in_available_net_worth && account.type === "bound")
+      .filter((account) => account.type === "bound")
       .reduce((sum, account) => sum + Number(account.balance), 0);
     const depot = accounts
       .filter((account) => account.type === "investment")
       .reduce((sum, account) => sum + Number(account.balance), 0);
-    const totalStored = available + bound + depot;
-    return { available, bound, depot, totalStored };
-  }, [accounts]);
+    const owedToMe = debts
+      .filter((debt) => debt.kind === "owed_to_me")
+      .reduce((sum, debt) => sum + Number(debt.amount), 0);
+    const iOwe = debts
+      .filter((debt) => debt.kind === "i_owe")
+      .reduce((sum, debt) => sum + Number(debt.amount), 0);
+    const total = active + bound + depot + owedToMe - iOwe;
+    return { active, bound, depot, owedToMe, iOwe, total };
+  }, [accounts, debts]);
 
   if (loading) return <main className="loading-page">Laden...</main>;
   if (!session) return <AuthGate />;
@@ -46,12 +62,14 @@ export function WealthPage() {
     <AppShell>
       <main className="dashboard">
         <section className="hero-card compact">
-          <h1>{formatEuro(sums.available)}</h1>
+          <h1>{formatEuro(sums.total)}</h1>
           <div className="summary-grid">
+            <div><span>Verfügbar</span><strong>{formatEuro(sums.active)}</strong></div>
             <div><span>Depot</span><strong>{formatEuro(sums.depot)}</strong></div>
             <div><span>Gebunden</span><strong>{formatEuro(sums.bound)}</strong></div>
-            <div><span>Gesamt</span><strong>{formatEuro(sums.totalStored)}</strong></div>
-            <div><span>Ohne Depot</span><strong>{formatEuro(sums.available + sums.bound)}</strong></div>
+            <div><span>Schulden</span><strong>{formatEuro(sums.iOwe)}</strong></div>
+            <div><span>Bei mir offen</span><strong>{formatEuro(sums.owedToMe)}</strong></div>
+            <div><span>Ohne Depot</span><strong>{formatEuro(sums.active + sums.bound + sums.owedToMe - sums.iOwe)}</strong></div>
           </div>
         </section>
 
@@ -69,7 +87,16 @@ export function WealthPage() {
                 <b>{formatEuro(Number(account.balance))}</b>
               </article>
             ))}
-            {!accounts.length && <p className="muted center">Keine Konten.</p>}
+            {debts.map((debt) => (
+              <article className="account-card money-row debt-money-row" key={debt.id} style={{ ["--accent" as string]: debt.kind === "i_owe" ? "#EF4444" : "#22C55E" }}>
+                <div>
+                  <strong>{debt.person}</strong>
+                  <span>{debt.kind === "i_owe" ? "Ich schulde" : "Bei mir offen"}</span>
+                </div>
+                <b>{debt.kind === "i_owe" ? "-" : "+"}{formatEuro(Number(debt.amount))}</b>
+              </article>
+            ))}
+            {!accounts.length && !debts.length && <p className="muted center">Leer.</p>}
           </div>
         </section>
       </main>

@@ -13,7 +13,8 @@ export function InvestmentsManager() {
   const { session, loading } = useSession();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [newBalance, setNewBalance] = useState<Record<string, string>>({});
+  const [values, setValues] = useState<Record<string, { balance: string; cost: string; tax: string }>>({});
+  const [newDepotName, setNewDepotName] = useState("");
   const currentMonth = monthKey();
 
   const load = useCallback(async () => {
@@ -26,33 +27,51 @@ export function InvestmentsManager() {
     const accountRows = (accountsRes.data ?? []) as Account[];
     setAccounts(accountRows);
     setTransactions((txRes.data ?? []) as Transaction[]);
-    setNewBalance(Object.fromEntries(accountRows.map((a) => [a.id, String(Number(a.balance)).replace(".", ",")])));
+    setValues(Object.fromEntries(accountRows.map((a) => [a.id, {
+      balance: String(Number(a.balance)).replace(".", ","),
+      cost: String(Number(a.cost_basis ?? 0)).replace(".", ","),
+      tax: String(Number(a.tax_reserve ?? 0)).replace(".", ",")
+    }])));
   }, [session?.user.id, currentMonth]);
 
   useEffect(() => { load(); }, [load]);
 
-  async function addScalable() {
+  async function addDepot() {
     if (!session?.user.id) return;
     await supabase.from("accounts").insert({
       user_id: session.user.id,
-      name: "Scalable Capital",
+      name: newDepotName.trim() || "Depot",
       type: "investment",
       include_in_available_net_worth: false,
       balance: 0,
+      cost_basis: 0,
+      tax_reserve: 0,
       color: "#A855F7",
       is_active: true
     });
+    setNewDepotName("");
     await load();
   }
 
-  async function updateBalance(account: Account) {
+  async function updateDepot(account: Account) {
     if (!session?.user.id) return;
-    await supabase.from("accounts").update({ balance: parseAmount(newBalance[account.id] ?? "0") }).eq("id", account.id).eq("user_id", session.user.id);
+    const current = values[account.id] ?? { balance: "0", cost: "0", tax: "0" };
+    await supabase.from("accounts").update({
+      balance: parseAmount(current.balance),
+      cost_basis: parseAmount(current.cost),
+      tax_reserve: parseAmount(current.tax)
+    }).eq("id", account.id).eq("user_id", session.user.id);
     await load();
   }
 
-  const total = useMemo(() => accounts.reduce((sum, account) => sum + Number(account.balance), 0), [accounts]);
-  const investedThisMonth = useMemo(() => transactions.reduce((sum, tx) => sum + Number(tx.amount), 0), [transactions]);
+  const summary = useMemo(() => {
+    const total = accounts.reduce((sum, account) => sum + Number(account.balance), 0);
+    const cost = accounts.reduce((sum, account) => sum + Number(account.cost_basis ?? 0), 0);
+    const taxReserve = accounts.reduce((sum, account) => sum + Number(account.tax_reserve ?? 0), 0);
+    const gain = total - cost;
+    const investedThisMonth = transactions.reduce((sum, tx) => sum + Number(tx.amount), 0);
+    return { total, cost, gain, taxReserve, investedThisMonth };
+  }, [accounts, transactions]);
 
   if (loading) return <main className="loading-page">Laden...</main>;
   if (!session) return <AuthGate />;
@@ -61,33 +80,44 @@ export function InvestmentsManager() {
     <AppShell>
       <main className="dashboard">
         <section className="hero-card compact">
-          <h1>{formatEuro(total)}</h1>
+          <h1>{formatEuro(summary.total)}</h1>
           <div className="summary-grid">
-            <div><span>Investiert</span><strong>{formatEuro(investedThisMonth)}</strong></div>
-            <div><span>Konten</span><strong>{accounts.length}</strong></div>
+            <div><span>Kaufwert</span><strong>{formatEuro(summary.cost)}</strong></div>
+            <div><span>Gewinn</span><strong>{formatEuro(summary.gain)}</strong></div>
+            <div><span>Steuerpuffer</span><strong>{formatEuro(summary.taxReserve)}</strong></div>
+            <div><span>Monat</span><strong>{formatEuro(summary.investedThisMonth)}</strong></div>
           </div>
         </section>
 
         <section className="list-card">
-          
-          {accounts.map((account) => (
-            <div className="tx-row" key={account.id}>
-              <div>
-                <strong>{account.name}</strong>
-                <span>{formatEuro(Number(account.balance))}</span>
+          {accounts.map((account) => {
+            const current = values[account.id] ?? { balance: "", cost: "", tax: "" };
+            const gain = Number(account.balance) - Number(account.cost_basis ?? 0);
+            return (
+              <div className="depot-card" key={account.id}>
+                <div className="budget-card-header">
+                  <div>
+                    <strong>{account.name}</strong>
+                    <span className="muted small">{formatEuro(Number(account.balance))} · {gain >= 0 ? "+" : ""}{formatEuro(gain)}</span>
+                  </div>
+                  <button className="mini-button" onClick={() => updateDepot(account)}>Speichern</button>
+                </div>
+                <div className="grid-3">
+                  <label>Wert<input inputMode="decimal" value={current.balance} onChange={(e) => setValues((old) => ({ ...old, [account.id]: { ...current, balance: e.target.value } }))} /></label>
+                  <label>Kaufwert<input inputMode="decimal" value={current.cost} onChange={(e) => setValues((old) => ({ ...old, [account.id]: { ...current, cost: e.target.value } }))} /></label>
+                  <label>Steuerpuffer<input inputMode="decimal" value={current.tax} onChange={(e) => setValues((old) => ({ ...old, [account.id]: { ...current, tax: e.target.value } }))} /></label>
+                </div>
               </div>
-              <div className="tx-actions wide-actions">
-                <input inputMode="decimal" value={newBalance[account.id] ?? ""} onChange={(e) => setNewBalance((old) => ({ ...old, [account.id]: e.target.value }))} />
-                <button className="mini-button" onClick={() => updateBalance(account)}>Speichern</button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
           {!accounts.length && <p className="muted center">Kein Depot.</p>}
-          <button className="primary" onClick={addScalable}>+ Scalable Capital anlegen</button>
+          <div className="add-depot-row">
+            <input value={newDepotName} onChange={(e) => setNewDepotName(e.target.value)} placeholder="Depotname" />
+            <button className="primary" onClick={addDepot}>Depot anlegen</button>
+          </div>
         </section>
 
         <section className="list-card">
-          
           {transactions.map((tx) => (
             <div className="tx-row" key={tx.id}>
               <div>
@@ -99,8 +129,6 @@ export function InvestmentsManager() {
           ))}
           {!transactions.length && <p className="muted center">Keine Investitionen.</p>}
         </section>
-
-
       </main>
     </AppShell>
   );
