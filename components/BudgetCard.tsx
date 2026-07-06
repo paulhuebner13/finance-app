@@ -40,9 +40,11 @@ function spentFor(transactions: Transaction[], categoryId?: string) {
 export function BudgetCard({ group, transactions, daysInMonth, currentDay, expanded = false, onClick, overrideSpent }: Props) {
   const spent = overrideSpent ?? spentFor(transactions);
   const budget = groupBudget(group, daysInMonth, currentDay);
-  const spentPercent = budget.limit > 0 ? Math.min(120, (spent / budget.limit) * 100) : 0;
+  const spentForBar = Math.max(0, spent);
+  const spentPercent = budget.limit > 0 ? Math.min(120, (spentForBar / budget.limit) * 100) : 0;
   const planPercent = budget.limit > 0 ? Math.min(100, (budget.plan / budget.limit) * 100) : 0;
-  const remaining = budget.limit - spent;
+  const remaining = budget.limit - spentForBar;
+  const isOuting = group.name.trim().toLowerCase() === "ausgehen";
 
   return (
     <article className={`budget-card ${expanded ? "expanded" : ""}`} style={{ ["--accent" as string]: group.color }}>
@@ -50,9 +52,9 @@ export function BudgetCard({ group, transactions, daysInMonth, currentDay, expan
         <div className="budget-card-header compact-budget-head">
           <div>
             <p className="card-title">{group.name}</p>
-            <p className="muted small">{formatEuro(spent)} / {formatEuro(budget.limit)}</p>
+            <p className="muted small">{isOuting ? "Differenz" : "Verbraucht"} {formatEuro(spent)} · Plan {formatEuro(budget.plan)}</p>
           </div>
-          <strong className={remaining < 0 ? "negative" : ""}>{remaining < 0 ? "+" : ""}{formatEuro(Math.abs(remaining))}</strong>
+          <strong className={remaining < 0 ? "negative" : ""}>{isOuting ? formatEuro(spent) : `${remaining < 0 ? "+" : ""}${formatEuro(Math.abs(remaining))}`}</strong>
         </div>
 
         <div className="budget-bar" aria-label={`${group.name} Budgetfortschritt`}>

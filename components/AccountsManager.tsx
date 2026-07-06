@@ -76,11 +76,6 @@ export function AccountsManager() {
   }
 
 
-  async function signOut() {
-    await supabase.auth.signOut();
-    window.location.href = "/";
-  }
-
   if (loading) return <main className="loading-page">Laden...</main>;
   if (!session) return <AuthGate />;
 
@@ -143,10 +138,6 @@ export function AccountsManager() {
           </select>
           <input value={balance} onChange={(e) => setBalance(e.target.value)} inputMode="decimal" placeholder="Stand" />
           <button className="primary" onClick={addAccount}>Hinzufügen</button>
-        </section>
-
-        <section className="form-card logout-card">
-          <button className="mini-button danger logout-button" onClick={signOut}>Logout</button>
         </section>
       </main>
     </AppShell>

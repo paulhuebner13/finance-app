@@ -13,7 +13,8 @@ const nav = [
   { href: "/categories", label: "Budgets" },
   { href: "/recurring", label: "Regeln" },
   { href: "/investments", label: "Depot" },
-  { href: "/analysis", label: "Analyse" }
+  { href: "/analysis", label: "Analyse" },
+  { href: "/profile", label: "Profil" }
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {

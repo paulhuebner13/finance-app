@@ -166,7 +166,7 @@ export function FinanceApp() {
     const outingGroup = groups.find((g) => g.name.toLowerCase() === "ausgehen");
     const outingTracked = outingGroup ? transactions.filter((t) => t.type === "expense" && t.group_id === outingGroup.id).reduce((sum, t) => sum + Number(t.amount), 0) : 0;
     const expensesWithoutOuting = expenses - outingTracked;
-    return { expenses, income, investments, outingValue: Math.max(0, income - expensesWithoutOuting - investments) };
+    return { expenses, income, investments, outingValue: income - expensesWithoutOuting - investments };
   }, [transactions, groups]);
 
   const expenseGroups = groups.filter((g) => g.kind === "expense");
@@ -182,8 +182,6 @@ export function FinanceApp() {
   return (
     <AppShell>
       <main className="dashboard start-dashboard">
-        <button className="big-add" onClick={() => setBookingOpen(true)}>+ Buchung</button>
-
         <section>
           <div className="cards-stack compact-cards">
             {expenseGroups.map((group) => (
@@ -221,6 +219,8 @@ export function FinanceApp() {
           </div>
         </section>
       </main>
+
+      <button className="floating-booking-button" onClick={() => setBookingOpen(true)}>+ Buchung</button>
 
       <BookingModal
         open={bookingOpen}

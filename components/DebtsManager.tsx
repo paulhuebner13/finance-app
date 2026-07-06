@@ -70,24 +70,22 @@ export function DebtsManager() {
 
   return (
     <AppShell>
-      <main className="dashboard">
+      <main className="dashboard debts-page">
         <section className="hero-card compact">
           <h1>{formatEuro(sums.net)}</h1>
-          <div className="summary-grid">
-            <div><span>Ich schulde</span><strong>{formatEuro(sums.iOwe)}</strong></div>
-            <div><span>Bei mir offen</span><strong>{formatEuro(sums.owedToMe)}</strong></div>
-          </div>
         </section>
 
-        <section className="cards-stack">
+        <section className="cards-stack debt-stack">
           {debts.map((debt) => (
-            <article className={`debt-card ${!debt.is_active ? "is-disabled" : ""}`} key={debt.id} style={{ ["--accent" as string]: debt.kind === "i_owe" ? "#EF4444" : "#22C55E" }}>
-              <div className="debt-grid">
-                <input className="plain-input" defaultValue={debt.person} onBlur={(e) => e.target.value.trim() && updateDebt(debt, { person: e.target.value.trim() })} />
-                <input className="budget-input" inputMode="decimal" defaultValue={String(debt.amount)} onBlur={(e) => updateDebt(debt, { amount: parseAmount(e.target.value) })} />
+            <article className={`debt-card debt-card-clean ${!debt.is_active ? "is-disabled" : ""}`} key={debt.id} style={{ ["--accent" as string]: debt.kind === "i_owe" ? "#EF4444" : "#22C55E" }}>
+              <div className="debt-card-top">
+                <input className="plain-input debt-person" defaultValue={debt.person} onBlur={(e) => e.target.value.trim() && updateDebt(debt, { person: e.target.value.trim() })} />
+                <input className="debt-amount-input" inputMode="decimal" defaultValue={String(debt.amount)} onBlur={(e) => updateDebt(debt, { amount: parseAmount(e.target.value) })} />
+              </div>
+              <div className="debt-card-controls">
                 <select value={debt.kind} onChange={(e) => updateDebt(debt, { kind: e.target.value as DebtKind })}>
-                  <option value="i_owe">ich schulde</option>
-                  <option value="owed_to_me">bei mir offen</option>
+                  <option value="i_owe">Schulde ich</option>
+                  <option value="owed_to_me">Schuldet mir</option>
                 </select>
                 <input defaultValue={debt.note ?? ""} placeholder="Notiz" onBlur={(e) => updateDebt(debt, { note: e.target.value.trim() || null })} />
               </div>
@@ -104,8 +102,8 @@ export function DebtsManager() {
           <input value={person} onChange={(e) => setPerson(e.target.value)} placeholder="Person / Sache" />
           <div className="grid-2">
             <select value={kind} onChange={(e) => setKind(e.target.value as DebtKind)}>
-              <option value="i_owe">ich schulde</option>
-              <option value="owed_to_me">bei mir offen</option>
+              <option value="i_owe">Schulde ich</option>
+              <option value="owed_to_me">Schuldet mir</option>
             </select>
             <input value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" placeholder="Betrag" />
           </div>
