@@ -46,36 +46,30 @@ export function WealthPage() {
     <AppShell>
       <main className="dashboard">
         <section className="hero-card compact">
-          <p className="eyebrow">Geldübersicht</p>
           <h1>{formatEuro(sums.available)}</h1>
-          <p className="muted">verfügbar auf aktiven Konten</p>
           <div className="summary-grid">
             <div><span>Depot</span><strong>{formatEuro(sums.depot)}</strong></div>
             <div><span>Gebunden</span><strong>{formatEuro(sums.bound)}</strong></div>
-            <div><span>Gesamt gespeichert</span><strong>{formatEuro(sums.totalStored)}</strong></div>
+            <div><span>Gesamt</span><strong>{formatEuro(sums.totalStored)}</strong></div>
             <div><span>Ohne Depot</span><strong>{formatEuro(sums.available + sums.bound)}</strong></div>
           </div>
         </section>
 
         <section>
-          <div className="section-title">
-            <h2>Konten</h2>
-            <p>aktueller Stand</p>
-          </div>
           <div className="cards-stack">
             {accounts.map((account) => (
               <article className="account-card money-row" key={account.id} style={{ ["--accent" as string]: account.color }}>
                 <div>
                   <strong>{account.name}</strong>
                   <span>
-                    {account.type === "active" ? "Aktives Konto" : account.type === "bound" ? "Gebunden" : "Depot"}
+                    {account.type === "active" ? "Aktiv" : account.type === "bound" ? "Gebunden" : "Depot"}
                     {account.is_default ? " · Standard" : ""}
                   </span>
                 </div>
                 <b>{formatEuro(Number(account.balance))}</b>
               </article>
             ))}
-            {!accounts.length && <p className="muted center">Noch keine Konten angelegt.</p>}
+            {!accounts.length && <p className="muted center">Keine Konten.</p>}
           </div>
         </section>
       </main>

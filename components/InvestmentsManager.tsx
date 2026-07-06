@@ -61,22 +61,20 @@ export function InvestmentsManager() {
     <AppShell>
       <main className="dashboard">
         <section className="hero-card compact">
-          <p className="eyebrow">Investments</p>
           <h1>{formatEuro(total)}</h1>
-          <p className="muted">Depotstand manuell gepflegt. Der Wert zählt separat und nicht zum frei verfügbaren Geld.</p>
           <div className="summary-grid">
-            <div><span>Investiert im Monat</span><strong>{formatEuro(investedThisMonth)}</strong></div>
+            <div><span>Investiert</span><strong>{formatEuro(investedThisMonth)}</strong></div>
             <div><span>Konten</span><strong>{accounts.length}</strong></div>
           </div>
         </section>
 
         <section className="list-card">
-          <div className="section-title"><h2>Depotstände</h2></div>
+          
           {accounts.map((account) => (
             <div className="tx-row" key={account.id}>
               <div>
                 <strong>{account.name}</strong>
-                <span>aktueller Stand laut App: {formatEuro(Number(account.balance))}</span>
+                <span>{formatEuro(Number(account.balance))}</span>
               </div>
               <div className="tx-actions wide-actions">
                 <input inputMode="decimal" value={newBalance[account.id] ?? ""} onChange={(e) => setNewBalance((old) => ({ ...old, [account.id]: e.target.value }))} />
@@ -84,12 +82,12 @@ export function InvestmentsManager() {
               </div>
             </div>
           ))}
-          {!accounts.length && <p className="muted center">Noch kein Investmentkonto.</p>}
+          {!accounts.length && <p className="muted center">Kein Depot.</p>}
           <button className="primary" onClick={addScalable}>+ Scalable Capital anlegen</button>
         </section>
 
         <section className="list-card">
-          <div className="section-title"><h2>Investitionen diesen Monat</h2></div>
+          
           {transactions.map((tx) => (
             <div className="tx-row" key={tx.id}>
               <div>
@@ -99,13 +97,10 @@ export function InvestmentsManager() {
               <b>{formatEuro(Number(tx.amount))}</b>
             </div>
           ))}
-          {!transactions.length && <p className="muted center">Noch keine Investitionen in diesem Monat.</p>}
+          {!transactions.length && <p className="muted center">Keine Investitionen.</p>}
         </section>
 
-        <section className="notice-card">
-          <strong>Warum manuell?</strong>
-          <p>Die App speichert Sparpläne und Käufe als Investitionen. Den echten Depotwert trägst du regelmäßig auf dieser Seite oder beim Monatsabschluss ein, weil Kurse schwanken und Scalable nicht sauber direkt aus der App aktualisiert wird.</p>
-        </section>
+
       </main>
     </AppShell>
   );

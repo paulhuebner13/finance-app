@@ -165,7 +165,7 @@ export function FinanceApp() {
   const monthDays = daysInMonth();
 
   if (loading || bootstrapping) {
-    return <main className="loading-page">Finance App wird geladen...</main>;
+    return <main className="loading-page">Laden...</main>;
   }
 
   if (!session) return <AuthGate />;
@@ -176,7 +176,6 @@ export function FinanceApp() {
         <section className="month-head">
           <div>
             <h1>{formatMonthTitle(currentMonth)}</h1>
-            <p className="muted">{formatEuro(stats.expenses)} Ausgaben · Planstand nach Monatstag</p>
           </div>
           <span className="month-pill">{currentDay}/{monthDays}</span>
         </section>
@@ -195,9 +194,6 @@ export function FinanceApp() {
         </section>
 
         <section>
-          <div className="section-title">
-            <h2>Letzte Buchungen</h2>
-          </div>
           <div className="list-card">
             {transactions.slice(0, 8).map((transaction) => {
               const group = groups.find((g) => g.id === transaction.group_id);
@@ -212,7 +208,7 @@ export function FinanceApp() {
                 </div>
               );
             })}
-            {!transactions.length && <p className="muted center">Noch keine Buchungen in diesem Monat.</p>}
+            {!transactions.length && <p className="muted center">Keine Buchungen.</p>}
           </div>
         </section>
       </main>

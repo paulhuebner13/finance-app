@@ -56,7 +56,7 @@ export function MonthClosingModal({ open, month, userId, accounts, onClose, onSa
 
       onSaved();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Monatsabschluss konnte nicht gespeichert werden.");
+      setError(err instanceof Error ? err.message : "Speichern fehlgeschlagen.");
     } finally {
       setSaving(false);
     }
@@ -69,9 +69,9 @@ export function MonthClosingModal({ open, month, userId, accounts, onClose, onSa
       <section className="closing-modal">
         <div className="modal-header">
           <div>
-            <p className="eyebrow">Monatsabschluss</p>
+            
             <h2>{formatMonthTitle(month)}</h2>
-            <p className="muted small">Trag deine echten Kontostände ein. Auch Scalable Capital/Investmentkonten sind hier dabei.</p>
+            
           </div>
           <button className="icon-button" onClick={onClose}>×</button>
         </div>
@@ -79,14 +79,14 @@ export function MonthClosingModal({ open, month, userId, accounts, onClose, onSa
         <div className="cards-stack">
           {accounts.filter((a) => a.is_active).map((account) => (
             <label key={account.id}>
-              {account.name} <span className="muted small">aktuell laut App: {formatEuro(Number(account.balance))}</span>
+              {account.name}
               <input inputMode="decimal" value={values[account.id] ?? ""} onChange={(e) => setValues((old) => ({ ...old, [account.id]: e.target.value }))} />
             </label>
           ))}
         </div>
 
         {error && <p className="error">{error}</p>}
-        <button className="primary" onClick={save} disabled={saving}>{saving ? "Speichern..." : "Monat abschließen"}</button>
+        <button className="primary" onClick={save} disabled={saving}>{saving ? "Speichern..." : "Speichern"}</button>
       </section>
     </div>
   );

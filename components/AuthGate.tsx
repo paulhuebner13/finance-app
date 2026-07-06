@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { hasSupabaseConfig, supabase } from "@/lib/supabase";
 
 export function AuthGate() {
   const [email, setEmail] = useState("");
@@ -14,34 +14,38 @@ export function AuthGate() {
     setLoading(true);
     setMessage("");
 
-    const result =
-      mode === "login"
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password });
+    try {
+      const result =
+        mode === "login"
+          ? await supabase.auth.signInWithPassword({ email, password })
+          : await supabase.auth.signUp({ email, password });
 
-    setLoading(false);
+      if (result.error) {
+        setMessage(result.error.message);
+        return;
+      }
 
-    if (result.error) {
-      setMessage(result.error.message);
-      return;
+      if (mode === "signup") {
+        setMessage("Erstellt. Jetzt einloggen.");
+        return;
+      }
+
+      window.location.reload();
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Verbindung fehlgeschlagen.");
+    } finally {
+      setLoading(false);
     }
-
-    if (mode === "signup") {
-      setMessage("Account erstellt. Falls E-Mail-Bestätigung aktiv ist: bitte Mail bestätigen und dann einloggen.");
-      return;
-    }
-
-    window.location.reload();
   }
 
   return (
     <main className="auth-page">
       <section className="auth-card">
         <div>
-          <p className="eyebrow">Finance App</p>
-          <h1>Deine Finanzen privat tracken.</h1>
-          <p className="muted">Login schützt deine Daten. Supabase RLS sorgt dafür, dass jeder User nur eigene Buchungen sieht.</p>
+          <h1>Finance</h1>
         </div>
+
+        {!hasSupabaseConfig && <p className="error">Supabase fehlt.</p>}
 
         <label>
           E-Mail
@@ -50,15 +54,15 @@ export function AuthGate() {
 
         <label>
           Passwort
-          <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="mindestens 6 Zeichen" type="password" />
+          <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Passwort" type="password" />
         </label>
 
-        <button className="primary" onClick={submit} disabled={loading || !email || !password}>
+        <button className="primary" onClick={submit} disabled={loading || !email || !password || !hasSupabaseConfig}>
           {loading ? "Bitte warten..." : mode === "login" ? "Einloggen" : "Konto erstellen"}
         </button>
 
         <button className="text-button" onClick={() => setMode(mode === "login" ? "signup" : "login")}>
-          {mode === "login" ? "Noch kein Konto? Konto erstellen" : "Schon ein Konto? Einloggen"}
+          {mode === "login" ? "Konto erstellen" : "Einloggen"}
         </button>
 
         {message && <p className="notice">{message}</p>}

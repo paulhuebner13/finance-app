@@ -56,7 +56,7 @@ export function TransactionsList() {
       await applyDeltas(session.user.id, accounts, invertDeltas(transactionDeltas(tx)));
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Löschen fehlgeschlagen.");
+      setError(err instanceof Error ? err.message : "löschen fehlgeschlagen.");
     }
   }
 
@@ -74,9 +74,7 @@ export function TransactionsList() {
     <AppShell>
       <main className="dashboard">
         <section className="hero-card compact">
-          <p className="eyebrow">Buchungen</p>
           <h1>{formatEuro(filter === "expense" ? totals.expenses : filter === "income" ? totals.income : filter === "investment" ? totals.investments : totals.all)}</h1>
-          <p className="muted">Bearbeiten oder löschen. Kontostände werden dabei mitkorrigiert.</p>
         </section>
 
         <section className="filters-card">
@@ -107,13 +105,13 @@ export function TransactionsList() {
                 </div>
                 <div className="tx-actions">
                   <b>{tx.type === "income" ? "+" : tx.type === "expense" || tx.type === "investment" ? "-" : ""}{formatEuro(Number(tx.amount))}</b>
-                  <button className="mini-button" onClick={() => setEditing(tx)}>Bearbeiten</button>
-                  <button className="mini-button danger" onClick={() => deleteTransaction(tx)}>Löschen</button>
+                  <button className="mini-button" onClick={() => setEditing(tx)}>bearbeiten</button>
+                  <button className="mini-button danger" onClick={() => deleteTransaction(tx)}>löschen</button>
                 </div>
               </div>
             );
           })}
-          {!filtered.length && <p className="muted center">Keine Buchungen für diese Auswahl.</p>}
+          {!filtered.length && <p className="muted center">Keine Buchungen.</p>}
         </section>
       </main>
 

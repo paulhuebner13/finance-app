@@ -81,9 +81,7 @@ export function AccountsManager() {
     <AppShell>
       <main className="dashboard">
         <section className="hero-card compact">
-          <p className="eyebrow">Konten</p>
           <h1>{formatEuro(sums.available)}</h1>
-          <p className="muted">verfügbares Geld</p>
           <div className="summary-grid">
             <div><span>Gebunden</span><strong>{formatEuro(sums.bound)}</strong></div>
             <div><span>Investment</span><strong>{formatEuro(sums.investment)}</strong></div>
@@ -91,14 +89,14 @@ export function AccountsManager() {
         </section>
 
         <section className="form-card">
-          <h2>Konto hinzufügen</h2>
+          
           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="z. B. N26" />
           <select value={type} onChange={(e) => setType(e.target.value as AccountType)}>
             <option value="active">Aktives Konto</option>
             <option value="bound">Gebundenes Geld</option>
             <option value="investment">Investmentkonto</option>
           </select>
-          <input value={balance} onChange={(e) => setBalance(e.target.value)} inputMode="decimal" placeholder="Startstand" />
+          <input value={balance} onChange={(e) => setBalance(e.target.value)} inputMode="decimal" placeholder="Stand" />
           <button className="primary" onClick={addAccount}>Hinzufügen</button>
         </section>
 
@@ -120,7 +118,7 @@ export function AccountsManager() {
                   checked={account.include_in_available_net_worth}
                   onChange={(e) => updateAccount(account, { include_in_available_net_worth: e.target.checked })}
                 />
-                zählt zu verfügbar
+                verfügbar
               </label>
               {account.type === "active" && (
                 <label className="inline-toggle">
@@ -129,13 +127,13 @@ export function AccountsManager() {
                     checked={account.is_default}
                     onChange={(e) => { if (e.target.checked) setDefaultAccount(account); }}
                   />
-                  Standardkonto für neue Buchungen
+                  Standardkonto
                 </label>
               )}
               <div className="button-row">
-                <button className="mini-button" onClick={() => renameAccount(account)}>Umbenennen</button>
-                <button className="mini-button" onClick={() => updateAccount(account, { is_active: !account.is_active })}>{account.is_active ? "Pausieren" : "Aktivieren"}</button>
-                <button className="mini-button danger" onClick={() => deactivateAccount(account)}>Deaktivieren</button>
+                <button className="mini-button" onClick={() => renameAccount(account)}>umbenennen</button>
+                <button className="mini-button" onClick={() => updateAccount(account, { is_active: !account.is_active })}>{account.is_active ? "pausieren" : "aktivieren"}</button>
+                <button className="mini-button danger" onClick={() => deactivateAccount(account)}>deaktivieren</button>
               </div>
             </article>
           ))}

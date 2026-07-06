@@ -96,20 +96,14 @@ export function CategoriesManager() {
   return (
     <AppShell>
       <main className="dashboard">
-        <section className="hero-card compact">
-          <h1>Plan einstellen</h1>
-          <p className="muted">Budget ist ein Durchschnittsmonat. Die App rechnet intern auf Tagesbudget und echte Monatslänge runter.</p>
-        </section>
-
         <section className="form-card">
-          <h2>Neue Gruppe</h2>
           <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="z. B. Reisen" />
           <select value={newKind} onChange={(e) => setNewKind(e.target.value as CategoryKind)}>
             <option value="expense">Ausgabe</option>
             <option value="income">Einnahme</option>
             <option value="investment">Investieren</option>
           </select>
-          <input value={newBudget} onChange={(e) => setNewBudget(e.target.value)} inputMode="decimal" placeholder="Durchschnittsbudget pro Monat" />
+          <input value={newBudget} onChange={(e) => setNewBudget(e.target.value)} inputMode="decimal" placeholder="Budget" />
           <button className="primary" onClick={addGroup}>Hinzufügen</button>
         </section>
 
@@ -119,7 +113,7 @@ export function CategoriesManager() {
               <div className="budget-card-header">
                 <div>
                   <input className="plain-input" value={group.name} onChange={(e) => updateGroup(group, { name: e.target.value })} />
-                  <p className="muted small">{group.kind} · {group.is_active ? "aktiv" : "inaktiv"} · Durchschnitt: {formatEuro(Number(group.average_monthly_budget))}</p>
+                  <p className="muted small">{group.is_active ? "aktiv" : "inaktiv"} · {formatEuro(Number(group.average_monthly_budget))}</p>
                 </div>
                 <input
                   className="budget-input"
@@ -131,11 +125,11 @@ export function CategoriesManager() {
 
               <div className="subchips">
                 {group.categories.map((category) => (
-                  <button key={category.id} className={!category.is_active ? "disabled-chip" : ""} onClick={() => renameCategory(category)} onContextMenu={(e) => { e.preventDefault(); toggleCategory(category); }} title="Klick = umbenennen, Rechtsklick = aktiv/inaktiv">
+                  <button key={category.id} className={!category.is_active ? "disabled-chip" : ""} onClick={() => renameCategory(category)} onContextMenu={(e) => { e.preventDefault(); toggleCategory(category); }} >
                     {category.name}{!category.is_active ? " (inaktiv)" : ""}
                   </button>
                 ))}
-                <button className="add-chip" onClick={() => addSubcategory(group)}>+ Unterkategorie</button>
+                <button className="add-chip" onClick={() => addSubcategory(group)}>+ Untergruppe</button>
                 {group.is_active ? <button className="danger-chip" onClick={() => deactivateGroup(group)}>deaktivieren</button> : <button className="add-chip" onClick={() => updateGroup(group, { is_active: true })}>reaktivieren</button>}
               </div>
             </article>

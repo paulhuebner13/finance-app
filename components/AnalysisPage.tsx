@@ -63,9 +63,7 @@ export function AnalysisPage() {
     <AppShell>
       <main className="dashboard">
         <section className="hero-card compact">
-          <p className="eyebrow">Auswertung</p>
           <h1>{formatEuro(totals.expenses)}</h1>
-          <p className="muted">Ausgaben im ausgewählten Monat</p>
           <div className="summary-grid">
             <div><span>Einnahmen</span><strong>{formatEuro(totals.income)}</strong></div>
             <div><span>Investiert</span><strong>{formatEuro(totals.investment)}</strong></div>
@@ -77,7 +75,7 @@ export function AnalysisPage() {
         </section>
 
         <section className="list-card">
-          <div className="section-title"><h2>Budgetvergleich</h2></div>
+          
           <div className="analysis-bars">
             {byGroup.map(({ group, spent, limit, plan, percent }) => (
               <div className="analysis-row" key={group.id} style={{ ["--accent" as string]: group.color }}>
@@ -89,14 +87,14 @@ export function AnalysisPage() {
         </section>
 
         <section className="list-card">
-          <div className="section-title"><h2>Top Unterkategorien</h2></div>
+          
           {bySubcategory.map(({ category, group, spent }) => (
             <div className="tx-row" key={category.id}>
               <div><strong>{category.name}</strong><span>{group?.name}</span></div>
               <b>{formatEuro(spent)}</b>
             </div>
           ))}
-          {!bySubcategory.length && <p className="muted center">Keine Ausgaben für diese Auswahl.</p>}
+          {!bySubcategory.length && <p className="muted center">Keine Ausgaben.</p>}
         </section>
       </main>
     </AppShell>

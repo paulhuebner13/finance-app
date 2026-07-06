@@ -23,7 +23,7 @@ export function BudgetCard({ group, spent, daysInMonth, currentDay }: Props) {
       <div className="budget-card-header">
         <div>
           <p className="card-title">{group.name}</p>
-          <p className="muted small">Limit im Monat: {formatEuro(monthLimit)}</p>
+          <p className="muted small">Limit: {formatEuro(monthLimit)}</p>
         </div>
         <strong>{formatEuro(spent)}</strong>
       </div>
@@ -34,7 +34,7 @@ export function BudgetCard({ group, spent, daysInMonth, currentDay }: Props) {
       </div>
 
       <div className="budget-meta">
-        <span>Planstand: {formatEuro(planNow)}</span>
+        <span>Plan: {formatEuro(planNow)}</span>
         <span>{delta >= 0 ? "+" : ""}{formatEuro(delta)}</span>
         <span>Rest: {formatEuro(remaining)}</span>
       </div>

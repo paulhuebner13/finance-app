@@ -91,7 +91,7 @@ export function RecurringManager() {
 
   async function remove(item: RecurringTransaction) {
     if (!session?.user.id) return;
-    if (!window.confirm("Wiederkehrende Buchung löschen? Bereits erstellte echte Buchungen bleiben erhalten.")) return;
+    if (!window.confirm("Regel löschen?")) return;
     await supabase.from("recurring_transactions").delete().eq("id", item.id).eq("user_id", session.user.id);
     await load();
   }
@@ -102,14 +102,7 @@ export function RecurringManager() {
   return (
     <AppShell>
       <main className="dashboard">
-        <section className="hero-card compact">
-          <p className="eyebrow">Regelmäßig</p>
-          <h1>Fixe Buchungen</h1>
-          <p className="muted">Miete, Gehalt, Spotify, Sparplan usw. werden beim App-Start einmal pro Monat automatisch erstellt.</p>
-        </section>
-
         <section className="form-card">
-          <h2>Neue Regel</h2>
           <div className="grid-2">
             <label>Typ
               <select value={type} onChange={(e) => { setType(e.target.value as EntryType); setGroupId(""); setCategoryId(""); }}>
@@ -149,7 +142,7 @@ export function RecurringManager() {
 
           <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Notiz optional" rows={2} />
           {error && <p className="error">{error}</p>}
-          <button className="primary" onClick={addRecurring}>Regel speichern</button>
+          <button className="primary" onClick={addRecurring}>Speichern</button>
         </section>
 
         <section className="list-card">
@@ -164,17 +157,17 @@ export function RecurringManager() {
                 <div>
                   <strong>{item.note || category?.name || group?.name || entryTypeLabel(item.type)}</strong>
                   <span>jeden {item.day_of_month}. · {entryTypeLabel(item.type)} · {item.type === "transfer" || item.type === "investment" ? `${from?.name ?? "?"} → ${to?.name ?? "?"}` : `${account?.name ?? "?"}`}</span>
-                  <span>letzter Monat: {item.last_created_month || "noch nie"}</span>
+                  <span>zuletzt: {item.last_created_month || "noch nie"}</span>
                 </div>
                 <div className="tx-actions">
                   <b>{formatEuro(Number(item.amount))}</b>
-                  <button className="mini-button" onClick={() => toggle(item)}>{item.active ? "Pausieren" : "Aktivieren"}</button>
-                  <button className="mini-button danger" onClick={() => remove(item)}>Löschen</button>
+                  <button className="mini-button" onClick={() => toggle(item)}>{item.active ? "pausieren" : "aktivieren"}</button>
+                  <button className="mini-button danger" onClick={() => remove(item)}>löschen</button>
                 </div>
               </div>
             );
           })}
-          {!items.length && <p className="muted center">Noch keine wiederkehrenden Buchungen.</p>}
+          {!items.length && <p className="muted center">Keine Regeln.</p>}
         </section>
       </main>
     </AppShell>
