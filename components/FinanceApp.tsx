@@ -22,6 +22,7 @@ export function FinanceApp() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [closingOpen, setClosingOpen] = useState(false);
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const currentMonth = monthKey();
   const prevMonth = previousMonthKey();
 
@@ -63,6 +64,7 @@ export function FinanceApp() {
             kind: group.kind,
             name: group.name,
             average_monthly_budget: group.average_monthly_budget,
+            budget_period: group.budget_period,
             color: group.color,
             sort_order: index
           })
@@ -71,10 +73,12 @@ export function FinanceApp() {
 
         if (error || !insertedGroup) continue;
 
-        await supabase.from("categories").insert(group.categories.map((name, categoryIndex) => ({
+        await supabase.from("categories").insert(group.categories.map((category, categoryIndex) => ({
           user_id: userId,
           group_id: insertedGroup.id,
-          name,
+          name: category.name,
+          average_monthly_budget: category.average_monthly_budget,
+          budget_period: category.budget_period ?? group.budget_period,
           sort_order: categoryIndex
         })));
       }
@@ -184,12 +188,17 @@ export function FinanceApp() {
 
         <section>
           <div className="cards-stack">
-            {expenseGroups.map((group) => {
-              const spent = transactions
-                .filter((t) => t.type === "expense" && t.group_id === group.id)
-                .reduce((sum, t) => sum + Number(t.amount), 0);
-              return <BudgetCard key={group.id} group={group} spent={spent} daysInMonth={monthDays} currentDay={currentDay} />;
-            })}
+            {expenseGroups.map((group) => (
+              <BudgetCard
+                key={group.id}
+                group={group}
+                transactions={transactions.filter((transaction) => transaction.group_id === group.id)}
+                daysInMonth={monthDays}
+                currentDay={currentDay}
+                expanded={selectedGroupId === group.id}
+                onClick={() => setSelectedGroupId((current) => current === group.id ? null : group.id)}
+              />
+            ))}
           </div>
         </section>
 

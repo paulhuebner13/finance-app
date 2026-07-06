@@ -22,6 +22,7 @@ create table if not exists public.category_groups (
   kind text not null check (kind in ('expense', 'income', 'investment')),
   name text not null,
   average_monthly_budget numeric(12,2) not null default 0,
+  budget_period text not null default 'daily' check (budget_period in ('daily', 'monthly')),
   color text not null default '#8B5CF6',
   sort_order integer not null default 0,
   is_active boolean not null default true,
@@ -33,6 +34,8 @@ create table if not exists public.categories (
   user_id uuid not null references auth.users(id) on delete cascade,
   group_id uuid not null references public.category_groups(id) on delete cascade,
   name text not null,
+  average_monthly_budget numeric(12,2) not null default 0,
+  budget_period text not null default 'daily' check (budget_period in ('daily', 'monthly')),
   sort_order integer not null default 0,
   is_active boolean not null default true,
   created_at timestamptz not null default now()

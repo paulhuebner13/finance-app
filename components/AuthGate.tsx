@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { hasSupabaseConfig, supabase } from "@/lib/supabase";
 
+function cleanEmail(value: string) {
+  return value.trim().toLowerCase();
+}
+
 export function AuthGate() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,23 +18,34 @@ export function AuthGate() {
     setLoading(true);
     setMessage("");
 
+    const normalizedEmail = cleanEmail(email);
+
     try {
-      const result =
-        mode === "login"
-          ? await supabase.auth.signInWithPassword({ email, password })
-          : await supabase.auth.signUp({ email, password });
+      if (mode === "login") {
+        const { error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
 
-      if (result.error) {
-        setMessage(result.error.message);
+        if (error) {
+          setMessage(error.message === "Invalid login credentials" ? "E-Mail oder Passwort passt nicht." : error.message);
+          return;
+        }
+
+        window.location.reload();
         return;
       }
 
-      if (mode === "signup") {
-        setMessage("Erstellt. Jetzt einloggen.");
+      const { data, error } = await supabase.auth.signUp({ email: normalizedEmail, password });
+
+      if (error) {
+        setMessage(error.message === "User already registered" ? "Konto gibt es schon. Bitte einloggen." : error.message);
         return;
       }
 
-      window.location.reload();
+      if (data.session) {
+        window.location.reload();
+        return;
+      }
+
+      setMessage("Konto erstellt. Supabase wartet noch auf E-Mail-Bestätigung.");
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Verbindung fehlgeschlagen.");
     } finally {
@@ -57,8 +72,8 @@ export function AuthGate() {
           <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Passwort" type="password" />
         </label>
 
-        <button className="primary" onClick={submit} disabled={loading || !email || !password || !hasSupabaseConfig}>
-          {loading ? "Bitte warten..." : mode === "login" ? "Einloggen" : "Konto erstellen"}
+        <button className="primary" onClick={submit} disabled={loading || !email.trim() || !password || !hasSupabaseConfig}>
+          {loading ? "..." : mode === "login" ? "Einloggen" : "Konto erstellen"}
         </button>
 
         <button className="text-button" onClick={() => setMode(mode === "login" ? "signup" : "login")}>

@@ -52,10 +52,16 @@ export function formatMonthTitle(key: string) {
   return new Intl.DateTimeFormat("de-AT", { month: "long", year: "numeric" }).format(new Date(year, month - 1, 1));
 }
 
-export function adjustedMonthlyLimit(averageMonthlyBudget: number, days: number) {
-  return (Number(averageMonthlyBudget) / AVERAGE_DAYS_PER_MONTH) * days;
+export type BudgetPeriodLike = "daily" | "monthly";
+
+export function adjustedMonthlyLimit(averageMonthlyBudget: number, days: number, period: BudgetPeriodLike = "daily") {
+  const budget = Number(averageMonthlyBudget) || 0;
+  if (period === "monthly") return budget;
+  return (budget / AVERAGE_DAYS_PER_MONTH) * days;
 }
 
-export function plannedUntilCurrentDay(averageMonthlyBudget: number, currentDay: number) {
-  return (Number(averageMonthlyBudget) / AVERAGE_DAYS_PER_MONTH) * currentDay;
+export function plannedUntilCurrentDay(averageMonthlyBudget: number, currentDay: number, period: BudgetPeriodLike = "daily") {
+  const budget = Number(averageMonthlyBudget) || 0;
+  if (period === "monthly") return budget;
+  return (budget / AVERAGE_DAYS_PER_MONTH) * currentDay;
 }

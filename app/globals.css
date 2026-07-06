@@ -240,3 +240,123 @@ label { display: grid; gap: 0.45rem; color: var(--muted); font-size: 0.9rem; }
 @media (min-width: 521px) {
   .bottom-nav { grid-template-columns: repeat(8, 1fr); }
 }
+
+/* Update: stärkere Farben, leichtere UI, eigene Scrollbars */
+:root {
+  --bg: #263244;
+  --panel: rgba(50, 66, 88, 0.94);
+  --panel-strong: rgba(61, 78, 103, 0.98);
+  --border: rgba(255, 255, 255, 0.20);
+  --text: #ffffff;
+  --muted: #d5deeb;
+  --danger: #ff3b4f;
+  --success: #18d66f;
+  --warning: #ffb020;
+}
+
+html { scrollbar-width: thin; scrollbar-color: rgba(148, 163, 184, 0.55) transparent; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.55); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(203, 213, 225, 0.75); }
+
+body::before {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(124, 58, 237, 0.28), transparent 27rem),
+    radial-gradient(circle at 86% 8%, rgba(14, 165, 233, 0.24), transparent 25rem),
+    linear-gradient(180deg, #263244 0%, #3b4e68 100%);
+}
+
+.auth-card, .hero-card, .form-card, .list-card, .filters-card, .budget-card, .account-card, .category-edit-card {
+  box-shadow: 0 16px 42px rgba(0,0,0,0.18);
+}
+
+input, select, textarea {
+  background: rgba(71, 85, 105, 0.78);
+  border-color: rgba(255,255,255,0.22);
+}
+
+.topbar { background: rgba(55, 70, 94, 0.84); }
+.bottom-nav { background: rgba(69, 84, 110, 0.92); }
+.bottom-nav::-webkit-scrollbar { height: 4px; }
+.bottom-nav::-webkit-scrollbar-thumb { background: rgba(203, 213, 225, 0.45); border-radius: 999px; }
+
+.primary, .big-add {
+  background: linear-gradient(135deg, #22d3ee, #a855f7 52%, #f97316);
+  color: #06101f;
+  box-shadow: 0 12px 30px rgba(34, 211, 238, 0.18);
+}
+
+.budget-card, .category-edit-card, .account-card {
+  border: 2px solid color-mix(in srgb, var(--accent) 64%, rgba(255,255,255,0.12));
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 22%, transparent), transparent 54%),
+    var(--panel);
+}
+.budget-card.expanded {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 32%, transparent), transparent 62%),
+    var(--panel-strong);
+}
+.budget-main {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+.budget-main:active { transform: scale(0.995); }
+.card-title { font-size: 1.18rem; }
+.budget-card-header strong { font-size: 1.28rem; }
+.budget-bar {
+  height: 20px;
+  background: rgba(226, 232, 240, 0.24);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.10);
+}
+.budget-fill {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 70%, #ffffff 4%), var(--accent));
+  box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.budget-marker { background: rgba(255,255,255,0.94); }
+
+.subcategory-panel {
+  display: grid;
+  gap: 0.78rem;
+  padding-top: 0.95rem;
+  margin-top: 0.95rem;
+  border-top: 1px solid rgba(255,255,255,0.18);
+}
+.subcategory-row { display: grid; gap: 0.4rem; }
+.subcategory-head { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.86rem; }
+.subcategory-head span { font-weight: 750; }
+.subcategory-head b { white-space: nowrap; font-size: 0.82rem; color: var(--muted); }
+.mini-bar { height: 10px; overflow: hidden; border-radius: 999px; background: rgba(226,232,240,0.22); }
+.mini-bar > div { height: 100%; border-radius: inherit; background: var(--accent); min-width: 2px; }
+
+.subcategory-edit-list { display: grid; gap: 0.55rem; margin-top: 1rem; }
+.subcategory-edit-row {
+  display: grid;
+  grid-template-columns: minmax(110px, 1fr) 82px 104px auto;
+  gap: 0.45rem;
+  align-items: center;
+  padding: 0.55rem;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.subcategory-edit-row.is-disabled { opacity: 0.48; }
+.edit-budget-pair { display: grid; grid-template-columns: 104px 112px; gap: 0.45rem; }
+.subcategory-edit-row select, .edit-budget-pair select { padding: 0.72rem 0.7rem; border-radius: 14px; }
+.subcategory-edit-row .budget-input, .edit-budget-pair .budget-input { width: 100%; }
+.danger-chip, .mini-button.danger { background: rgba(255, 59, 79, 0.16) !important; color: #ffd2d8 !important; border-color: rgba(255, 59, 79, 0.62) !important; }
+.subchips .add-chip { color: #dff7ff; border-color: rgba(34, 211, 238, 0.45); background: rgba(34, 211, 238, 0.13); }
+
+.add-account-card { margin-top: 0.25rem; }
+
+@media (max-width: 520px) {
+  .subcategory-edit-row { grid-template-columns: 1fr 86px; }
+  .subcategory-edit-row select, .subcategory-edit-row button { grid-column: span 1; }
+  .edit-budget-pair { grid-template-columns: 1fr 1fr; }
+}

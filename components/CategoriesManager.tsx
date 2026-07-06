@@ -1,13 +1,23 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { AuthGate } from "@/components/AuthGate";
 import { categoryColors } from "@/lib/defaults";
 import { formatEuro } from "@/lib/date";
 import { supabase } from "@/lib/supabase";
-import type { Category, CategoryGroup, CategoryKind, CategoryWithChildren } from "@/lib/types";
+import type { BudgetPeriod, Category, CategoryGroup, CategoryKind, CategoryWithChildren } from "@/lib/types";
 import { useSession } from "@/lib/useSession";
+
+function parseBudget(value: string | number) {
+  if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+  const parsed = Number(value.replace(",", "."));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function childBudgetSum(group: CategoryWithChildren) {
+  return group.categories.filter((category) => category.is_active).reduce((sum, category) => sum + Number(category.average_monthly_budget), 0);
+}
 
 export function CategoriesManager() {
   const { session, loading } = useSession();
@@ -15,6 +25,7 @@ export function CategoriesManager() {
   const [newName, setNewName] = useState("");
   const [newKind, setNewKind] = useState<CategoryKind>("expense");
   const [newBudget, setNewBudget] = useState("");
+  const [newPeriod, setNewPeriod] = useState<BudgetPeriod>("daily");
 
   const load = useCallback(async () => {
     if (!session?.user.id) return;
@@ -29,6 +40,8 @@ export function CategoriesManager() {
 
   useEffect(() => { load(); }, [load]);
 
+  const totalExpenseBudget = useMemo(() => groups.filter((g) => g.kind === "expense" && g.is_active).reduce((sum, group) => sum + Math.max(Number(group.average_monthly_budget), childBudgetSum(group)), 0), [groups]);
+
   async function addGroup() {
     if (!session?.user.id || !newName.trim()) return;
     const color = categoryColors[groups.length % categoryColors.length];
@@ -36,23 +49,45 @@ export function CategoriesManager() {
       user_id: session.user.id,
       kind: newKind,
       name: newName.trim(),
-      average_monthly_budget: Number(newBudget.replace(",", ".")) || 0,
+      average_monthly_budget: parseBudget(newBudget),
+      budget_period: newPeriod,
       color,
       sort_order: groups.length
     }).select("id").single();
 
     if (data?.id) {
-      await supabase.from("categories").insert({ user_id: session.user.id, group_id: data.id, name: "Sonstiges", sort_order: 0 });
+      await supabase.from("categories").insert({
+        user_id: session.user.id,
+        group_id: data.id,
+        name: "Sonstiges",
+        average_monthly_budget: 0,
+        budget_period: newPeriod,
+        sort_order: 0
+      });
     }
     setNewName("");
     setNewBudget("");
     await load();
   }
 
-  async function updateGroup(group: CategoryGroup, patch: Partial<CategoryGroup>) {
+  async function updateGroup(group: CategoryWithChildren, patch: Partial<CategoryGroup>) {
     if (!session?.user.id) return;
-    await supabase.from("category_groups").update(patch).eq("id", group.id).eq("user_id", session.user.id);
+    const childSum = childBudgetSum(group);
+    const nextPatch = { ...patch };
+    if (patch.average_monthly_budget !== undefined) {
+      nextPatch.average_monthly_budget = Math.max(Number(patch.average_monthly_budget), childSum);
+    }
+    await supabase.from("category_groups").update(nextPatch).eq("id", group.id).eq("user_id", session.user.id);
     await load();
+  }
+
+  async function ensureGroupMinimum(group: CategoryWithChildren, nextCategories?: Category[]) {
+    if (!session?.user.id) return;
+    const categories = nextCategories ?? group.categories;
+    const sum = categories.filter((c) => c.is_active).reduce((total, c) => total + Number(c.average_monthly_budget), 0);
+    if (Number(group.average_monthly_budget) < sum) {
+      await supabase.from("category_groups").update({ average_monthly_budget: sum }).eq("id", group.id).eq("user_id", session.user.id);
+    }
   }
 
   async function addSubcategory(group: CategoryWithChildren) {
@@ -63,29 +98,27 @@ export function CategoriesManager() {
       user_id: session.user.id,
       group_id: group.id,
       name: name.trim(),
+      average_monthly_budget: 0,
+      budget_period: group.budget_period,
       sort_order: group.categories.length
     });
     await load();
   }
 
-  async function renameCategory(category: Category) {
+  async function updateCategory(group: CategoryWithChildren, category: Category, patch: Partial<Category>) {
     if (!session?.user.id) return;
-    const name = window.prompt("Unterkategorie umbenennen", category.name);
-    if (!name?.trim()) return;
-    await supabase.from("categories").update({ name: name.trim() }).eq("id", category.id).eq("user_id", session.user.id);
+    const nextCategory = { ...category, ...patch };
+    await supabase.from("categories").update(patch).eq("id", category.id).eq("user_id", session.user.id);
+    await ensureGroupMinimum(group, group.categories.map((item) => item.id === category.id ? nextCategory : item));
     await load();
   }
 
-  async function toggleCategory(category: Category) {
-    if (!session?.user.id) return;
-    await supabase.from("categories").update({ is_active: !category.is_active }).eq("id", category.id).eq("user_id", session.user.id);
-    await load();
+  async function toggleCategory(group: CategoryWithChildren, category: Category) {
+    await updateCategory(group, category, { is_active: !category.is_active });
   }
 
-  async function deactivateGroup(group: CategoryGroup) {
+  async function deactivateGroup(group: CategoryWithChildren) {
     if (!session?.user.id) return;
-    const ok = window.confirm(`${group.name} deaktivieren? Bestehende Buchungen bleiben erhalten.`);
-    if (!ok) return;
     await supabase.from("category_groups").update({ is_active: false }).eq("id", group.id).eq("user_id", session.user.id);
     await load();
   }
@@ -96,44 +129,73 @@ export function CategoriesManager() {
   return (
     <AppShell>
       <main className="dashboard">
+        <section className="hero-card compact">
+          <h1>{formatEuro(totalExpenseBudget)}</h1>
+        </section>
+
         <section className="form-card">
-          <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="z. B. Reisen" />
-          <select value={newKind} onChange={(e) => setNewKind(e.target.value as CategoryKind)}>
-            <option value="expense">Ausgabe</option>
-            <option value="income">Einnahme</option>
-            <option value="investment">Investieren</option>
-          </select>
+          <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Neue Gruppe" />
+          <div className="grid-2">
+            <select value={newKind} onChange={(e) => setNewKind(e.target.value as CategoryKind)}>
+              <option value="expense">Ausgabe</option>
+              <option value="income">Einnahme</option>
+              <option value="investment">Investieren</option>
+            </select>
+            <select value={newPeriod} onChange={(e) => setNewPeriod(e.target.value as BudgetPeriod)}>
+              <option value="daily">täglich</option>
+              <option value="monthly">monatlich</option>
+            </select>
+          </div>
           <input value={newBudget} onChange={(e) => setNewBudget(e.target.value)} inputMode="decimal" placeholder="Budget" />
           <button className="primary" onClick={addGroup}>Hinzufügen</button>
         </section>
 
         <section className="cards-stack">
-          {groups.map((group) => (
-            <article className="category-edit-card" key={group.id} style={{ ["--accent" as string]: group.color }}>
-              <div className="budget-card-header">
-                <div>
-                  <input className="plain-input" value={group.name} onChange={(e) => updateGroup(group, { name: e.target.value })} />
-                  <p className="muted small">{group.is_active ? "aktiv" : "inaktiv"} · {formatEuro(Number(group.average_monthly_budget))}</p>
+          {groups.map((group) => {
+            const minimum = childBudgetSum(group);
+            const effective = Math.max(Number(group.average_monthly_budget), minimum);
+            return (
+              <article className="category-edit-card" key={group.id} style={{ ["--accent" as string]: group.color }}>
+                <div className="budget-card-header">
+                  <div>
+                    <input className="plain-input" defaultValue={group.name} onBlur={(e) => e.target.value.trim() && updateGroup(group, { name: e.target.value.trim() })} />
+                    <p className="muted small">{formatEuro(effective)}</p>
+                  </div>
+                  <div className="edit-budget-pair">
+                    <input
+                      className="budget-input"
+                      inputMode="decimal"
+                      defaultValue={String(group.average_monthly_budget)}
+                      onBlur={(e) => updateGroup(group, { average_monthly_budget: parseBudget(e.target.value) })}
+                    />
+                    <select value={group.budget_period} onChange={(e) => updateGroup(group, { budget_period: e.target.value as BudgetPeriod })}>
+                      <option value="daily">täglich</option>
+                      <option value="monthly">monatlich</option>
+                    </select>
+                  </div>
                 </div>
-                <input
-                  className="budget-input"
-                  inputMode="decimal"
-                  value={String(group.average_monthly_budget)}
-                  onChange={(e) => updateGroup(group, { average_monthly_budget: Number(e.target.value.replace(",", ".")) || 0 })}
-                />
-              </div>
 
-              <div className="subchips">
-                {group.categories.map((category) => (
-                  <button key={category.id} className={!category.is_active ? "disabled-chip" : ""} onClick={() => renameCategory(category)} onContextMenu={(e) => { e.preventDefault(); toggleCategory(category); }} >
-                    {category.name}{!category.is_active ? " (inaktiv)" : ""}
-                  </button>
-                ))}
-                <button className="add-chip" onClick={() => addSubcategory(group)}>+ Untergruppe</button>
-                {group.is_active ? <button className="danger-chip" onClick={() => deactivateGroup(group)}>deaktivieren</button> : <button className="add-chip" onClick={() => updateGroup(group, { is_active: true })}>reaktivieren</button>}
-              </div>
-            </article>
-          ))}
+                <div className="subcategory-edit-list">
+                  {group.categories.map((category) => (
+                    <div className={`subcategory-edit-row ${!category.is_active ? "is-disabled" : ""}`} key={category.id}>
+                      <input className="plain-input" defaultValue={category.name} onBlur={(e) => e.target.value.trim() && updateCategory(group, category, { name: e.target.value.trim() })} />
+                      <input className="budget-input" inputMode="decimal" defaultValue={String(category.average_monthly_budget)} onBlur={(e) => updateCategory(group, category, { average_monthly_budget: parseBudget(e.target.value) })} />
+                      <select value={category.budget_period} onChange={(e) => updateCategory(group, category, { budget_period: e.target.value as BudgetPeriod })}>
+                        <option value="daily">täglich</option>
+                        <option value="monthly">monatlich</option>
+                      </select>
+                      <button className="mini-button" onClick={() => toggleCategory(group, category)}>{category.is_active ? "aus" : "an"}</button>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="subchips">
+                  <button className="add-chip" onClick={() => addSubcategory(group)}>+ Untergruppe</button>
+                  {group.is_active ? <button className="danger-chip" onClick={() => deactivateGroup(group)}>deaktivieren</button> : <button className="add-chip" onClick={() => updateGroup(group, { is_active: true })}>reaktivieren</button>}
+                </div>
+              </article>
+            );
+          })}
         </section>
       </main>
     </AppShell>

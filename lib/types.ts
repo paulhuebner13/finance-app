@@ -1,6 +1,7 @@
 export type EntryType = "expense" | "income" | "transfer" | "investment";
 export type CategoryKind = "expense" | "income" | "investment";
 export type AccountType = "active" | "bound" | "investment";
+export type BudgetPeriod = "daily" | "monthly";
 
 export type Account = {
   id: string;
@@ -21,6 +22,7 @@ export type CategoryGroup = {
   kind: CategoryKind;
   name: string;
   average_monthly_budget: number;
+  budget_period: BudgetPeriod;
   color: string;
   sort_order: number;
   is_active: boolean;
@@ -32,6 +34,8 @@ export type Category = {
   user_id: string;
   group_id: string;
   name: string;
+  average_monthly_budget: number;
+  budget_period: BudgetPeriod;
   sort_order: number;
   is_active: boolean;
   created_at: string;

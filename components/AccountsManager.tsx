@@ -69,8 +69,6 @@ export function AccountsManager() {
   }
 
   async function deactivateAccount(account: Account) {
-    const ok = window.confirm(`${account.name} deaktivieren? Buchungen bleiben erhalten.`);
-    if (!ok) return;
     await updateAccount(account, { is_active: false });
   }
 
@@ -88,17 +86,6 @@ export function AccountsManager() {
           </div>
         </section>
 
-        <section className="form-card">
-          
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="z. B. N26" />
-          <select value={type} onChange={(e) => setType(e.target.value as AccountType)}>
-            <option value="active">Aktives Konto</option>
-            <option value="bound">Gebundenes Geld</option>
-            <option value="investment">Investmentkonto</option>
-          </select>
-          <input value={balance} onChange={(e) => setBalance(e.target.value)} inputMode="decimal" placeholder="Stand" />
-          <button className="primary" onClick={addAccount}>Hinzufügen</button>
-        </section>
 
         <section className="cards-stack">
           {accounts.map((account) => (
@@ -108,9 +95,9 @@ export function AccountsManager() {
                 <span>{account.type === "active" ? "Aktiv" : account.type === "bound" ? "Gebunden" : "Investment"}{!account.is_active ? " · inaktiv" : ""}</span>
               </div>
               <input
-                value={String(account.balance)}
+                defaultValue={String(account.balance)}
                 inputMode="decimal"
-                onChange={(e) => updateAccount(account, { balance: Number(e.target.value.replace(",", ".")) || 0 })}
+                onBlur={(e) => updateAccount(account, { balance: Number(e.target.value.replace(",", ".")) || 0 })}
               />
               <label className="inline-toggle">
                 <input
@@ -137,6 +124,16 @@ export function AccountsManager() {
               </div>
             </article>
           ))}
+        </section>
+        <section className="form-card add-account-card">
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Neues Konto" />
+          <select value={type} onChange={(e) => setType(e.target.value as AccountType)}>
+            <option value="active">Aktiv</option>
+            <option value="bound">Gebunden</option>
+            <option value="investment">Investment</option>
+          </select>
+          <input value={balance} onChange={(e) => setBalance(e.target.value)} inputMode="decimal" placeholder="Stand" />
+          <button className="primary" onClick={addAccount}>Hinzufügen</button>
         </section>
       </main>
     </AppShell>
