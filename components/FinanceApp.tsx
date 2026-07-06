@@ -9,7 +9,7 @@ import { BookingModal } from "@/components/BookingModal";
 import { BudgetCard } from "@/components/BudgetCard";
 import { MonthClosingModal } from "@/components/MonthClosingModal";
 import { defaultAccounts, defaultCategoryGroups } from "@/lib/defaults";
-import { applyDeltas, transactionDeltas } from "@/lib/finance";
+import { applyDeltas, sortAccountsStable, transactionDeltas } from "@/lib/finance";
 import { dateForMonthDay, dayOfMonth, daysInMonth, formatEuro, getMonthRange, monthKey, previousMonthKey } from "@/lib/date";
 import type { Account, Category, CategoryGroup, CategoryWithChildren, Debt, RecurringTransaction, Transaction } from "@/lib/types";
 
@@ -36,7 +36,7 @@ export function FinanceApp() {
   const load = useCallback(async (userId: string) => {
     const range = getMonthRange(currentMonth);
     const [accountsRes, debtsRes, groupsRes, categoriesRes, transactionsRes] = await Promise.all([
-      supabase.from("accounts").select("*").eq("user_id", userId).order("created_at"),
+      supabase.from("accounts").select("*").eq("user_id", userId).eq("is_active", true).order("created_at"),
       supabase.from("debts").select("*").eq("user_id", userId).eq("is_active", true).order("created_at"),
       supabase.from("category_groups").select("*").eq("user_id", userId).eq("is_active", true).order("sort_order"),
       supabase.from("categories").select("*").eq("user_id", userId).eq("is_active", true).order("sort_order"),
@@ -50,7 +50,7 @@ export function FinanceApp() {
 
     const categoryRows = (categoriesRes.data ?? []) as Category[];
     const groupRows = (groupsRes.data ?? []) as CategoryGroup[];
-    setAccounts((accountsRes.data ?? []) as Account[]);
+    setAccounts(sortAccountsStable((accountsRes.data ?? []) as Account[]));
     setDebts((debtsRes.data ?? []) as Debt[]);
     setGroups(groupRows.map((group) => ({ ...group, categories: categoryRows.filter((category) => category.group_id === group.id) })));
     setTransactions((transactionsRes.data ?? []) as Transaction[]);
@@ -143,8 +143,8 @@ export function FinanceApp() {
       setSession(data.session);
       if (data.session?.user.id) {
         await setupDefaults(data.session.user.id);
-        const { data: accountRows } = await supabase.from("accounts").select("*").eq("user_id", data.session.user.id).order("created_at");
-        const currentAccounts = (accountRows ?? []) as Account[];
+        const { data: accountRows } = await supabase.from("accounts").select("*").eq("user_id", data.session.user.id).eq("is_active", true).order("created_at");
+        const currentAccounts = sortAccountsStable((accountRows ?? []) as Account[]);
         await applyRecurring(data.session.user.id, currentAccounts);
         await load(data.session.user.id);
         await checkMonthClosing(data.session.user.id);

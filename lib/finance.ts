@@ -74,3 +74,26 @@ export function depotTax(balance: number, taxBase: number) {
 export function depotNetValue(balance: number, taxBase: number) {
   return Number(balance || 0) - depotTax(balance, taxBase);
 }
+
+export function accountSortRank(account: Pick<Account, "type" | "name" | "created_at">) {
+  const name = account.name.trim().toLowerCase();
+  if (account.type === "active") {
+    if (name === "n26") return 10;
+    if (name.includes("bank austria") || name.includes("bankaustria")) return 20;
+    if (name.includes("bargeld") || name.includes("cash")) return 30;
+    return 40;
+  }
+  if (account.type === "investment") return 100;
+  if (account.type === "bound") return 200;
+  return 300;
+}
+
+export function sortAccountsStable<T extends Pick<Account, "type" | "name" | "created_at">>(accounts: T[]) {
+  return [...accounts].sort((a, b) => {
+    const rankDiff = accountSortRank(a) - accountSortRank(b);
+    if (rankDiff !== 0) return rankDiff;
+    const createdDiff = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    if (createdDiff !== 0) return createdDiff;
+    return a.name.localeCompare(b.name, "de");
+  });
+}

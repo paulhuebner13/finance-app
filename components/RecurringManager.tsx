@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { AuthGate } from "@/components/AuthGate";
 import { formatEuro } from "@/lib/date";
-import { entryTypeLabel, parseAmount } from "@/lib/finance";
+import { entryTypeLabel, parseAmount, sortAccountsStable } from "@/lib/finance";
 import { supabase } from "@/lib/supabase";
 import type { Account, Category, CategoryGroup, CategoryWithChildren, EntryType, RecurringTransaction } from "@/lib/types";
 import { useSession } from "@/lib/useSession";
@@ -29,14 +29,14 @@ export function RecurringManager() {
     if (!session?.user.id) return;
     const [itemsRes, accountRes, groupRes, categoryRes] = await Promise.all([
       supabase.from("recurring_transactions").select("*").eq("user_id", session.user.id).order("day_of_month"),
-      supabase.from("accounts").select("*").eq("user_id", session.user.id).order("created_at"),
+      supabase.from("accounts").select("*").eq("user_id", session.user.id).eq("is_active", true).order("created_at"),
       supabase.from("category_groups").select("*").eq("user_id", session.user.id).order("sort_order"),
       supabase.from("categories").select("*").eq("user_id", session.user.id).order("sort_order")
     ]);
     const categoryRows = (categoryRes.data ?? []) as Category[];
     const groupRows = (groupRes.data ?? []) as CategoryGroup[];
     setItems((itemsRes.data ?? []) as RecurringTransaction[]);
-    setAccounts((accountRes.data ?? []) as Account[]);
+    setAccounts(sortAccountsStable((accountRes.data ?? []) as Account[]));
     setGroups(groupRows.map((group) => ({ ...group, categories: categoryRows.filter((category) => category.group_id === group.id) })));
   }, [session?.user.id]);
 

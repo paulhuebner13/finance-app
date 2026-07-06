@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { AuthGate } from "@/components/AuthGate";
 import { formatEuro } from "@/lib/date";
+import { sortAccountsStable } from "@/lib/finance";
 import { supabase } from "@/lib/supabase";
 import type { Account, AccountType } from "@/lib/types";
 import { useSession } from "@/lib/useSession";
@@ -17,8 +18,8 @@ export function AccountsManager() {
 
   const load = useCallback(async () => {
     if (!session?.user.id) return;
-    const { data } = await supabase.from("accounts").select("*").eq("user_id", session.user.id).order("created_at");
-    setAccounts((data ?? []) as Account[]);
+    const { data } = await supabase.from("accounts").select("*").eq("user_id", session.user.id).eq("is_active", true).order("created_at");
+    setAccounts(sortAccountsStable((data ?? []) as Account[]));
   }, [session?.user.id]);
 
   useEffect(() => { load(); }, [load]);

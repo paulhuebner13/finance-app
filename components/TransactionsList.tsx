@@ -5,7 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { AuthGate } from "@/components/AuthGate";
 import { BookingModal } from "@/components/BookingModal";
 import { formatEuro, getMonthRange, monthKey } from "@/lib/date";
-import { applyDeltas, entryTypeLabel, invertDeltas, transactionDeltas } from "@/lib/finance";
+import { applyDeltas, entryTypeLabel, invertDeltas, sortAccountsStable, transactionDeltas } from "@/lib/finance";
 import { supabase } from "@/lib/supabase";
 import type { Account, Category, CategoryGroup, CategoryWithChildren, Transaction } from "@/lib/types";
 import { useSession } from "@/lib/useSession";
@@ -28,14 +28,14 @@ export function TransactionsList() {
       supabase.from("transactions").select("*").eq("user_id", session.user.id).gte("date", range.start).lte("date", range.end).order("date", { ascending: false }).order("created_at", { ascending: false }),
       supabase.from("category_groups").select("*").eq("user_id", session.user.id).order("sort_order"),
       supabase.from("categories").select("*").eq("user_id", session.user.id).order("sort_order"),
-      supabase.from("accounts").select("*").eq("user_id", session.user.id).order("created_at")
+      supabase.from("accounts").select("*").eq("user_id", session.user.id).eq("is_active", true).order("created_at")
     ]);
     const categoryRows = (categoryRes.data ?? []) as Category[];
     const groupRows = (groupRes.data ?? []) as CategoryGroup[];
     setTransactions((txRes.data ?? []) as Transaction[]);
     setCategories(categoryRows);
     setGroups(groupRows.map((group) => ({ ...group, categories: categoryRows.filter((category) => category.group_id === group.id) })));
-    setAccounts((accountRes.data ?? []) as Account[]);
+    setAccounts(sortAccountsStable((accountRes.data ?? []) as Account[]));
   }, [month, session?.user.id]);
 
   useEffect(() => { load(); }, [load]);

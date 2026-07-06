@@ -493,3 +493,14 @@ input, select, textarea {
   .solo-budget-row span { grid-column: 1; }
   .subedit-main { grid-template-columns: 1fr 78px; }
 }
+
+/* Patch: wealth total excludes bound money, stable account order, aggregated debts */
+.muted-money-row {
+  opacity: 0.72;
+}
+.muted-money-row b {
+  color: var(--muted);
+}
+.debt-money-row b {
+  white-space: nowrap;
+}
