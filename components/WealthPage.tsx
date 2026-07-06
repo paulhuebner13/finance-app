@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { AuthGate } from "@/components/AuthGate";
 import { formatEuro } from "@/lib/date";
+import { depotNetValue, depotTax } from "@/lib/finance";
 import { supabase } from "@/lib/supabase";
 import type { Account, Debt } from "@/lib/types";
 import { useSession } from "@/lib/useSession";
@@ -44,7 +45,13 @@ export function WealthPage() {
       .reduce((sum, account) => sum + Number(account.balance), 0);
     const depot = accounts
       .filter((account) => account.type === "investment")
+      .reduce((sum, account) => sum + depotNetValue(Number(account.balance), Number(account.cost_basis ?? 0)), 0);
+    const depotGross = accounts
+      .filter((account) => account.type === "investment")
       .reduce((sum, account) => sum + Number(account.balance), 0);
+    const depotTaxTotal = accounts
+      .filter((account) => account.type === "investment")
+      .reduce((sum, account) => sum + depotTax(Number(account.balance), Number(account.cost_basis ?? 0)), 0);
     const owedToMe = debts
       .filter((debt) => debt.kind === "owed_to_me")
       .reduce((sum, debt) => sum + Number(debt.amount), 0);
@@ -52,7 +59,7 @@ export function WealthPage() {
       .filter((debt) => debt.kind === "i_owe")
       .reduce((sum, debt) => sum + Number(debt.amount), 0);
     const total = active + bound + depot + owedToMe - iOwe;
-    return { active, bound, depot, owedToMe, iOwe, total };
+    return { active, bound, depot, depotGross, depotTaxTotal, owedToMe, iOwe, total };
   }, [accounts, debts]);
 
   if (loading) return <main className="loading-page">Laden...</main>;
@@ -61,16 +68,8 @@ export function WealthPage() {
   return (
     <AppShell>
       <main className="dashboard">
-        <section className="hero-card compact">
+        <section className="hero-card compact money-total-card">
           <h1>{formatEuro(sums.total)}</h1>
-          <div className="summary-grid">
-            <div><span>Verfügbar</span><strong>{formatEuro(sums.active)}</strong></div>
-            <div><span>Depot</span><strong>{formatEuro(sums.depot)}</strong></div>
-            <div><span>Gebunden</span><strong>{formatEuro(sums.bound)}</strong></div>
-            <div><span>Schulden</span><strong>{formatEuro(sums.iOwe)}</strong></div>
-            <div><span>Bei mir offen</span><strong>{formatEuro(sums.owedToMe)}</strong></div>
-            <div><span>Ohne Depot</span><strong>{formatEuro(sums.active + sums.bound + sums.owedToMe - sums.iOwe)}</strong></div>
-          </div>
         </section>
 
         <section>
@@ -80,11 +79,11 @@ export function WealthPage() {
                 <div>
                   <strong>{account.name}</strong>
                   <span>
-                    {account.type === "active" ? "Aktiv" : account.type === "bound" ? "Gebunden" : "Depot"}
+                    {account.type === "active" ? "Konto" : account.type === "bound" ? "Gebunden" : `Depot · Steuer ${formatEuro(depotTax(Number(account.balance), Number(account.cost_basis ?? 0)))}`}
                     {account.is_default ? " · Standard" : ""}
                   </span>
                 </div>
-                <b>{formatEuro(Number(account.balance))}</b>
+                <b>{account.type === "investment" ? formatEuro(depotNetValue(Number(account.balance), Number(account.cost_basis ?? 0))) : formatEuro(Number(account.balance))}</b>
               </article>
             ))}
             {debts.map((debt) => (

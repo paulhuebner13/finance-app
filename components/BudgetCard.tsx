@@ -10,6 +10,7 @@ type Props = {
   currentDay: number;
   expanded?: boolean;
   onClick?: () => void;
+  overrideSpent?: number;
 };
 
 function activeCategories(group: CategoryWithChildren) {
@@ -18,6 +19,12 @@ function activeCategories(group: CategoryWithChildren) {
 
 function groupBudget(group: CategoryWithChildren, daysInMonth: number, currentDay: number) {
   const categories = activeCategories(group);
+  if (!categories.length) {
+    return {
+      limit: adjustedMonthlyLimit(group.average_monthly_budget, daysInMonth, group.budget_period),
+      plan: plannedUntilCurrentDay(group.average_monthly_budget, currentDay, group.budget_period)
+    };
+  }
   return {
     limit: categories.reduce((sum, category) => sum + adjustedMonthlyLimit(category.average_monthly_budget, daysInMonth, category.budget_period), 0),
     plan: categories.reduce((sum, category) => sum + plannedUntilCurrentDay(category.average_monthly_budget, currentDay, category.budget_period), 0)
@@ -30,8 +37,8 @@ function spentFor(transactions: Transaction[], categoryId?: string) {
     .reduce((sum, transaction) => sum + Number(transaction.amount), 0);
 }
 
-export function BudgetCard({ group, transactions, daysInMonth, currentDay, expanded = false, onClick }: Props) {
-  const spent = spentFor(transactions);
+export function BudgetCard({ group, transactions, daysInMonth, currentDay, expanded = false, onClick, overrideSpent }: Props) {
+  const spent = overrideSpent ?? spentFor(transactions);
   const budget = groupBudget(group, daysInMonth, currentDay);
   const spentPercent = budget.limit > 0 ? Math.min(120, (spent / budget.limit) * 100) : 0;
   const planPercent = budget.limit > 0 ? Math.min(100, (budget.plan / budget.limit) * 100) : 0;
@@ -54,7 +61,7 @@ export function BudgetCard({ group, transactions, daysInMonth, currentDay, expan
         </div>
       </button>
 
-      {expanded && (
+      {expanded && activeCategories(group).length > 0 && (
         <div className="subcategory-panel">
           {activeCategories(group).map((category) => {
             const categorySpent = spentFor(transactions, category.id);

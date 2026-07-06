@@ -15,8 +15,10 @@ function parseBudget(value: string | number) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function childBudgetSum(group: CategoryWithChildren) {
-  return group.categories.filter((category) => category.is_active).reduce((sum, category) => sum + Number(category.average_monthly_budget), 0);
+function effectiveGroupBudget(group: CategoryWithChildren) {
+  const activeChildren = group.categories.filter((category) => category.is_active);
+  if (!activeChildren.length) return Number(group.average_monthly_budget) || 0;
+  return activeChildren.reduce((sum, category) => sum + Number(category.average_monthly_budget), 0);
 }
 
 export function CategoriesManager() {
@@ -39,11 +41,12 @@ export function CategoriesManager() {
 
   useEffect(() => { load(); }, [load]);
 
-  const totalExpenseBudget = useMemo(() => groups.filter((g) => g.kind === "expense" && g.is_active).reduce((sum, group) => sum + childBudgetSum(group), 0), [groups]);
+  const totalExpenseBudget = useMemo(() => groups.filter((g) => g.kind === "expense" && g.is_active).reduce((sum, group) => sum + effectiveGroupBudget(group), 0), [groups]);
 
   async function syncGroupBudget(group: CategoryWithChildren, nextCategories?: Category[]) {
     if (!session?.user.id) return;
     const categories = nextCategories ?? group.categories;
+    if (!categories.length) return;
     const sum = categories.filter((c) => c.is_active).reduce((total, c) => total + Number(c.average_monthly_budget), 0);
     await supabase.from("category_groups").update({ average_monthly_budget: sum }).eq("id", group.id).eq("user_id", session.user.id);
   }
@@ -143,36 +146,53 @@ export function CategoriesManager() {
 
         <section className="cards-stack">
           {groups.map((group) => {
-            const effective = childBudgetSum(group);
+            const effective = effectiveGroupBudget(group);
+            const hasChildren = group.categories.length > 0;
             return (
               <article className="category-edit-card" key={group.id} style={{ ["--accent" as string]: group.color }}>
-                <div className="budget-card-header">
+                <div className="budget-card-header simple-category-head">
                   <div>
                     <input className="plain-input" defaultValue={group.name} onBlur={(e) => e.target.value.trim() && updateGroup(group, { name: e.target.value.trim() })} />
                     <p className="muted small">{formatEuro(effective)}</p>
                   </div>
-                  <select className="group-period-select" value={group.budget_period} onChange={(e) => updateGroup(group, { budget_period: e.target.value as BudgetPeriod })}>
-                    <option value="daily">täglich</option>
-                    <option value="monthly">monatlich</option>
-                  </select>
+                  {!hasChildren && (
+                    <select className="group-period-select" value={group.budget_period} onChange={(e) => updateGroup(group, { budget_period: e.target.value as BudgetPeriod })}>
+                      <option value="daily">täglich</option>
+                      <option value="monthly">monatlich</option>
+                    </select>
+                  )}
                 </div>
 
-                <div className="subcategory-edit-list">
-                  {group.categories.map((category) => (
-                    <div className={`subcategory-edit-row ${!category.is_active ? "is-disabled" : ""}`} key={category.id}>
-                      <input className="plain-input" defaultValue={category.name} onBlur={(e) => e.target.value.trim() && updateCategory(group, category, { name: e.target.value.trim() })} />
-                      <input className="budget-input" inputMode="decimal" defaultValue={String(category.average_monthly_budget)} onBlur={(e) => updateCategory(group, category, { average_monthly_budget: parseBudget(e.target.value) })} />
-                      <select value={category.budget_period} onChange={(e) => updateCategory(group, category, { budget_period: e.target.value as BudgetPeriod })}>
-                        <option value="daily">täglich</option>
-                        <option value="monthly">monatlich</option>
-                      </select>
-                      <button className="mini-button" onClick={() => toggleCategory(group, category)}>{category.is_active ? "aus" : "an"}</button>
-                    </div>
-                  ))}
-                </div>
+                {!hasChildren && (
+                  <div className="solo-budget-row">
+                    <input className="budget-input" inputMode="decimal" defaultValue={String(group.average_monthly_budget)} onBlur={(e) => updateGroup(group, { average_monthly_budget: parseBudget(e.target.value) })} />
+                    <span>{group.budget_period === "daily" ? "täglich" : "monatlich"}</span>
+                    <button className="mini-button" onClick={() => updateGroup(group, { is_active: !group.is_active })}>{group.is_active ? "aus" : "an"}</button>
+                  </div>
+                )}
+
+                {hasChildren && (
+                  <div className="subcategory-edit-list slim-subcategory-list">
+                    {group.categories.map((category) => (
+                      <div className={`subcategory-edit-row slim ${!category.is_active ? "is-disabled" : ""}`} key={category.id}>
+                        <div className="subedit-main">
+                          <input className="plain-input" defaultValue={category.name} onBlur={(e) => e.target.value.trim() && updateCategory(group, category, { name: e.target.value.trim() })} />
+                          <input className="subedit-amount" inputMode="decimal" defaultValue={String(category.average_monthly_budget)} onBlur={(e) => updateCategory(group, category, { average_monthly_budget: parseBudget(e.target.value) })} />
+                        </div>
+                        <div className="subedit-meta">
+                          <select value={category.budget_period} onChange={(e) => updateCategory(group, category, { budget_period: e.target.value as BudgetPeriod })}>
+                            <option value="daily">täglich</option>
+                            <option value="monthly">monatlich</option>
+                          </select>
+                          <button className="mini-button" onClick={() => toggleCategory(group, category)}>{category.is_active ? "aus" : "an"}</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <div className="subchips">
-                  <button className="add-chip" onClick={() => addSubcategory(group)}>+ Untergruppe</button>
+                  {hasChildren && <button className="add-chip" onClick={() => addSubcategory(group)}>+ Untergruppe</button>}
                   {group.is_active ? <button className="danger-chip" onClick={() => deactivateGroup(group)}>deaktivieren</button> : <button className="add-chip" onClick={() => updateGroup(group, { is_active: true })}>reaktivieren</button>}
                 </div>
               </article>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { formatMonthTitle } from "@/lib/date";
-import { parseAmount } from "@/lib/finance";
+import { depotTax, parseAmount } from "@/lib/finance";
 import { supabase } from "@/lib/supabase";
 import type { Account, Debt } from "@/lib/types";
 
@@ -51,7 +51,7 @@ export function MonthClosingModal({ open, month, userId, accounts, debts, onClos
         const actual = parseAmount(accountValues[account.id] ?? "0");
         const { error: accountError } = await supabase
           .from("accounts")
-          .update({ balance: actual })
+          .update(account.type === "investment" ? { balance: actual, tax_reserve: depotTax(actual, Number(account.cost_basis ?? 0)) } : { balance: actual })
           .eq("id", account.id)
           .eq("user_id", userId);
         if (accountError) throw accountError;

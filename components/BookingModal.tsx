@@ -80,6 +80,7 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
 
   const selectedGroup = groups.find((g) => g.id === groupId);
   const selectedCategories = selectedGroup?.categories ?? [];
+  const hasSubcategories = selectedCategories.length > 0;
   function applyDefaultAccounts(nextType: EntryType) {
     if (nextType === "expense" || nextType === "income") {
       setAccountId(defaultAccount?.id ?? "");
@@ -229,13 +230,15 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
                 {relevantGroups.map((group) => <option key={group.id} value={group.id}>{group.name}</option>)}
               </select>
             </label>
-            <label>
-              Unterkategorie
-              <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} disabled={!groupId}>
-                <option value="">Sonstiges/automatisch</option>
-                {selectedCategories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
-              </select>
-            </label>
+            {hasSubcategories && (
+              <label>
+                Unterkategorie
+                <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} disabled={!groupId}>
+                  <option value="">Sonstiges/automatisch</option>
+                  {selectedCategories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+                </select>
+              </label>
+            )}
           </>
         ) : (
           <>
@@ -247,13 +250,15 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
               </select>
             </label>
 
-            <label>
-              Unterkategorie
-              <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} disabled={!groupId}>
-                <option value="">Sonstiges/automatisch</option>
-                {selectedCategories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
-              </select>
-            </label>
+            {hasSubcategories && (
+              <label>
+                Unterkategorie
+                <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} disabled={!groupId}>
+                  <option value="">Sonstiges/automatisch</option>
+                  {selectedCategories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+                </select>
+              </label>
+            )}
 
             <label>
               Konto

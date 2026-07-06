@@ -62,3 +62,15 @@ export function entryTypeLabel(type: string) {
   if (type === "investment") return "Investition";
   return type;
 }
+
+
+export const KEST_RATE = 0.275;
+
+export function depotTax(balance: number, taxBase: number) {
+  const gain = Number(balance || 0) - Number(taxBase || 0);
+  return Math.max(0, gain * KEST_RATE);
+}
+
+export function depotNetValue(balance: number, taxBase: number) {
+  return Number(balance || 0) - depotTax(balance, taxBase);
+}

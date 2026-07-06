@@ -14,7 +14,9 @@ import { dateForMonthDay, dayOfMonth, daysInMonth, formatEuro, getMonthRange, mo
 import type { Account, Category, CategoryGroup, CategoryWithChildren, Debt, RecurringTransaction, Transaction } from "@/lib/types";
 
 function categoriesBudgetSum(group: CategoryWithChildren) {
-  return group.categories.filter((category) => category.is_active).reduce((sum, category) => sum + Number(category.average_monthly_budget), 0);
+  const active = group.categories.filter((category) => category.is_active);
+  if (!active.length) return Number(group.average_monthly_budget) || 0;
+  return active.reduce((sum, category) => sum + Number(category.average_monthly_budget), 0);
 }
 
 export function FinanceApp() {
@@ -64,7 +66,7 @@ export function FinanceApp() {
     const { data: existingGroups } = await supabase.from("category_groups").select("id").eq("user_id", userId).limit(1);
     if (!existingGroups?.length) {
       for (const [index, group] of defaultCategoryGroups.entries()) {
-        const groupBudget = group.categories.reduce((sum, category) => sum + Number(category.average_monthly_budget), 0);
+        const groupBudget = group.categories.length ? group.categories.reduce((sum, category) => sum + Number(category.average_monthly_budget), 0) : group.average_monthly_budget;
         const { data: insertedGroup, error } = await supabase
           .from("category_groups")
           .insert({
@@ -81,14 +83,16 @@ export function FinanceApp() {
 
         if (error || !insertedGroup) continue;
 
-        await supabase.from("categories").insert(group.categories.map((category, categoryIndex) => ({
-          user_id: userId,
-          group_id: insertedGroup.id,
-          name: category.name,
-          average_monthly_budget: category.average_monthly_budget,
-          budget_period: category.budget_period ?? group.budget_period,
-          sort_order: categoryIndex
-        })));
+        if (group.categories.length) {
+          await supabase.from("categories").insert(group.categories.map((category, categoryIndex) => ({
+            user_id: userId,
+            group_id: insertedGroup.id,
+            name: category.name,
+            average_monthly_budget: category.average_monthly_budget,
+            budget_period: category.budget_period ?? group.budget_period,
+            sort_order: categoryIndex
+          })));
+        }
       }
     }
     setBootstrapping(false);
@@ -159,8 +163,11 @@ export function FinanceApp() {
     const expenses = transactions.filter((t) => t.type === "expense").reduce((sum, t) => sum + Number(t.amount), 0);
     const income = transactions.filter((t) => t.type === "income").reduce((sum, t) => sum + Number(t.amount), 0);
     const investments = transactions.filter((t) => t.type === "investment").reduce((sum, t) => sum + Number(t.amount), 0);
-    return { expenses, income, investments, untracked: income - expenses - investments };
-  }, [transactions]);
+    const outingGroup = groups.find((g) => g.name.toLowerCase() === "ausgehen");
+    const outingTracked = outingGroup ? transactions.filter((t) => t.type === "expense" && t.group_id === outingGroup.id).reduce((sum, t) => sum + Number(t.amount), 0) : 0;
+    const expensesWithoutOuting = expenses - outingTracked;
+    return { expenses, income, investments, outingValue: Math.max(0, income - expensesWithoutOuting - investments) };
+  }, [transactions, groups]);
 
   const expenseGroups = groups.filter((g) => g.kind === "expense");
   const currentDay = dayOfMonth();
@@ -188,21 +195,10 @@ export function FinanceApp() {
                 currentDay={currentDay}
                 expanded={selectedGroupId === group.id}
                 onClick={() => setSelectedGroupId((current) => current === group.id ? null : group.id)}
+                overrideSpent={group.name.toLowerCase() === "ausgehen" ? stats.outingValue : undefined}
               />
             ))}
 
-            <article className="budget-card outing-card" style={{ ["--accent" as string]: "#F97316" }}>
-              <div className="budget-card-header compact-budget-head">
-                <div>
-                  <p className="card-title">Ausgehen</p>
-                  <p className="muted small">Einnahmen − Ausgaben − Investieren</p>
-                </div>
-                <strong className={stats.untracked < 0 ? "negative" : ""}>{formatEuro(stats.untracked)}</strong>
-              </div>
-              <div className="budget-bar outing-bar">
-                <div className="budget-fill" style={{ width: `${stats.income > 0 ? Math.min(100, ((stats.expenses + stats.investments) / stats.income) * 100) : 0}%` }} />
-              </div>
-            </article>
           </div>
         </section>
 

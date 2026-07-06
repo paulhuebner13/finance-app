@@ -1,35 +1,30 @@
 # Finance App
 
-Mobile-first Finanz-App mit Supabase Auth, Konten, Budgets, Buchungen, Depot, Schulden und Monatsabschluss.
+Next.js + Supabase finance app.
 
-## Setup
+## Wichtig nach diesem Patch
 
-```bash
-npm install
-cp .env.example .env.local
-npm run dev
-```
+In Supabase einmal ausführen:
 
-`.env.local`:
+- `supabase/migrations_add_outing_tax_cleanup.sql`
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=...
-NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-```
+Danach lokal:
 
-## Supabase
-
-Für neue Projekte `supabase/schema.sql` ausführen.
-
-Für bestehende Projekte zuerst bestehende Migrationen ausführen und danach:
-
-- `supabase/migrations_add_debts_investments_outing.sql`
-
-## Deploy
-
-```bash
-npm run build
+```powershell
+npm.cmd config set registry https://registry.npmjs.org/
+Remove-Item package-lock.json -Force
+Remove-Item node_modules -Recurse -Force -ErrorAction SilentlyContinue
+npm.cmd install
+npm.cmd run build
 git add .
-git commit -m "Update budget debt and depot flow"
+git commit -m "Update money budgets depot"
 git push
 ```
+
+Falls `package-lock.json` beim Kopieren ersetzt wurde: vor dem Push prüfen:
+
+```powershell
+Select-String -Path package-lock.json -Pattern "applied-caas"
+```
+
+Es darf nichts ausgegeben werden.
