@@ -5,6 +5,11 @@ export const metadata: Metadata = {
   title: "Finance App",
   description: "Mobile-first Finanztracking mit Kategorien, Konten und Budget-Bars.",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg"
+  },
   appleWebApp: {
     capable: true,
     title: "Finance"
@@ -14,7 +19,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#f5f1e8"
+  themeColor: "#F6EFE2"
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
