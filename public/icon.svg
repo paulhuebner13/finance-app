@@ -1,12 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Finance app icon">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Finance App Logo">
   <rect width="512" height="512" rx="112" fill="#F6EFE2"/>
-  <circle cx="256" cy="256" r="152" fill="none" stroke="#E8DCCB" stroke-width="78" opacity="0.55"/>
-  <g transform="rotate(-90 256 256)" fill="none" stroke-width="78" stroke-linecap="round" pathLength="100">
-    <circle cx="256" cy="256" r="152" stroke="#8FA977" stroke-dasharray="31 69" stroke-dashoffset="0"/>
-    <circle cx="256" cy="256" r="152" stroke="#E56F52" stroke-dasharray="23 77" stroke-dashoffset="-33"/>
-    <circle cx="256" cy="256" r="152" stroke="#DCA63A" stroke-dasharray="17 83" stroke-dashoffset="-58"/>
-    <circle cx="256" cy="256" r="152" stroke="#7899A8" stroke-dasharray="12 88" stroke-dashoffset="-77"/>
-    <circle cx="256" cy="256" r="152" stroke="#3F434B" stroke-dasharray="8 92" stroke-dashoffset="-91"/>
-  </g>
-  <circle cx="256" cy="256" r="82" fill="#F6EFE2"/>
+  <circle cx="256" cy="256" r="145" fill="none" stroke="#E8D8BE" stroke-width="72" opacity="0.38"/>
+  <path d="M 268.638 111.552 A 145 145 0 0 1 307.963 391.369" fill="none" stroke="#88A66F" stroke-width="72" stroke-linecap="round"/>
+  <path d="M 286.147 397.831 A 145 145 0 0 1 115.307 220.921" fill="none" stroke="#D96F4F" stroke-width="72" stroke-linecap="round"/>
+  <path d="M 125.675 192.436 A 145 145 0 0 1 243.362 111.552" fill="none" stroke="#D8A437" stroke-width="72" stroke-linecap="round"/>
+  <circle cx="256" cy="256" r="84" fill="#F6EFE2"/>
 </svg>

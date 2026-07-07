@@ -1097,3 +1097,196 @@ html { scrollbar-color: rgba(117, 107, 93, 0.42) transparent; }
 .tx-row {
   color: var(--text);
 }
+
+/* Final UI patch: ordered tabs, start total, transaction strips, money colors, analysis months, simple SVG-logo app pass */
+.start-total-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.78rem 0.95rem;
+  border-radius: 22px;
+  background: rgba(255, 253, 248, 0.88);
+  border: 1.6px solid rgba(94, 74, 48, 0.16);
+  box-shadow: 0 10px 24px rgba(120, 97, 68, 0.09);
+}
+.start-total-card span {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 850;
+}
+.start-total-card strong {
+  color: var(--text);
+  font-size: 1.04rem;
+  white-space: nowrap;
+  letter-spacing: -0.02em;
+}
+
+/* Buttons: beige, calm, with darker border from the same family */
+.primary, .big-add, .floating-booking-button {
+  border: 1.8px solid #9f7f52 !important;
+  background: linear-gradient(180deg, #eadcc6 0%, #d8c2a1 100%) !important;
+  color: #2f2518 !important;
+  box-shadow: 0 12px 28px rgba(120, 97, 68, 0.18), inset 0 1px 0 rgba(255,255,255,0.58) !important;
+}
+.primary:hover, .big-add:hover, .floating-booking-button:hover {
+  background: linear-gradient(180deg, #e6d4ba 0%, #c9ad82 100%) !important;
+}
+.add-chip, .subchips .add-chip {
+  border-color: #a98758 !important;
+}
+
+/* Buchungen: card rows with a simple colored left strip */
+.list-card:has(.transaction-card) {
+  display: grid;
+  gap: 0.62rem;
+  padding: 0.72rem;
+}
+.transaction-card {
+  --tx: #8b7353;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.8rem;
+  align-items: center;
+  padding: 0.82rem 0.82rem 0.82rem 1rem;
+  border-radius: 18px;
+  background: rgba(255, 253, 248, 0.86);
+  border: 1px solid rgba(44, 38, 30, 0.11);
+  box-shadow: 0 8px 18px rgba(92, 73, 49, 0.06);
+  overflow: hidden;
+}
+.transaction-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: var(--tx);
+}
+.transaction-card.tx-expense { --tx: var(--danger); }
+.transaction-card.tx-income { --tx: var(--success); }
+.transaction-card.tx-transfer { --tx: var(--warning); }
+.transaction-card.tx-investment { --tx: var(--investment); }
+.transaction-main { min-width: 0; display: grid; gap: 0.18rem; }
+.transaction-main strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.transaction-main span { color: var(--muted); font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.transaction-card .tx-actions { min-width: 7.6rem; }
+.transaction-card .tx-actions b { color: var(--tx) !important; }
+@media (max-width: 520px) {
+  .transaction-card { grid-template-columns: 1fr; gap: 0.6rem; }
+  .transaction-card .tx-actions { justify-items: start; grid-template-columns: auto auto auto; align-items: center; min-width: 0; }
+}
+
+/* Geld: rows get coherent colors without side stripes */
+.money-stack .clean-money-row {
+  border: 1.7px solid color-mix(in srgb, var(--accent, #8b7353) 44%, rgba(44,38,30,0.12)) !important;
+  background:
+    linear-gradient(180deg, rgba(255,253,248,0.98), rgba(250,244,234,0.92)),
+    color-mix(in srgb, var(--accent, #8b7353) 10%, white) !important;
+}
+.money-stack .clean-money-row strong::before {
+  content: "";
+  display: inline-block;
+  width: 0.62rem;
+  height: 0.62rem;
+  border-radius: 999px;
+  background: var(--accent, #8b7353);
+  margin-right: 0.48rem;
+  vertical-align: 0.02rem;
+}
+.money-stack .debt-money-row b { color: var(--accent, var(--text)) !important; }
+
+/* Abrechnung: expanded values always one below another */
+.closing-edit-list {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 0.65rem !important;
+}
+.closing-edit-list label {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 0.42rem !important;
+  min-width: 0 !important;
+}
+.closing-edit-list input { width: 100% !important; min-width: 0 !important; }
+
+/* Budgets: no duplicate group name in expanded body; compact fields away from the screen edge */
+.budget-group-body { padding-top: 0.12rem; }
+.budget-sub-top {
+  grid-template-columns: minmax(0, 1fr) minmax(92px, 116px) !important;
+  padding-right: 0.12rem;
+}
+.budget-sub-row { overflow: hidden; }
+.budget-sub-top .subedit-amount { max-width: 116px; justify-self: end; }
+.budget-group-summary::after {
+  content: "›";
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--muted);
+  transform: rotate(90deg);
+  opacity: 0.62;
+}
+.budget-group-summary { grid-template-columns: minmax(0, 1fr) auto auto !important; }
+
+/* Analyse: last-month bars by group */
+.monthly-analysis-stack { gap: 0.82rem; }
+.monthly-group-card {
+  border-radius: 24px;
+  padding: 0.92rem;
+  background:
+    linear-gradient(180deg, rgba(255,253,248,0.98), rgba(250,244,234,0.92)),
+    color-mix(in srgb, var(--accent, #8b7353) 8%, white);
+  border: 1.7px solid color-mix(in srgb, var(--accent, #8b7353) 42%, rgba(44,38,30,0.12));
+  box-shadow: 0 10px 24px rgba(92, 73, 49, 0.08);
+}
+.monthly-group-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.74rem;
+}
+.monthly-group-head strong { font-size: 1rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.monthly-group-head b { white-space: nowrap; }
+.month-bars { display: grid; gap: 0.48rem; }
+.month-bar-row {
+  display: grid;
+  grid-template-columns: 3.2rem minmax(0, 1fr) auto;
+  gap: 0.55rem;
+  align-items: center;
+}
+.month-bar-row span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: lowercase;
+}
+.month-bar-row b {
+  white-space: nowrap;
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+.month-bar-track {
+  height: 0.72rem;
+  border-radius: 999px;
+  background: rgba(44, 38, 30, 0.10);
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(44,38,30,0.05);
+}
+.month-bar-track > div {
+  height: 100%;
+  min-width: 2px;
+  border-radius: 999px;
+  background: var(--accent, #8b7353);
+}
+@media (max-width: 420px) {
+  .month-bar-row { grid-template-columns: 2.7rem minmax(0, 1fr); }
+  .month-bar-row b { grid-column: 2; color: var(--muted); }
+}
+
+/* Bottom bar now has 11 tabs in the requested order */
+.bottom-nav { grid-template-columns: repeat(11, minmax(78px, 1fr)) !important; overflow-x: auto; }
+@media (min-width: 521px) { .bottom-nav { grid-template-columns: repeat(11, minmax(84px, 1fr)) !important; } }
+@media (max-width: 520px) { .bottom-nav { grid-template-columns: repeat(11, minmax(76px, 1fr)) !important; } }

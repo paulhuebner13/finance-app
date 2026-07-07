@@ -152,8 +152,6 @@ export function CategoriesManager() {
 
                 {open && (
                   <div className="budget-group-body">
-                    <input className="plain-input group-name-input" defaultValue={group.name} onBlur={(e) => e.target.value.trim() && updateGroup(group, { name: e.target.value.trim() })} />
-
                     {!hasChildren && (
                       <div className="solo-budget-row clean-budget-row">
                         <input className="budget-input" inputMode="decimal" defaultValue={formatNumber(Number(group.average_monthly_budget))} onBlur={(e) => updateGroup(group, { average_monthly_budget: parseAmount(e.target.value) })} />

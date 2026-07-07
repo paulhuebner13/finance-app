@@ -10,13 +10,19 @@ import { BudgetCard } from "@/components/BudgetCard";
 import { MonthClosingModal } from "@/components/MonthClosingModal";
 import { defaultAccounts, defaultCategoryGroups } from "@/lib/defaults";
 import { applyDeltas, invertDeltas, mergeDeltas, sortAccountsStable, transactionDeltas } from "@/lib/finance";
-import { dateForMonthDay, dayOfMonth, daysInMonth, formatEuro, getMonthRange, monthKey, previousMonthKey, todayISO } from "@/lib/date";
+import { dateForMonthDay, dayOfMonth, daysInMonth, formatEuro, getMonthRange, monthKey, plannedUntilCurrentDay, previousMonthKey, todayISO } from "@/lib/date";
 import type { Account, Category, CategoryGroup, CategoryWithChildren, Debt, RecurringTransaction, Transaction } from "@/lib/types";
 
 function categoriesBudgetSum(group: CategoryWithChildren) {
   const active = group.categories.filter((category) => category.is_active);
   if (!active.length) return Number(group.average_monthly_budget) || 0;
   return active.reduce((sum, category) => sum + Number(category.average_monthly_budget), 0);
+}
+
+function categoriesPlanSum(group: CategoryWithChildren, currentDay: number) {
+  const active = group.categories.filter((category) => category.is_active);
+  if (!active.length) return plannedUntilCurrentDay(Number(group.average_monthly_budget), currentDay, group.budget_period);
+  return active.reduce((sum, category) => sum + plannedUntilCurrentDay(Number(category.average_monthly_budget), currentDay, category.budget_period), 0);
 }
 
 export function FinanceApp() {
@@ -217,6 +223,7 @@ export function FinanceApp() {
   const expenseGroups = groups.filter((g) => g.kind === "expense");
   const currentDay = dayOfMonth();
   const monthDays = daysInMonth();
+  const plannedExpenses = expenseGroups.reduce((sum, group) => sum + categoriesPlanSum(group, currentDay), 0);
 
   if (loading || bootstrapping) {
     return <main className="loading-page">Laden...</main>;
@@ -227,6 +234,11 @@ export function FinanceApp() {
   return (
     <AppShell>
       <main className="dashboard start-dashboard">
+        <section className="start-total-card">
+          <span>Ausgaben</span>
+          <strong>{formatEuro(stats.expenses)} / {formatEuro(plannedExpenses)}</strong>
+        </section>
+
         <section>
           <div className="cards-stack compact-cards">
             {expenseGroups.map((group) => (

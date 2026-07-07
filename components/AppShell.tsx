@@ -6,15 +6,15 @@ import { useEffect, useRef } from "react";
 
 const nav = [
   { href: "/", label: "Start" },
+  { href: "/accounts", label: "Konten" },
   { href: "/transactions", label: "Buchungen" },
   { href: "/wealth", label: "Geld" },
   { href: "/debts", label: "Schulden" },
   { href: "/closings", label: "Abrechnung" },
-  { href: "/accounts", label: "Konten" },
-  { href: "/categories", label: "Budgets" },
   { href: "/recurring", label: "Regeln" },
-  { href: "/investments", label: "Depot" },
+  { href: "/categories", label: "Budgets" },
   { href: "/analysis", label: "Analyse" },
+  { href: "/investments", label: "Depot" },
   { href: "/profile", label: "Profil" }
 ];
 

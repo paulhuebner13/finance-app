@@ -98,8 +98,8 @@ export function TransactionsList() {
             const from = accounts.find((a) => a.id === tx.from_account_id);
             const to = accounts.find((a) => a.id === tx.to_account_id);
             return (
-              <div className={`tx-row tx-${tx.type}`} key={tx.id}>
-                <div>
+              <article className={`transaction-card tx-${tx.type}`} key={tx.id}>
+                <div className="transaction-main">
                   <strong>{tx.note || category?.name || group?.name || entryTypeLabel(tx.type)}</strong>
                   <span>{tx.date} · {entryTypeLabel(tx.type)} · {tx.type === "transfer" || tx.type === "investment" ? `${from?.name ?? "?"} → ${to?.name ?? "?"}` : `${group?.name ?? ""}${category ? ` / ${category.name}` : ""} · ${account?.name ?? ""}`}</span>
                 </div>
@@ -108,7 +108,7 @@ export function TransactionsList() {
                   <button className="mini-button" onClick={() => setEditing(tx)}>bearbeiten</button>
                   <button className="mini-button danger" onClick={() => deleteTransaction(tx)}>löschen</button>
                 </div>
-              </div>
+              </article>
             );
           })}
           {!filtered.length && <p className="muted center">Keine Buchungen.</p>}
