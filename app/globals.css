@@ -805,3 +805,177 @@ input:focus, select:focus, textarea:focus { border-color: rgba(14, 165, 233, 0.7
   .solo-budget-row.clean-budget-row { grid-template-columns: 1fr auto; }
   .solo-budget-row.clean-budget-row select { grid-column: 1 / -1; }
 }
+
+/* Final color system pass: coherent light palette, no side stripes, calmer buttons */
+:root {
+  color-scheme: light;
+  --bg: #f6f1e8;
+  --surface: #fffdf8;
+  --surface-2: #fdf8ee;
+  --panel: rgba(255, 253, 248, 0.92);
+  --panel-strong: rgba(255, 255, 255, 0.98);
+  --border: rgba(44, 38, 30, 0.12);
+  --text: #201a14;
+  --muted: #756b5d;
+  --accent-main: #315fbd;
+  --accent-main-dark: #244a96;
+  --danger: #c2410c;
+  --success: #2f855a;
+  --warning: #b7791f;
+  --investment: #6d5bd0;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+body::before {
+  background:
+    radial-gradient(circle at 8% -8%, rgba(49, 95, 189, 0.12), transparent 25rem),
+    radial-gradient(circle at 92% 0%, rgba(217, 119, 6, 0.11), transparent 26rem),
+    linear-gradient(180deg, #fbf6ec 0%, #f3eadc 100%);
+}
+
+.auth-card, .hero-card, .form-card, .list-card, .filters-card, .budget-card, .account-card, .category-edit-card,
+.debt-card, .depot-card, .rule-card, .debt-card-collapsible, .closing-card, .notice-card {
+  background: var(--panel);
+  border: 1.5px solid var(--border);
+  box-shadow: 0 14px 34px rgba(92, 73, 49, 0.10);
+  backdrop-filter: blur(14px);
+}
+
+input, select, textarea,
+.debt-amount-input, .subedit-amount, .budget-input {
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text);
+  border: 1px solid rgba(44, 38, 30, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+}
+
+input:focus, select:focus, textarea:focus,
+.debt-amount-input:focus, .subedit-amount:focus, .budget-input:focus {
+  border-color: color-mix(in srgb, var(--accent-main) 58%, white);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-main) 16%, transparent);
+}
+
+.primary, .big-add, .floating-booking-button {
+  color: #fffdf8;
+  background: linear-gradient(180deg, #3d6fd0 0%, var(--accent-main) 100%);
+  box-shadow: 0 14px 30px rgba(49, 95, 189, 0.22), inset 0 1px 0 rgba(255,255,255,0.22);
+}
+
+.primary:hover, .big-add:hover, .floating-booking-button:hover {
+  background: linear-gradient(180deg, #426fd0 0%, var(--accent-main-dark) 100%);
+}
+
+.ghost, .mini-button, .subchips button, .text-button {
+  background: rgba(255, 253, 248, 0.76);
+  color: var(--text);
+  border-color: rgba(44, 38, 30, 0.14);
+}
+
+.mini-button.danger, .danger-chip, .subchips .danger-chip {
+  color: #9a3412 !important;
+  background: rgba(255, 237, 213, 0.9) !important;
+  border-color: rgba(194, 65, 12, 0.28) !important;
+}
+
+.notice { color: #244a96; background: rgba(49, 95, 189, 0.10); }
+.error { color: #9a3412; background: rgba(194, 65, 12, 0.10); }
+
+.bottom-nav {
+  background: rgba(255, 253, 248, 0.94);
+  border: 1px solid rgba(44, 38, 30, 0.12);
+  box-shadow: 0 14px 36px rgba(92, 73, 49, 0.16);
+}
+.bottom-nav a { color: #7c7265; }
+.bottom-nav a.active {
+  background: rgba(49, 95, 189, 0.11);
+  color: var(--accent-main-dark);
+}
+
+.booking-modal, .closing-modal {
+  background: rgba(255, 253, 248, 0.98);
+  color: var(--text);
+  box-shadow: 0 22px 70px rgba(44, 38, 30, 0.24);
+}
+.booking-modal { border-color: var(--danger); }
+.booking-income { border-color: var(--success); }
+.booking-transfer { border-color: var(--warning); }
+.booking-investment { border-color: var(--investment); }
+.type-pill { background: rgba(255, 253, 248, 0.82); }
+.booking-investment .type-pill { color: var(--investment); }
+
+/* Category cards: full, even colored outline instead of directional tinted blocks */
+.budget-card, .category-edit-card, .account-card, .debt-card, .depot-card {
+  border: 1.8px solid color-mix(in srgb, var(--accent, var(--accent-main)) 44%, rgba(44,38,30,0.14));
+  background:
+    linear-gradient(180deg, rgba(255,253,248,0.96), rgba(255,253,248,0.88)),
+    color-mix(in srgb, var(--accent, var(--accent-main)) 7%, white);
+}
+.budget-card.expanded {
+  background:
+    linear-gradient(180deg, rgba(255,253,248,0.99), rgba(255,253,248,0.91)),
+    color-mix(in srgb, var(--accent, var(--accent-main)) 9%, white);
+}
+.budget-card, .category-edit-card, .account-card { border-width: 1.8px; }
+
+.budget-bar, .mini-bar {
+  background: rgba(44, 38, 30, 0.10);
+  box-shadow: inset 0 0 0 1px rgba(44,38,30,0.06);
+}
+.budget-fill, .mini-bar > div {
+  background: var(--accent, var(--accent-main));
+  box-shadow: none;
+}
+.budget-marker, .mini-bar > i {
+  background: #2c261e;
+  box-shadow: 0 0 0 3px rgba(255,253,248,0.82), 0 0 0 4px rgba(44,38,30,0.16);
+}
+
+.subcategory-panel, .rule-edit-panel, .debt-edit-panel { border-top-color: rgba(44, 38, 30, 0.11); }
+.budget-sub-row, .solo-budget-row.clean-budget-row, .subcategory-edit-row.slim, .tax-preview {
+  background: rgba(255, 253, 248, 0.76);
+  border: 1px solid rgba(44,38,30,0.10);
+}
+
+/* No left/right-only color stripes: use an even outline on cards. */
+.rule-card, .debt-card-collapsible {
+  border-left: 1.8px solid color-mix(in srgb, var(--accent, var(--accent-main)) 48%, rgba(44,38,30,0.14));
+  border-right: 1.8px solid color-mix(in srgb, var(--accent, var(--accent-main)) 48%, rgba(44,38,30,0.14));
+  border-top: 1.8px solid color-mix(in srgb, var(--accent, var(--accent-main)) 48%, rgba(44,38,30,0.14));
+  border-bottom: 1.8px solid color-mix(in srgb, var(--accent, var(--accent-main)) 48%, rgba(44,38,30,0.14));
+  background:
+    linear-gradient(180deg, rgba(255,253,248,0.97), rgba(255,253,248,0.90)),
+    color-mix(in srgb, var(--accent, var(--accent-main)) 7%, white);
+}
+.rule-card.rule-income { --accent: var(--success); }
+.rule-card.rule-expense { --accent: var(--danger); }
+.rule-card.rule-transfer { --accent: var(--warning); }
+.rule-card.rule-investment { --accent: var(--investment); }
+
+.tx-expense, .tx-income, .tx-transfer, .tx-investment {
+  border-left: 0;
+  padding-left: 0;
+}
+.tx-expense b { color: var(--danger); }
+.tx-income b { color: var(--success); }
+.tx-transfer b { color: var(--warning); }
+.tx-investment b { color: var(--investment); }
+
+.debt-card-collapsible[style*="--accent: #16a34a"], .debt-card-collapsible[style*="--accent:#16a34a"] { --accent: var(--success) !important; }
+.debt-summary-line b { color: var(--accent, var(--text)); }
+
+.money-total-card, .clean-money-row {
+  background: rgba(255, 253, 248, 0.82);
+}
+.muted-money-row { opacity: 0.70; }
+
+.month-pill, .type-pill, .bottom-nav a.active, .subedit-meta select, .budget-sub-meta select {
+  border-color: rgba(44, 38, 30, 0.12);
+}
+
+::-webkit-scrollbar-thumb { background: rgba(117, 107, 93, 0.42); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(117, 107, 93, 0.62); }
+html { scrollbar-color: rgba(117, 107, 93, 0.42) transparent; }
