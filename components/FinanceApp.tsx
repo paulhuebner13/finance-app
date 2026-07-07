@@ -10,7 +10,7 @@ import { BudgetCard } from "@/components/BudgetCard";
 import { MonthClosingModal } from "@/components/MonthClosingModal";
 import { defaultAccounts, defaultCategoryGroups } from "@/lib/defaults";
 import { applyDeltas, sortAccountsStable, transactionDeltas } from "@/lib/finance";
-import { dateForMonthDay, dayOfMonth, daysInMonth, formatEuro, getMonthRange, monthKey, previousMonthKey } from "@/lib/date";
+import { dateForMonthDay, dayOfMonth, daysInMonth, formatEuro, getMonthRange, monthKey, previousMonthKey, todayISO } from "@/lib/date";
 import type { Account, Category, CategoryGroup, CategoryWithChildren, Debt, RecurringTransaction, Transaction } from "@/lib/types";
 
 function categoriesBudgetSum(group: CategoryWithChildren) {
@@ -107,13 +107,16 @@ export function FinanceApp() {
     if (error) return;
 
     const recurring = (data ?? []) as RecurringTransaction[];
+    const today = todayISO();
     for (const item of recurring) {
+      const scheduledDate = dateForMonthDay(currentMonth, item.day_of_month);
       if (item.last_created_month === currentMonth) continue;
+      if (scheduledDate > today) continue;
       const payload = {
         user_id: userId,
         type: item.type,
         amount: Number(item.amount),
-        date: dateForMonthDay(currentMonth, item.day_of_month),
+        date: scheduledDate,
         account_id: item.account_id,
         from_account_id: item.from_account_id,
         to_account_id: item.to_account_id,
@@ -200,24 +203,7 @@ export function FinanceApp() {
           </div>
         </section>
 
-        <section>
-          <div className="list-card recent-list compact-list">
-            {transactions.slice(0, 6).map((transaction) => {
-              const group = groups.find((g) => g.id === transaction.group_id);
-              const account = accounts.find((a) => a.id === transaction.account_id || a.id === transaction.from_account_id || a.id === transaction.to_account_id);
-              return (
-                <div className="list-row" key={transaction.id}>
-                  <div>
-                    <strong>{transaction.note || group?.name || (transaction.type === "investment" ? "Investition" : "Umbuchung")}</strong>
-                    <span>{account?.name ?? ""}</span>
-                  </div>
-                  <b>{transaction.type === "income" ? "+" : transaction.type === "expense" || transaction.type === "investment" ? "-" : ""}{formatEuro(Number(transaction.amount))}</b>
-                </div>
-              );
-            })}
-            {!transactions.length && <p className="muted center">Keine Buchungen.</p>}
-          </div>
-        </section>
+
       </main>
 
       <button className="floating-booking-button" onClick={() => setBookingOpen(true)}>+ Buchung</button>

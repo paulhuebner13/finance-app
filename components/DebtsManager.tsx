@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { AuthGate } from "@/components/AuthGate";
-import { formatEuro } from "@/lib/date";
+import { formatEuro, formatNumber } from "@/lib/date";
 import { parseAmount } from "@/lib/finance";
 import { supabase } from "@/lib/supabase";
 import type { Debt, DebtKind } from "@/lib/types";
@@ -16,6 +16,7 @@ export function DebtsManager() {
   const [amount, setAmount] = useState("");
   const [kind, setKind] = useState<DebtKind>("i_owe");
   const [note, setNote] = useState("");
+  const [expanded, setExpanded] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!session?.user.id) return;
@@ -29,11 +30,8 @@ export function DebtsManager() {
 
   useEffect(() => { load(); }, [load]);
 
-  const sums = useMemo(() => {
-    const active = debts.filter((debt) => debt.is_active);
-    const iOwe = active.filter((debt) => debt.kind === "i_owe").reduce((sum, debt) => sum + Number(debt.amount), 0);
-    const owedToMe = active.filter((debt) => debt.kind === "owed_to_me").reduce((sum, debt) => sum + Number(debt.amount), 0);
-    return { iOwe, owedToMe, net: owedToMe - iOwe };
+  const net = useMemo(() => {
+    return debts.filter((debt) => debt.is_active).reduce((sum, debt) => sum + (debt.kind === "owed_to_me" ? Number(debt.amount) : -Number(debt.amount)), 0);
   }, [debts]);
 
   async function addDebt() {
@@ -72,34 +70,47 @@ export function DebtsManager() {
     <AppShell>
       <main className="dashboard debts-page">
         <section className="hero-card compact">
-          <h1>{formatEuro(sums.net)}</h1>
+          <h1>{formatEuro(net)}</h1>
         </section>
 
-        <section className="cards-stack debt-stack">
-          {debts.map((debt) => (
-            <article className={`debt-card debt-card-clean ${!debt.is_active ? "is-disabled" : ""}`} key={debt.id} style={{ ["--accent" as string]: debt.kind === "i_owe" ? "#EF4444" : "#22C55E" }}>
-              <div className="debt-card-top">
-                <input className="plain-input debt-person" defaultValue={debt.person} onBlur={(e) => e.target.value.trim() && updateDebt(debt, { person: e.target.value.trim() })} />
-                <input className="debt-amount-input" inputMode="decimal" defaultValue={String(debt.amount)} onBlur={(e) => updateDebt(debt, { amount: parseAmount(e.target.value) })} />
-              </div>
-              <div className="debt-card-controls">
-                <select value={debt.kind} onChange={(e) => updateDebt(debt, { kind: e.target.value as DebtKind })}>
-                  <option value="i_owe">Schulde ich</option>
-                  <option value="owed_to_me">Schuldet mir</option>
-                </select>
-                <input defaultValue={debt.note ?? ""} placeholder="Notiz" onBlur={(e) => updateDebt(debt, { note: e.target.value.trim() || null })} />
-              </div>
-              <div className="button-row">
-                <button className="mini-button" onClick={() => updateDebt(debt, { is_active: !debt.is_active })}>{debt.is_active ? "pausieren" : "aktivieren"}</button>
-                <button className="mini-button danger" onClick={() => deleteDebt(debt)}>löschen</button>
-              </div>
-            </article>
-          ))}
+        <section className="cards-stack debt-stack compact-debt-stack">
+          {debts.map((debt) => {
+            const isOpen = expanded === debt.id;
+            const positive = debt.kind === "owed_to_me";
+            return (
+              <article className={`debt-card debt-card-collapsible ${!debt.is_active ? "is-disabled" : ""}`} key={debt.id} style={{ ["--accent" as string]: positive ? "#16A34A" : "#DC2626" }}>
+                <div className="debt-summary-line">
+                  <div>
+                    <strong>{debt.person}</strong>
+                    {debt.note && <span>{debt.note}</span>}
+                  </div>
+                  <b>{positive ? "+" : "−"}{formatEuro(Number(debt.amount))}</b>
+                </div>
+                <button className="mini-button edit-toggle" onClick={() => setExpanded(isOpen ? null : debt.id)}>{isOpen ? "schließen" : "bearbeiten"}</button>
+
+                {isOpen && (
+                  <div className="debt-edit-panel">
+                    <input defaultValue={debt.person} placeholder="Name" onBlur={(e) => e.target.value.trim() && updateDebt(debt, { person: e.target.value.trim() })} />
+                    <input inputMode="decimal" defaultValue={formatNumber(Number(debt.amount))} placeholder="Betrag" onBlur={(e) => updateDebt(debt, { amount: parseAmount(e.target.value) })} />
+                    <select value={debt.kind} onChange={(e) => updateDebt(debt, { kind: e.target.value as DebtKind })}>
+                      <option value="i_owe">Schulde ich</option>
+                      <option value="owed_to_me">Schuldet mir</option>
+                    </select>
+                    <input defaultValue={debt.note ?? ""} placeholder="Notiz" onBlur={(e) => updateDebt(debt, { note: e.target.value.trim() || null })} />
+                    <div className="button-row">
+                      <button className="mini-button" onClick={() => updateDebt(debt, { is_active: !debt.is_active })}>{debt.is_active ? "pausieren" : "aktivieren"}</button>
+                      <button className="mini-button danger" onClick={() => deleteDebt(debt)}>löschen</button>
+                    </div>
+                  </div>
+                )}
+              </article>
+            );
+          })}
           {!debts.length && <p className="muted center">Leer.</p>}
         </section>
 
-        <section className="form-card">
-          <input value={person} onChange={(e) => setPerson(e.target.value)} placeholder="Person / Sache" />
+        <section className="form-card add-debt-card">
+          <input value={person} onChange={(e) => setPerson(e.target.value)} placeholder="Titel / Person" />
           <div className="grid-2">
             <select value={kind} onChange={(e) => setKind(e.target.value as DebtKind)}>
               <option value="i_owe">Schulde ich</option>

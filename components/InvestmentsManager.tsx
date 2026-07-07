@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { AuthGate } from "@/components/AuthGate";
-import { formatEuro, getMonthRange, monthKey } from "@/lib/date";
+import { formatEuro, formatNumber, getMonthRange, monthKey } from "@/lib/date";
 import { depotNetValue, depotTax, parseAmount } from "@/lib/finance";
 import { supabase } from "@/lib/supabase";
 import type { Account, Transaction } from "@/lib/types";
@@ -28,8 +28,8 @@ export function InvestmentsManager() {
     setAccounts(accountRows);
     setTransactions((txRes.data ?? []) as Transaction[]);
     setValues(Object.fromEntries(accountRows.map((a) => [a.id, {
-      balance: String(Number(a.balance)).replace(".", ","),
-      taxBase: String(Number(a.cost_basis ?? 0)).replace(".", ",")
+      balance: formatNumber(Number(a.balance)),
+      taxBase: formatNumber(Number(a.cost_basis ?? 0))
     }])));
   }, [session?.user.id, currentMonth]);
 

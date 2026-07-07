@@ -43,6 +43,14 @@ export function formatEuro(value: number) {
   return new Intl.NumberFormat("de-AT", {
     style: "currency",
     currency: "EUR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(Number.isFinite(value) ? value : 0);
+}
+
+export function formatNumber(value: number) {
+  return new Intl.NumberFormat("de-AT", {
+    minimumFractionDigits: 2,
     maximumFractionDigits: 2
   }).format(Number.isFinite(value) ? value : 0);
 }

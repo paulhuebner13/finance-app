@@ -9,6 +9,7 @@ const nav = [
   { href: "/transactions", label: "Buchungen" },
   { href: "/wealth", label: "Geld" },
   { href: "/debts", label: "Schulden" },
+  { href: "/closings", label: "Abrechnung" },
   { href: "/accounts", label: "Konten" },
   { href: "/categories", label: "Budgets" },
   { href: "/recurring", label: "Regeln" },

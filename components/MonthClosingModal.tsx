@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { formatMonthTitle } from "@/lib/date";
+import { formatMonthTitle, formatNumber } from "@/lib/date";
 import { depotTax, parseAmount } from "@/lib/finance";
 import { supabase } from "@/lib/supabase";
 import type { Account, Debt } from "@/lib/types";
@@ -24,8 +24,8 @@ export function MonthClosingModal({ open, month, userId, accounts, debts, onClos
 
   useEffect(() => {
     if (!open) return;
-    setAccountValues(Object.fromEntries(accounts.filter((a) => a.is_active).map((a) => [a.id, String(Number(a.balance)).replace(".", ",")] )));
-    setDebtValues(Object.fromEntries(debts.filter((d) => d.is_active).map((d) => [d.id, String(Number(d.amount)).replace(".", ",")] )));
+    setAccountValues(Object.fromEntries(accounts.filter((a) => a.is_active).map((a) => [a.id, formatNumber(Number(a.balance))] )));
+    setDebtValues(Object.fromEntries(debts.filter((d) => d.is_active).map((d) => [d.id, formatNumber(Number(d.amount))] )));
     setError("");
   }, [open, accounts, debts]);
 

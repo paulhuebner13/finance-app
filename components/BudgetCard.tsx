@@ -43,18 +43,13 @@ export function BudgetCard({ group, transactions, daysInMonth, currentDay, expan
   const spentForBar = Math.max(0, spent);
   const spentPercent = budget.limit > 0 ? Math.min(120, (spentForBar / budget.limit) * 100) : 0;
   const planPercent = budget.limit > 0 ? Math.min(100, (budget.plan / budget.limit) * 100) : 0;
-  const remaining = budget.limit - spentForBar;
-  const isOuting = group.name.trim().toLowerCase() === "ausgehen";
 
   return (
     <article className={`budget-card ${expanded ? "expanded" : ""}`} style={{ ["--accent" as string]: group.color }}>
       <button className="budget-main" onClick={onClick} type="button">
-        <div className="budget-card-header compact-budget-head">
-          <div>
-            <p className="card-title">{group.name}</p>
-            <p className="muted small">{isOuting ? "Differenz" : "Verbraucht"} {formatEuro(spent)} · Plan {formatEuro(budget.plan)}</p>
-          </div>
-          <strong className={remaining < 0 ? "negative" : ""}>{isOuting ? formatEuro(spent) : `${remaining < 0 ? "+" : ""}${formatEuro(Math.abs(remaining))}`}</strong>
+        <div className="budget-card-header compact-budget-head start-budget-head">
+          <p className="card-title">{group.name}</p>
+          <strong>{formatEuro(spent)} / {formatEuro(budget.plan)}</strong>
         </div>
 
         <div className="budget-bar" aria-label={`${group.name} Budgetfortschritt`}>
@@ -69,7 +64,7 @@ export function BudgetCard({ group, transactions, daysInMonth, currentDay, expan
             const categorySpent = spentFor(transactions, category.id);
             const limit = adjustedMonthlyLimit(category.average_monthly_budget, daysInMonth, category.budget_period);
             const plan = plannedUntilCurrentDay(category.average_monthly_budget, currentDay, category.budget_period);
-            const percent = limit > 0 ? Math.min(120, (categorySpent / limit) * 100) : 0;
+            const percent = limit > 0 ? Math.min(120, (Math.max(0, categorySpent) / limit) * 100) : 0;
             const planPercentInner = limit > 0 ? Math.min(100, (plan / limit) * 100) : 0;
             return (
               <div className="subcategory-row" key={category.id}>

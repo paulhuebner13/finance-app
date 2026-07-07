@@ -3,7 +3,10 @@ import { supabase } from "./supabase";
 
 export function parseAmount(value: string | number) {
   if (typeof value === "number") return Number.isFinite(value) ? value : 0;
-  const normalized = value.replace(/\s/g, "").replace("€", "").replace(",", ".");
+  const raw = value.trim().replace(/\s/g, "").replace(/€/g, "");
+  const normalized = raw.includes(",")
+    ? raw.replace(/\./g, "").replace(",", ".")
+    : raw;
   const parsed = Number(normalized);
   return Number.isFinite(parsed) ? parsed : 0;
 }

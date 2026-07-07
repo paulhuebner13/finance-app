@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { AuthGate } from "@/components/AuthGate";
-import { formatEuro } from "@/lib/date";
-import { sortAccountsStable } from "@/lib/finance";
+import { formatEuro, formatNumber } from "@/lib/date";
+import { parseAmount, sortAccountsStable } from "@/lib/finance";
 import { supabase } from "@/lib/supabase";
 import type { Account, AccountType } from "@/lib/types";
 import { useSession } from "@/lib/useSession";
@@ -41,7 +41,7 @@ export function AccountsManager() {
       type,
       include_in_available_net_worth: type === "active",
       is_default: shouldBeDefault,
-      balance: Number(balance.replace(",", ".")) || 0,
+      balance: parseAmount(balance),
       cost_basis: 0,
       tax_reserve: 0,
       color: type === "active" ? "#38BDF8" : type === "bound" ? "#F59E0B" : "#A855F7"
@@ -99,9 +99,9 @@ export function AccountsManager() {
                 <span>{account.type === "active" ? "Aktiv" : account.type === "bound" ? "Gebunden" : "Depot"}{!account.is_active ? " · inaktiv" : ""}</span>
               </div>
               <input
-                defaultValue={String(account.balance)}
+                defaultValue={formatNumber(Number(account.balance))}
                 inputMode="decimal"
-                onBlur={(e) => updateAccount(account, { balance: Number(e.target.value.replace(",", ".")) || 0 })}
+                onBlur={(e) => updateAccount(account, { balance: parseAmount(e.target.value) })}
               />
               <label className="inline-toggle">
                 <input
