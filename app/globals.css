@@ -979,3 +979,121 @@ input:focus, select:focus, textarea:focus,
 ::-webkit-scrollbar-thumb { background: rgba(117, 107, 93, 0.42); border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(117, 107, 93, 0.62); }
 html { scrollbar-color: rgba(117, 107, 93, 0.42) transparent; }
+
+
+/* Beige button + mobile closing cleanup */
+:root {
+  --button-beige: #d8c2a1;
+  --button-beige-strong: #c9ad82;
+  --button-beige-text: #2f2518;
+}
+
+.primary, .big-add, .floating-booking-button {
+  color: var(--button-beige-text) !important;
+  background: linear-gradient(180deg, #eadcc6 0%, var(--button-beige) 100%) !important;
+  border: 1px solid rgba(94, 74, 48, 0.18) !important;
+  box-shadow: 0 12px 28px rgba(120, 97, 68, 0.18), inset 0 1px 0 rgba(255,255,255,0.55) !important;
+}
+
+.primary:hover, .big-add:hover, .floating-booking-button:hover {
+  background: linear-gradient(180deg, #e6d4ba 0%, var(--button-beige-strong) 100%) !important;
+}
+
+.primary:active, .big-add:active {
+  transform: translateY(1px);
+}
+
+.floating-booking-button:active {
+  transform: translateX(-50%) scale(0.992);
+}
+
+.subchips .add-chip, .add-chip {
+  color: var(--button-beige-text) !important;
+  background: rgba(216, 194, 161, 0.34) !important;
+  border-color: rgba(120, 97, 68, 0.22) !important;
+}
+
+.closing-edit-list {
+  grid-template-columns: 1fr !important;
+}
+
+.closing-edit-list label {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 0.42rem !important;
+  align-items: stretch !important;
+}
+
+.closing-edit-list input {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* Patch: remove leftover dark-grey boxes on analysis, depot and accounts */
+.summary-grid div,
+.analysis-row,
+.grid-2 label,
+.grid-3 > *,
+.tax-preview,
+.account-card,
+.depot-card,
+.money-total-card,
+.clean-money-row {
+  background:
+    linear-gradient(180deg, rgba(255, 253, 248, 0.98), rgba(250, 244, 234, 0.94)) !important;
+  color: var(--text) !important;
+  border-color: rgba(44, 38, 30, 0.12) !important;
+  box-shadow: 0 10px 24px rgba(92, 73, 49, 0.08) !important;
+}
+
+.summary-grid div {
+  border: 1px solid rgba(44, 38, 30, 0.11) !important;
+  border-radius: 18px;
+}
+
+.analysis-row {
+  border: 1px solid rgba(44, 38, 30, 0.10);
+  border-radius: 18px;
+  padding: 0.72rem;
+}
+
+.analysis-head span,
+.summary-grid span,
+.account-card span,
+.depot-card .small,
+.grid-2 label,
+.grid-3 > * {
+  color: var(--muted) !important;
+}
+
+.summary-grid strong,
+.account-card strong,
+.account-card b,
+.depot-card strong,
+.tx-row strong,
+.tx-row b,
+.analysis-head strong {
+  color: var(--text) !important;
+}
+
+.depot-card {
+  border: 1.6px solid color-mix(in srgb, var(--accent, var(--investment)) 34%, rgba(44,38,30,0.14)) !important;
+}
+
+.account-card {
+  border: 1.6px solid color-mix(in srgb, var(--accent, var(--accent-main)) 34%, rgba(44,38,30,0.14)) !important;
+}
+
+.clean-money-row,
+.money-total-card {
+  border: 1px solid rgba(44, 38, 30, 0.11) !important;
+}
+
+.tax-preview {
+  border: 1px solid rgba(44, 38, 30, 0.10) !important;
+  border-radius: 16px;
+}
+
+.tx-row {
+  color: var(--text);
+}

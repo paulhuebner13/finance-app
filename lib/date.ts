@@ -1,7 +1,10 @@
 export const AVERAGE_DAYS_PER_MONTH = 30.44;
 
-export function todayISO() {
-  return new Date().toISOString().slice(0, 10);
+export function todayISO(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 export function monthKey(date = new Date()) {

@@ -9,7 +9,7 @@ import { BookingModal } from "@/components/BookingModal";
 import { BudgetCard } from "@/components/BudgetCard";
 import { MonthClosingModal } from "@/components/MonthClosingModal";
 import { defaultAccounts, defaultCategoryGroups } from "@/lib/defaults";
-import { applyDeltas, sortAccountsStable, transactionDeltas } from "@/lib/finance";
+import { applyDeltas, invertDeltas, mergeDeltas, sortAccountsStable, transactionDeltas } from "@/lib/finance";
 import { dateForMonthDay, dayOfMonth, daysInMonth, formatEuro, getMonthRange, monthKey, previousMonthKey, todayISO } from "@/lib/date";
 import type { Account, Category, CategoryGroup, CategoryWithChildren, Debt, RecurringTransaction, Transaction } from "@/lib/types";
 
@@ -98,6 +98,43 @@ export function FinanceApp() {
     setBootstrapping(false);
   }, []);
 
+
+  const cleanupPrematureRecurring = useCallback(async (userId: string, currentAccounts: Account[]) => {
+    const today = todayISO();
+    const currentDay = dayOfMonth();
+
+    const { data: futureRows, error: futureError } = await supabase
+      .from("transactions")
+      .select("*")
+      .eq("user_id", userId)
+      .gt("date", today)
+      .ilike("note", "%automatisch%");
+
+    const futureAutomatic = (futureRows ?? []) as Transaction[];
+
+    if (!futureError && futureAutomatic.length) {
+      const reverseDeltas = mergeDeltas(
+        ...futureAutomatic.map((transaction) => invertDeltas(transactionDeltas(transaction)))
+      );
+      await applyDeltas(userId, currentAccounts, reverseDeltas);
+      await supabase
+        .from("transactions")
+        .delete()
+        .eq("user_id", userId)
+        .in("id", futureAutomatic.map((transaction) => transaction.id));
+    }
+
+    await supabase
+      .from("recurring_transactions")
+      .update({ last_created_month: null })
+      .eq("user_id", userId)
+      .eq("active", true)
+      .eq("last_created_month", currentMonth)
+      .gt("day_of_month", currentDay);
+
+    return futureAutomatic.length > 0;
+  }, [currentMonth]);
+
   const applyRecurring = useCallback(async (userId: string, currentAccounts: Account[]) => {
     const { data, error } = await supabase
       .from("recurring_transactions")
@@ -147,7 +184,12 @@ export function FinanceApp() {
       if (data.session?.user.id) {
         await setupDefaults(data.session.user.id);
         const { data: accountRows } = await supabase.from("accounts").select("*").eq("user_id", data.session.user.id).eq("is_active", true).order("created_at");
-        const currentAccounts = sortAccountsStable((accountRows ?? []) as Account[]);
+        let currentAccounts = sortAccountsStable((accountRows ?? []) as Account[]);
+        const cleanedPremature = await cleanupPrematureRecurring(data.session.user.id, currentAccounts);
+        if (cleanedPremature) {
+          const { data: refreshedRows } = await supabase.from("accounts").select("*").eq("user_id", data.session.user.id).eq("is_active", true).order("created_at");
+          currentAccounts = sortAccountsStable((refreshedRows ?? []) as Account[]);
+        }
         await applyRecurring(data.session.user.id, currentAccounts);
         await load(data.session.user.id);
         await checkMonthClosing(data.session.user.id);
@@ -160,7 +202,7 @@ export function FinanceApp() {
     });
 
     return () => listener.subscription.unsubscribe();
-  }, [load, setupDefaults, applyRecurring, checkMonthClosing]);
+  }, [load, setupDefaults, cleanupPrematureRecurring, applyRecurring, checkMonthClosing]);
 
   const stats = useMemo(() => {
     const expenses = transactions.filter((t) => t.type === "expense").reduce((sum, t) => sum + Number(t.amount), 0);
