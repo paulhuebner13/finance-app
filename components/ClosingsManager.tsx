@@ -55,13 +55,21 @@ export function ClosingsManager() {
   useEffect(() => { load(); }, [load]);
 
   async function updateBalance(balance: ClosingBalance, value: string) {
-    await supabase.from("month_closing_balances").update({ actual_balance: parseAmount(value) }).eq("id", balance.id);
-    await load();
+    const nextAmount = parseAmount(value);
+    setClosings((current) => current.map((closing) => ({
+      ...closing,
+      balances: closing.balances.map((item) => item.id === balance.id ? { ...item, actual_balance: nextAmount } : item)
+    })));
+    await supabase.from("month_closing_balances").update({ actual_balance: nextAmount }).eq("id", balance.id);
   }
 
   async function updateDebtValue(value: ClosingDebt, amount: string) {
-    await supabase.from("month_closing_debts").update({ actual_amount: parseAmount(amount) }).eq("id", value.id);
-    await load();
+    const nextAmount = parseAmount(amount);
+    setClosings((current) => current.map((closing) => ({
+      ...closing,
+      debtValues: closing.debtValues.map((item) => item.id === value.id ? { ...item, actual_amount: nextAmount } : item)
+    })));
+    await supabase.from("month_closing_debts").update({ actual_amount: nextAmount }).eq("id", value.id);
   }
 
   function totalFor(closing: ClosingBundle) {
@@ -108,7 +116,7 @@ export function ClosingsManager() {
                       return (
                         <label key={balance.id}>
                           {account.name}
-                          <input inputMode="decimal" defaultValue={formatNumber(Number(balance.actual_balance))} onBlur={(e) => updateBalance(balance, e.target.value)} />
+                          <input inputMode="decimal" defaultValue={formatNumber(Number(balance.actual_balance))} onChange={(e) => updateBalance(balance, e.target.value)} />
                         </label>
                       );
                     })}
@@ -118,7 +126,7 @@ export function ClosingsManager() {
                       return (
                         <label key={value.id}>
                           {debt.person}
-                          <input inputMode="decimal" defaultValue={formatNumber(Number(value.actual_amount))} onBlur={(e) => updateDebtValue(value, e.target.value)} />
+                          <input inputMode="decimal" defaultValue={formatNumber(Number(value.actual_amount))} onChange={(e) => updateDebtValue(value, e.target.value)} />
                         </label>
                       );
                     })}

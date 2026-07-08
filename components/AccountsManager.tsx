@@ -54,8 +54,8 @@ export function AccountsManager() {
 
   async function updateAccount(account: Account, patch: Partial<Account>) {
     if (!session?.user.id) return;
+    setAccounts((current) => sortAccountsStable(current.map((item) => item.id === account.id ? { ...item, ...patch } : item)));
     await supabase.from("accounts").update(patch).eq("id", account.id).eq("user_id", session.user.id);
-    await load();
   }
 
   async function setDefaultAccount(account: Account) {
@@ -101,7 +101,7 @@ export function AccountsManager() {
               <input
                 defaultValue={formatNumber(Number(account.balance))}
                 inputMode="decimal"
-                onBlur={(e) => updateAccount(account, { balance: parseAmount(e.target.value) })}
+                onChange={(e) => updateAccount(account, { balance: parseAmount(e.target.value) })}
               />
               <label className="inline-toggle">
                 <input

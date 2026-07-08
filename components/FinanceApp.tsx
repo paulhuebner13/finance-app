@@ -25,12 +25,23 @@ function categoriesPlanSum(group: CategoryWithChildren, currentDay: number) {
   return active.reduce((sum, category) => sum + plannedUntilCurrentDay(Number(category.average_monthly_budget), currentDay, category.budget_period), 0);
 }
 
+function accountCountsForAusgehen(account: Account) {
+  return account.type === "active" && account.include_in_available_net_worth;
+}
+
+function availableAccountTotal(accounts: Account[]) {
+  return accounts
+    .filter(accountCountsForAusgehen)
+    .reduce((sum, account) => sum + Number(account.balance), 0);
+}
+
 export function FinanceApp() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [bootstrapping, setBootstrapping] = useState(false);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [debts, setDebts] = useState<Debt[]>([]);
+  const [openingAvailable, setOpeningAvailable] = useState<number | null>(null);
   const [groups, setGroups] = useState<CategoryWithChildren[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [bookingOpen, setBookingOpen] = useState(false);
@@ -56,11 +67,35 @@ export function FinanceApp() {
 
     const categoryRows = (categoriesRes.data ?? []) as Category[];
     const groupRows = (groupsRes.data ?? []) as CategoryGroup[];
-    setAccounts(sortAccountsStable((accountsRes.data ?? []) as Account[]));
+    const accountRows = sortAccountsStable((accountsRes.data ?? []) as Account[]);
+
+    const { data: prevClosing } = await supabase
+      .from("month_closings")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("month", prevMonth)
+      .maybeSingle();
+
+    if (prevClosing?.id) {
+      const { data: closingBalances } = await supabase
+        .from("month_closing_balances")
+        .select("account_id, actual_balance")
+        .eq("closing_id", prevClosing.id);
+      const opening = (closingBalances ?? []).reduce((sum, balance) => {
+        const account = accountRows.find((item) => item.id === balance.account_id);
+        if (!account || !accountCountsForAusgehen(account)) return sum;
+        return sum + Number(balance.actual_balance);
+      }, 0);
+      setOpeningAvailable(opening);
+    } else {
+      setOpeningAvailable(null);
+    }
+
+    setAccounts(accountRows);
     setDebts((debtsRes.data ?? []) as Debt[]);
     setGroups(groupRows.map((group) => ({ ...group, categories: categoryRows.filter((category) => category.group_id === group.id) })));
     setTransactions((transactionsRes.data ?? []) as Transaction[]);
-  }, [currentMonth]);
+  }, [currentMonth, prevMonth]);
 
   const setupDefaults = useCallback(async (userId: string) => {
     setBootstrapping(true);
@@ -216,9 +251,14 @@ export function FinanceApp() {
     const investments = transactions.filter((t) => t.type === "investment").reduce((sum, t) => sum + Number(t.amount), 0);
     const outingGroup = groups.find((g) => g.name.toLowerCase() === "ausgehen");
     const outingTracked = outingGroup ? transactions.filter((t) => t.type === "expense" && t.group_id === outingGroup.id).reduce((sum, t) => sum + Number(t.amount), 0) : 0;
-    const expensesWithoutOuting = expenses - outingTracked;
-    return { expenses, income, investments, outingValue: income - expensesWithoutOuting - investments };
-  }, [transactions, groups]);
+    const trackedExpensesWithoutOuting = expenses - outingTracked;
+    const currentAvailable = availableAccountTotal(accounts);
+    const outingValue = openingAvailable === null
+      ? income - trackedExpensesWithoutOuting - investments
+      : openingAvailable + income - investments - trackedExpensesWithoutOuting - currentAvailable;
+    const effectiveExpenses = trackedExpensesWithoutOuting + outingValue;
+    return { expenses, income, investments, outingValue, effectiveExpenses };
+  }, [transactions, groups, accounts, openingAvailable]);
 
   const expenseGroups = groups.filter((g) => g.kind === "expense");
   const currentDay = dayOfMonth();
@@ -236,7 +276,7 @@ export function FinanceApp() {
       <main className="dashboard start-dashboard">
         <section className="start-total-card">
           <span>Ausgaben</span>
-          <strong>{formatEuro(stats.expenses)} / {formatEuro(plannedExpenses)}</strong>
+          <strong>{formatEuro(stats.effectiveExpenses)} / {formatEuro(plannedExpenses)}</strong>
         </section>
 
         <section>

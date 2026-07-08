@@ -67,8 +67,8 @@ export function CategoriesManager() {
 
   async function updateGroup(group: CategoryWithChildren, patch: Partial<CategoryGroup>) {
     if (!session?.user.id) return;
+    setGroups((current) => current.map((item) => item.id === group.id ? { ...item, ...patch } : item));
     await supabase.from("category_groups").update(patch).eq("id", group.id).eq("user_id", session.user.id);
-    await load();
   }
 
   async function addSubcategory(group: CategoryWithChildren) {
@@ -90,9 +90,10 @@ export function CategoriesManager() {
     if (!session?.user.id) return;
     const nextCategory = { ...category, ...patch };
     const nextCategories = group.categories.map((item) => item.id === category.id ? nextCategory : item);
+    const nextGroupBudget = nextCategories.filter((c) => c.is_active).reduce((total, c) => total + Number(c.average_monthly_budget), 0);
+    setGroups((current) => current.map((item) => item.id === group.id ? { ...item, average_monthly_budget: nextGroupBudget, categories: nextCategories } : item));
     await supabase.from("categories").update(patch).eq("id", category.id).eq("user_id", session.user.id);
     await syncGroupBudget(group, nextCategories);
-    await load();
   }
 
   async function toggleCategory(group: CategoryWithChildren, category: Category) {
@@ -154,7 +155,7 @@ export function CategoriesManager() {
                   <div className="budget-group-body">
                     {!hasChildren && (
                       <div className="solo-budget-row clean-budget-row">
-                        <input className="budget-input" inputMode="decimal" defaultValue={formatNumber(Number(group.average_monthly_budget))} onBlur={(e) => updateGroup(group, { average_monthly_budget: parseAmount(e.target.value) })} />
+                        <input className="budget-input" inputMode="decimal" defaultValue={formatNumber(Number(group.average_monthly_budget))} onChange={(e) => updateGroup(group, { average_monthly_budget: parseAmount(e.target.value) })} />
                         <select value={group.budget_period} onChange={(e) => updateGroup(group, { budget_period: e.target.value as BudgetPeriod })}>
                           <option value="daily">täglich</option>
                           <option value="monthly">monatlich</option>
@@ -168,8 +169,8 @@ export function CategoriesManager() {
                         {group.categories.map((category) => (
                           <div className={`subcategory-edit-row budget-sub-row ${!category.is_active ? "is-disabled" : ""}`} key={category.id}>
                             <div className="budget-sub-top">
-                              <input className="plain-input" defaultValue={category.name} onBlur={(e) => e.target.value.trim() && updateCategory(group, category, { name: e.target.value.trim() })} />
-                              <input className="subedit-amount" inputMode="decimal" defaultValue={formatNumber(Number(category.average_monthly_budget))} onBlur={(e) => updateCategory(group, category, { average_monthly_budget: parseAmount(e.target.value) })} />
+                              <input className="plain-input" defaultValue={category.name} onChange={(e) => e.target.value.trim() && updateCategory(group, category, { name: e.target.value.trim() })} />
+                              <input className="subedit-amount" inputMode="decimal" defaultValue={formatNumber(Number(category.average_monthly_budget))} onChange={(e) => updateCategory(group, category, { average_monthly_budget: parseAmount(e.target.value) })} />
                             </div>
                             <div className="budget-sub-meta">
                               <select value={category.budget_period} onChange={(e) => updateCategory(group, category, { budget_period: e.target.value as BudgetPeriod })}>

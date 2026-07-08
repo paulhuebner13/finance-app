@@ -61,11 +61,11 @@ export function TransactionsList() {
   }
 
   const totals = useMemo(() => ({
-    expenses: filtered.filter((tx) => tx.type === "expense").reduce((sum, tx) => sum + Number(tx.amount), 0),
-    income: filtered.filter((tx) => tx.type === "income").reduce((sum, tx) => sum + Number(tx.amount), 0),
-    investments: filtered.filter((tx) => tx.type === "investment").reduce((sum, tx) => sum + Number(tx.amount), 0),
-    all: filtered.reduce((sum, tx) => sum + Number(tx.amount), 0)
-  }), [filtered]);
+    expenses: transactions.filter((tx) => tx.type === "expense").reduce((sum, tx) => sum + Number(tx.amount), 0),
+    income: transactions.filter((tx) => tx.type === "income").reduce((sum, tx) => sum + Number(tx.amount), 0),
+    investments: transactions.filter((tx) => tx.type === "investment").reduce((sum, tx) => sum + Number(tx.amount), 0),
+    all: transactions.reduce((sum, tx) => sum + Number(tx.amount), 0)
+  }), [transactions]);
 
   if (loading) return <main className="loading-page">Laden...</main>;
   if (!session) return <AuthGate />;
@@ -73,8 +73,15 @@ export function TransactionsList() {
   return (
     <AppShell>
       <main className="dashboard">
-        <section className="hero-card compact">
-          <h1>{formatEuro(filter === "expense" ? totals.expenses : filter === "income" ? totals.income : filter === "investment" ? totals.investments : totals.all)}</h1>
+        <section className="transaction-totals-card">
+          <div className="transaction-total expense-total">
+            <span>Ausgaben</span>
+            <strong>{formatEuro(totals.expenses)}</strong>
+          </div>
+          <div className="transaction-total income-total">
+            <span>Einnahmen</span>
+            <strong>{formatEuro(totals.income)}</strong>
+          </div>
         </section>
 
         <section className="filters-card">

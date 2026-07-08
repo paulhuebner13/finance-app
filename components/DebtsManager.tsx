@@ -53,8 +53,8 @@ export function DebtsManager() {
 
   async function updateDebt(debt: Debt, patch: Partial<Debt>) {
     if (!session?.user.id) return;
+    setDebts((current) => current.map((item) => item.id === debt.id ? { ...item, ...patch } : item));
     await supabase.from("debts").update(patch).eq("id", debt.id).eq("user_id", session.user.id);
-    await load();
   }
 
   async function deleteDebt(debt: Debt) {
@@ -90,13 +90,13 @@ export function DebtsManager() {
 
                 {isOpen && (
                   <div className="debt-edit-panel">
-                    <input defaultValue={debt.person} placeholder="Name" onBlur={(e) => e.target.value.trim() && updateDebt(debt, { person: e.target.value.trim() })} />
-                    <input inputMode="decimal" defaultValue={formatNumber(Number(debt.amount))} placeholder="Betrag" onBlur={(e) => updateDebt(debt, { amount: parseAmount(e.target.value) })} />
+                    <input defaultValue={debt.person} placeholder="Name" onChange={(e) => e.target.value.trim() && updateDebt(debt, { person: e.target.value.trim() })} />
+                    <input inputMode="decimal" defaultValue={formatNumber(Number(debt.amount))} placeholder="Betrag" onChange={(e) => updateDebt(debt, { amount: parseAmount(e.target.value) })} />
                     <select value={debt.kind} onChange={(e) => updateDebt(debt, { kind: e.target.value as DebtKind })}>
                       <option value="i_owe">Schulde ich</option>
                       <option value="owed_to_me">Schuldet mir</option>
                     </select>
-                    <input defaultValue={debt.note ?? ""} placeholder="Notiz" onBlur={(e) => updateDebt(debt, { note: e.target.value.trim() || null })} />
+                    <input defaultValue={debt.note ?? ""} placeholder="Notiz" onChange={(e) => updateDebt(debt, { note: e.target.value.trim() || null })} />
                     <div className="button-row">
                       <button className="mini-button" onClick={() => updateDebt(debt, { is_active: !debt.is_active })}>{debt.is_active ? "pausieren" : "aktivieren"}</button>
                       <button className="mini-button danger" onClick={() => deleteDebt(debt)}>löschen</button>
