@@ -33,6 +33,7 @@ export type Debt = {
   id: string;
   user_id: string;
   debtor_id: string | null;
+  account_id: string | null;
   person: string;
   kind: DebtKind;
   amount: number;

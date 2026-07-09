@@ -95,38 +95,45 @@ export function AccountsManager() {
                 </button>
 
                 {isOpen && (
-                  <div className="account-detail-panel">
-                    <label>
-                      Betrag
-                      <input
-                        defaultValue={formatNumber(Number(account.balance))}
-                        inputMode="decimal"
-                        onChange={(e) => updateAccount(account, { balance: parseAmount(e.target.value) })}
-                      />
-                    </label>
-                    <select value={account.type} onChange={(e) => updateAccount(account, { type: e.target.value as AccountType, include_in_available_net_worth: e.target.value === "active" })}>
-                      <option value="active">Aktiv</option>
-                      <option value="bound">Gebunden</option>
-                      <option value="investment">Depot</option>
-                    </select>
-                    <label className="inline-toggle">
-                      <input
-                        type="checkbox"
-                        checked={account.include_in_available_net_worth}
-                        onChange={(e) => updateAccount(account, { include_in_available_net_worth: e.target.checked })}
-                      />
-                      verfügbar
-                    </label>
-                    {account.type === "active" && (
+                  <div className="account-detail-panel compact-account-panel">
+                    <div className="account-detail-row two-fields">
+                      <label>
+                        Betrag
+                        <input
+                          defaultValue={formatNumber(Number(account.balance))}
+                          inputMode="decimal"
+                          onChange={(e) => updateAccount(account, { balance: parseAmount(e.target.value) })}
+                        />
+                      </label>
+                      <label>
+                        Typ
+                        <select value={account.type} onChange={(e) => updateAccount(account, { type: e.target.value as AccountType, include_in_available_net_worth: e.target.value === "active" })}>
+                          <option value="active">Aktiv</option>
+                          <option value="bound">Gebunden</option>
+                          <option value="investment">Depot</option>
+                        </select>
+                      </label>
+                    </div>
+                    <div className="account-detail-row toggle-row">
                       <label className="inline-toggle">
                         <input
                           type="checkbox"
-                          checked={account.is_default}
-                          onChange={(e) => { if (e.target.checked) setDefaultAccount(account); }}
+                          checked={account.include_in_available_net_worth}
+                          onChange={(e) => updateAccount(account, { include_in_available_net_worth: e.target.checked })}
                         />
-                        Standardkonto
+                        verfügbar
                       </label>
-                    )}
+                      {account.type === "active" && (
+                        <label className="inline-toggle">
+                          <input
+                            type="checkbox"
+                            checked={account.is_default}
+                            onChange={(e) => { if (e.target.checked) setDefaultAccount(account); }}
+                          />
+                          Standardkonto
+                        </label>
+                      )}
+                    </div>
                     <input value={account.name} onChange={(e) => updateAccount(account, { name: e.target.value })} />
                     <div className="button-row">
                       <button className="mini-button" onClick={() => updateAccount(account, { is_active: !account.is_active })}>{account.is_active ? "pausieren" : "aktivieren"}</button>

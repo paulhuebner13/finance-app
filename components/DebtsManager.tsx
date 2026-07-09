@@ -6,7 +6,7 @@ import { AuthGate } from "@/components/AuthGate";
 import { formatEuro, formatNumber, todayISO } from "@/lib/date";
 import { parseAmount } from "@/lib/finance";
 import { supabase } from "@/lib/supabase";
-import type { Debt, DebtKind, Debtor } from "@/lib/types";
+import type { Account, Debt, DebtKind, Debtor } from "@/lib/types";
 import { useSession } from "@/lib/useSession";
 
 type Mode = "none" | "debt" | "debtor";
@@ -24,6 +24,7 @@ export function DebtsManager() {
   const { session, loading } = useSession();
   const [debts, setDebts] = useState<Debt[]>([]);
   const [debtors, setDebtors] = useState<Debtor[]>([]);
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [mode, setMode] = useState<Mode>("none");
   const [expandedDebtor, setExpandedDebtor] = useState<string | null>(null);
   const [expandedStandalone, setExpandedStandalone] = useState<string | null>(null);
@@ -40,7 +41,13 @@ export function DebtsManager() {
 
   const load = useCallback(async () => {
     if (!session?.user.id) return;
-    const [debtorsRes, debtsRes] = await Promise.all([
+    const [accountsRes, debtorsRes, debtsRes] = await Promise.all([
+      supabase
+        .from("accounts")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .eq("is_active", true)
+        .order("created_at", { ascending: true }),
       supabase
         .from("debtors")
         .select("*")
@@ -57,6 +64,7 @@ export function DebtsManager() {
         .order("created_at", { ascending: false })
     ]);
 
+    setAccounts((accountsRes.data ?? []) as Account[]);
     const nextDebtors = (debtorsRes.data ?? []) as Debtor[];
     const nextDebts = (debtsRes.data ?? []) as Debt[];
     setDebtors(nextDebtors);
@@ -74,6 +82,22 @@ export function DebtsManager() {
   useEffect(() => { load(); }, [load]);
 
   const net = useMemo(() => debts.reduce((sum, debt) => sum + debtValue(debt), 0), [debts]);
+
+  const defaultAccount = useMemo(() => {
+    return accounts.find((account) => account.type === "active" && account.is_default)
+      ?? accounts.find((account) => account.type === "active" && account.include_in_available_net_worth)
+      ?? accounts.find((account) => account.type === "active")
+      ?? null;
+  }, [accounts]);
+
+  async function adjustAccountBalance(accountId: string | null | undefined, delta: number) {
+    if (!session?.user.id || !accountId || !delta) return;
+    const account = accounts.find((item) => item.id === accountId);
+    if (!account) return;
+    const nextBalance = Number(account.balance) + delta;
+    setAccounts((current) => current.map((item) => item.id === accountId ? { ...item, balance: nextBalance } : item));
+    await supabase.from("accounts").update({ balance: nextBalance }).eq("id", accountId).eq("user_id", session.user.id);
+  }
 
   const byDebtor = useMemo(() => {
     return debtors.map((debtor) => {
@@ -115,22 +139,33 @@ export function DebtsManager() {
     await load();
   }
 
+  function accountIdForDebt(kind: DebtKind, currentAccountId?: string | null) {
+    if (kind !== "owed_to_me") return null;
+    return currentAccountId ?? defaultAccount?.id ?? null;
+  }
+
   async function addDebt() {
     if (!session?.user.id) return;
     const debtor = debtors.find((item) => item.id === selectedDebtorId);
     const kind = debtor ? debtor.kind : newDebtKind;
     const title = debtor ? debtor.name : standaloneTitle.trim();
+    const parsedAmount = parseAmount(amount);
     if (!title) return;
+    const accountId = accountIdForDebt(kind);
     await supabase.from("debts").insert({
       user_id: session.user.id,
       debtor_id: debtor?.id ?? null,
+      account_id: accountId,
       person: title,
-      amount: parseAmount(amount),
+      amount: parsedAmount,
       kind,
       date,
       note: note.trim() || null,
       is_active: true
     });
+    if (kind === "owed_to_me" && accountId) {
+      await adjustAccountBalance(accountId, -parsedAmount);
+    }
     setAmount("");
     setNote("");
     setStandaloneTitle("");
@@ -141,8 +176,19 @@ export function DebtsManager() {
 
   async function updateDebt(debt: Debt, patch: Partial<Debt>) {
     if (!session?.user.id) return;
-    setDebts((current) => current.map((item) => item.id === debt.id ? { ...item, ...patch } : item));
-    await supabase.from("debts").update(patch).eq("id", debt.id).eq("user_id", session.user.id);
+    const oldAccountId = debt.kind === "owed_to_me" ? debt.account_id : null;
+    const oldAmount = oldAccountId ? Number(debt.amount) : 0;
+    const nextDebt = { ...debt, ...patch };
+    const nextAccountId = accountIdForDebt(nextDebt.kind, nextDebt.account_id);
+    const nextAmount = nextDebt.kind === "owed_to_me" && nextAccountId ? Number(nextDebt.amount) : 0;
+    const nextPatch: Partial<Debt> = { ...patch, account_id: nextAccountId };
+
+    setDebts((current) => current.map((item) => item.id === debt.id ? { ...item, ...nextPatch } : item));
+    await supabase.from("debts").update(nextPatch).eq("id", debt.id).eq("user_id", session.user.id);
+
+    if (oldAccountId) await adjustAccountBalance(oldAccountId, oldAmount);
+    if (nextAccountId) await adjustAccountBalance(nextAccountId, -nextAmount);
+    await load();
   }
 
   async function updateDebtor(debtor: Debtor, patch: Partial<Debtor>) {
@@ -173,6 +219,9 @@ export function DebtsManager() {
 
   async function deleteDebt(debt: Debt) {
     if (!session?.user.id) return;
+    if (debt.kind === "owed_to_me" && debt.account_id) {
+      await adjustAccountBalance(debt.account_id, Number(debt.amount));
+    }
     await supabase.from("debts").delete().eq("id", debt.id).eq("user_id", session.user.id);
     await load();
   }
@@ -202,21 +251,9 @@ export function DebtsManager() {
           <h1>{formatEuro(net)}</h1>
         </section>
 
-        <section className="debt-action-grid">
+        <section className="debt-action-grid single-action">
           <button className="primary" onClick={startDebtForm}>Schulden hinzufügen</button>
-          <button className="primary secondary-add" onClick={() => setMode(mode === "debtor" ? "none" : "debtor")}>Schuldner hinzufügen</button>
         </section>
-
-        {mode === "debtor" && (
-          <section className="form-card debt-form-card">
-            <input value={newDebtorName} onChange={(e) => setNewDebtorName(e.target.value)} placeholder="Name" />
-            <select value={newDebtorKind} onChange={(e) => setNewDebtorKind(e.target.value as DebtKind)}>
-              <option value="i_owe">Schulde ich</option>
-              <option value="owed_to_me">Schuldet mir</option>
-            </select>
-            <button className="primary" onClick={addDebtor}>Speichern</button>
-          </section>
-        )}
 
         {mode === "debt" && (
           <section className="form-card debt-form-card">
@@ -326,6 +363,21 @@ export function DebtsManager() {
 
           {!debtors.length && !standaloneDebts.length && <p className="muted center">Leer.</p>}
         </section>
+
+        <section className="debt-add-debtor-section">
+          <button className="primary secondary-add" onClick={() => setMode(mode === "debtor" ? "none" : "debtor")}>Schuldner hinzufügen</button>
+        </section>
+
+        {mode === "debtor" && (
+          <section className="form-card debt-form-card debtor-form-bottom">
+            <input value={newDebtorName} onChange={(e) => setNewDebtorName(e.target.value)} placeholder="Name" />
+            <select value={newDebtorKind} onChange={(e) => setNewDebtorKind(e.target.value as DebtKind)}>
+              <option value="i_owe">Schulde ich</option>
+              <option value="owed_to_me">Schuldet mir</option>
+            </select>
+            <button className="primary" onClick={addDebtor}>Speichern</button>
+          </section>
+        )}
       </main>
     </AppShell>
   );

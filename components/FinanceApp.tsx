@@ -10,7 +10,7 @@ import { BudgetCard } from "@/components/BudgetCard";
 import { MonthClosingModal } from "@/components/MonthClosingModal";
 import { defaultAccounts, defaultCategoryGroups } from "@/lib/defaults";
 import { applyDeltas, invertDeltas, mergeDeltas, sortAccountsStable, transactionDeltas } from "@/lib/finance";
-import { dateForMonthDay, dayOfMonth, daysInMonth, formatEuro, formatNumber, getMonthRange, monthKey, plannedUntilCurrentDay, previousMonthKey, todayISO } from "@/lib/date";
+import { dateForMonthDay, dayOfMonth, daysInMonth, formatEuro, getMonthRange, monthKey, plannedUntilCurrentDay, previousMonthKey, todayISO } from "@/lib/date";
 import type { Account, Category, CategoryGroup, CategoryWithChildren, Debt, RecurringTransaction, Transaction } from "@/lib/types";
 
 function categoriesBudgetSum(group: CategoryWithChildren) {
@@ -264,7 +264,7 @@ export function FinanceApp() {
   const currentDay = dayOfMonth();
   const monthDays = daysInMonth();
   const plannedExpenses = expenseGroups.reduce((sum, group) => sum + categoriesPlanSum(group, currentDay), 0);
-  const plannedExpensePercent = plannedExpenses > 0 ? (stats.effectiveExpenses / plannedExpenses) * 100 : 0;
+  const plannedExpensePercent = plannedExpenses > 0 ? Math.round((stats.effectiveExpenses / plannedExpenses) * 100) : 0;
 
   if (loading || bootstrapping) {
     return <main className="loading-page">Laden...</main>;
@@ -277,7 +277,7 @@ export function FinanceApp() {
       <main className="dashboard start-dashboard">
         <section className="start-total-card">
           <span>Ausgaben</span>
-          <strong>{formatEuro(stats.effectiveExpenses)} / {formatEuro(plannedExpenses)} · {formatNumber(plannedExpensePercent)}%</strong>
+          <strong>{formatEuro(stats.effectiveExpenses)} / {formatEuro(plannedExpenses)} · <span className={plannedExpensePercent > 100 ? "plan-percent over" : "plan-percent"}>{plannedExpensePercent}%</span></strong>
         </section>
 
         <section>
