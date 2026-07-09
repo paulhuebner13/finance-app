@@ -101,13 +101,14 @@ export function AccountsManager() {
           {accounts.map((account) => {
             const isOpen = expanded === account.id;
             return (
-              <article className={`account-card account-collapsible-card ${isOpen ? "expanded" : ""}`} key={account.id} style={{ ["--accent" as string]: account.color }}>
-                <div className="account-summary-line">
-                  <button className="account-name-button" onClick={() => setExpanded(isOpen ? null : account.id)}>
+              <article className={`account-card account-clean-card ${isOpen ? "expanded" : ""}`} key={account.id} style={{ ["--accent" as string]: account.color }}>
+                <div className="account-clean-summary">
+                  <button className="account-clean-name" onClick={() => setExpanded(isOpen ? null : account.id)} aria-expanded={isOpen}>
                     <strong>{account.name}</strong>
+                    <span>{isOpen ? "schließen" : "Details"}</span>
                   </button>
                   <input
-                    className="account-quick-balance"
+                    className="account-clean-balance"
                     value={accountInputs[account.id] ?? formatNumber(Number(account.balance))}
                     inputMode="decimal"
                     aria-label={`Kontostand ${account.name}`}
@@ -117,24 +118,24 @@ export function AccountsManager() {
                 </div>
 
                 {isOpen && (
-                  <div className="account-detail-panel compact-account-panel">
-                    <div className="account-detail-line">
+                  <div className="account-clean-panel">
+                    <label className="account-clean-field">
                       <span>Betrag</span>
                       <input
                         value={accountInputs[account.id] ?? formatNumber(Number(account.balance))}
                         inputMode="decimal"
                         onChange={(e) => updateBalance(account, e.target.value)}
                       />
-                    </div>
-                    <div className="account-detail-line">
+                    </label>
+                    <label className="account-clean-field">
                       <span>Typ</span>
                       <select value={account.type} onChange={(e) => updateAccount(account, { type: e.target.value as AccountType, include_in_available_net_worth: e.target.value === "active" })}>
                         <option value="active">Aktiv</option>
                         <option value="bound">Gebunden</option>
                         <option value="investment">Depot</option>
                       </select>
-                    </div>
-                    <div className="account-toggle-stack">
+                    </label>
+                    <div className="account-clean-toggles">
                       <label className="inline-toggle">
                         <input
                           type="checkbox"
@@ -154,11 +155,11 @@ export function AccountsManager() {
                         </label>
                       )}
                     </div>
-                    <div className="account-detail-line">
+                    <label className="account-clean-field">
                       <span>Name</span>
                       <input value={account.name} onChange={(e) => updateAccount(account, { name: e.target.value })} />
-                    </div>
-                    <div className="button-row account-action-row">
+                    </label>
+                    <div className="account-clean-actions">
                       <button className="mini-button" onClick={() => updateAccount(account, { is_active: !account.is_active })}>{account.is_active ? "pausieren" : "aktivieren"}</button>
                       <button className="mini-button danger" onClick={() => deactivateAccount(account)}>löschen</button>
                     </div>

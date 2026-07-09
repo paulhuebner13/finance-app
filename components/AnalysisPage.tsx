@@ -99,10 +99,15 @@ export function AnalysisPage() {
           {rows.map(({ group, values, max, average, total }) => {
             const plotWidth = chart.width - chart.left - chart.right;
             const plotHeight = chart.height - chart.top - chart.bottom;
-            const barGap = 8;
-            const barWidth = (plotWidth - barGap * (values.length - 1)) / values.length;
+            const pointStep = values.length > 1 ? plotWidth / (values.length - 1) : plotWidth;
             const valueToY = (value: number) => chart.top + plotHeight - (value / max) * plotHeight;
             const averageY = valueToY(average);
+            const points = values.map((value, index) => ({
+              ...value,
+              x: chart.left + index * pointStep,
+              y: valueToY(value.spent)
+            }));
+            const linePoints = points.map((point) => `${point.x},${point.y}`).join(" ");
             return (
               <article className="monthly-chart-card" key={group.id} style={{ ["--accent" as string]: group.color }}>
                 <div className="monthly-group-head">
@@ -114,19 +119,16 @@ export function AnalysisPage() {
                   <line className="chart-axis" x1={chart.left} y1={chart.top + plotHeight} x2={chart.width - chart.right} y2={chart.top + plotHeight} />
                   <text className="chart-y-label" x={chart.left - 8} y={chart.top + 6} textAnchor="end">{formatEuro(max)}</text>
                   <text className="chart-y-label" x={chart.left - 8} y={chart.top + plotHeight} textAnchor="end">€ 0,00</text>
+                  <polyline className="chart-line" points={linePoints} />
+                  {points.map((point) => (
+                    <g key={point.month}>
+                      <text className="chart-value-label" x={point.x} y={Math.max(chart.top + 9, point.y - 8)} textAnchor="middle">{formatEuro(point.spent)}</text>
+                      <circle className="chart-point" cx={point.x} cy={point.y} r="4" />
+                      <text className="chart-x-label" x={point.x} y={chart.height - 12} textAnchor="middle">{shortMonth(point.month)}</text>
+                    </g>
+                  ))}
                   <line className="chart-average" x1={chart.left} y1={averageY} x2={chart.width - chart.right} y2={averageY} />
                   <text className="chart-average-label" x={chart.width - chart.right} y={Math.max(chart.top + 10, averageY - 5)} textAnchor="end">Ø {formatEuro(average)}</text>
-                  {values.map((value, index) => {
-                    const x = chart.left + index * (barWidth + barGap);
-                    const y = valueToY(value.spent);
-                    const height = chart.top + plotHeight - y;
-                    return (
-                      <g key={value.month}>
-                        <rect className="chart-bar" x={x} y={y} width={barWidth} height={Math.max(2, height)} rx="4" />
-                        <text className="chart-x-label" x={x + barWidth / 2} y={chart.height - 12} textAnchor="middle">{shortMonth(value.month)}</text>
-                      </g>
-                    );
-                  })}
                 </svg>
               </article>
             );

@@ -1978,3 +1978,172 @@ textarea,
   .depot-card-head { grid-template-columns: 1fr; }
   .depot-card-head .button-row { justify-content: flex-start; }
 }
+
+/* Patch: fix accounts layout, line analysis, and calmer outlined action buttons */
+.primary,
+.big-add,
+.floating-booking-button {
+  color: #174f61 !important;
+  background: linear-gradient(180deg, rgba(37, 111, 132, 0.13) 0%, rgba(37, 111, 132, 0.08) 100%) !important;
+  border: 1.8px solid rgba(23, 79, 97, 0.82) !important;
+  box-shadow: 0 8px 18px rgba(31, 102, 120, 0.10), inset 0 1px 0 rgba(255,255,255,0.92) !important;
+}
+.primary:hover,
+.big-add:hover,
+.floating-booking-button:hover {
+  background: linear-gradient(180deg, rgba(37, 111, 132, 0.18) 0%, rgba(37, 111, 132, 0.10) 100%) !important;
+  border-color: #174f61 !important;
+}
+.floating-booking-button {
+  backdrop-filter: blur(14px);
+}
+
+.account-clean-card {
+  padding: 0 !important;
+  overflow: hidden !important;
+  border-radius: 20px !important;
+  border: 1.5px solid rgba(35, 70, 125, 0.14) !important;
+}
+.account-clean-summary {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 8.2rem !important;
+  gap: 0.7rem !important;
+  align-items: center !important;
+  padding: 0.78rem 0.85rem !important;
+  min-width: 0 !important;
+}
+.account-clean-name {
+  min-width: 0 !important;
+  width: 100% !important;
+  border: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  text-align: left !important;
+  color: var(--text) !important;
+  display: grid !important;
+  gap: 0.12rem !important;
+}
+.account-clean-name strong {
+  display: block !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  font-size: 0.98rem !important;
+}
+.account-clean-name span {
+  color: var(--muted) !important;
+  font-size: 0.68rem !important;
+  font-weight: 800 !important;
+}
+.account-clean-balance {
+  width: 8.2rem !important;
+  max-width: 8.2rem !important;
+  min-width: 0 !important;
+  justify-self: end !important;
+  text-align: right !important;
+  font-size: 0.92rem !important;
+  font-weight: 900 !important;
+  border-radius: 12px !important;
+  padding: 0.55rem 0.58rem !important;
+  box-sizing: border-box !important;
+}
+.account-clean-panel {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 0.75rem !important;
+  padding: 0 0.85rem 0.9rem !important;
+  min-width: 0 !important;
+}
+.account-clean-field {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 0.32rem !important;
+  min-width: 0 !important;
+}
+.account-clean-field span {
+  color: var(--muted) !important;
+  font-size: 0.74rem !important;
+  font-weight: 850 !important;
+}
+.account-clean-field input,
+.account-clean-field select {
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+.account-clean-toggles {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 0.45rem !important;
+  min-width: 0 !important;
+}
+.account-clean-toggles .inline-toggle {
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  border-radius: 14px !important;
+  background: rgba(37, 111, 132, 0.06) !important;
+  border: 1px solid rgba(37, 111, 132, 0.14) !important;
+  padding: 0.6rem 0.65rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+}
+.account-clean-toggles .inline-toggle input {
+  width: auto !important;
+  min-width: auto !important;
+}
+.account-clean-actions {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 0.5rem !important;
+}
+.account-clean-actions .mini-button {
+  width: 100% !important;
+  justify-content: center !important;
+}
+@media (max-width: 390px) {
+  .account-clean-summary {
+    grid-template-columns: minmax(0, 1fr) 7.1rem !important;
+    gap: 0.5rem !important;
+    padding: 0.72rem 0.72rem !important;
+  }
+  .account-clean-balance {
+    width: 7.1rem !important;
+    max-width: 7.1rem !important;
+    font-size: 0.86rem !important;
+    padding-inline: 0.48rem !important;
+  }
+}
+
+/* Analysis as line chart, with average line drawn above the graph */
+.chart-bar { display: none !important; }
+.chart-line {
+  fill: none;
+  stroke: var(--accent, var(--accent-main));
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.9;
+}
+.chart-point {
+  fill: #ffffff;
+  stroke: var(--accent, var(--accent-main));
+  stroke-width: 2.3;
+}
+.chart-value-label {
+  fill: rgba(20, 32, 51, 0.66);
+  font-size: 8.2px;
+  font-weight: 780;
+}
+.chart-average {
+  stroke: #142033 !important;
+  stroke-width: 1.55 !important;
+  stroke-dasharray: 5 4 !important;
+  opacity: 0.74 !important;
+  pointer-events: none;
+}
+.monthly-chart-card .analysis-chart {
+  overflow: visible !important;
+}
