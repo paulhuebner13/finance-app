@@ -19,12 +19,25 @@ create table if not exists public.accounts (
 );
 
 
+
+create table if not exists public.debtors (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  name text not null,
+  kind text not null check (kind in ('i_owe', 'owed_to_me')),
+  is_default boolean not null default false,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
 create table if not exists public.debts (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
+  debtor_id uuid references public.debtors(id) on delete set null,
   person text not null,
   kind text not null check (kind in ('i_owe', 'owed_to_me')),
   amount numeric(12,2) not null default 0,
+  date date not null default current_date,
   note text,
   is_active boolean not null default true,
   created_at timestamptz not null default now()
@@ -115,7 +128,9 @@ create table if not exists public.month_closing_debts (
 );
 
 create index if not exists accounts_user_idx on public.accounts(user_id);
+create index if not exists debtors_user_idx on public.debtors(user_id);
 create index if not exists debts_user_idx on public.debts(user_id);
+create index if not exists debts_debtor_idx on public.debts(debtor_id);
 create unique index if not exists accounts_one_default_idx on public.accounts(user_id) where is_default;
 create index if not exists category_groups_user_idx on public.category_groups(user_id);
 create index if not exists categories_user_idx on public.categories(user_id);
@@ -125,6 +140,7 @@ create index if not exists closings_user_month_idx on public.month_closings(user
 create index if not exists closing_debts_closing_idx on public.month_closing_debts(closing_id);
 
 alter table public.accounts enable row level security;
+alter table public.debtors enable row level security;
 alter table public.debts enable row level security;
 alter table public.category_groups enable row level security;
 alter table public.categories enable row level security;
@@ -145,6 +161,21 @@ create policy "accounts_insert_own" on public.accounts for insert with check (au
 create policy "accounts_update_own" on public.accounts for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "accounts_delete_own" on public.accounts for delete using (auth.uid() = user_id);
 
+
+
+drop policy if exists "debtors_select_own" on public.debtors;
+drop policy if exists "debtors_insert_own" on public.debtors;
+drop policy if exists "debtors_update_own" on public.debtors;
+drop policy if exists "debtors_delete_own" on public.debtors;
+
+create policy "debtors_select_own" on public.debtors for select using (auth.uid() = user_id);
+create policy "debtors_insert_own" on public.debtors for insert with check (auth.uid() = user_id);
+create policy "debtors_update_own" on public.debtors for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "debtors_delete_own" on public.debtors for delete using (auth.uid() = user_id);
+
+create unique index if not exists debtors_one_default_idx
+on public.debtors(user_id)
+where is_default and is_active;
 
 drop policy if exists "debts_select_own" on public.debts;
 drop policy if exists "debts_insert_own" on public.debts;

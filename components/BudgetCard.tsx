@@ -1,6 +1,6 @@
 "use client";
 
-import { adjustedMonthlyLimit, formatEuro, plannedUntilCurrentDay } from "@/lib/date";
+import { adjustedMonthlyLimit, formatEuro, formatNumber, plannedUntilCurrentDay } from "@/lib/date";
 import type { CategoryWithChildren, Transaction } from "@/lib/types";
 
 type Props = {
@@ -43,13 +43,14 @@ export function BudgetCard({ group, transactions, daysInMonth, currentDay, expan
   const spentForBar = Math.max(0, spent);
   const spentPercent = budget.limit > 0 ? Math.min(120, (spentForBar / budget.limit) * 100) : 0;
   const planPercent = budget.limit > 0 ? Math.min(100, (budget.plan / budget.limit) * 100) : 0;
+  const planUsagePercent = budget.plan > 0 ? (spent / budget.plan) * 100 : 0;
 
   return (
     <article className={`budget-card ${expanded ? "expanded" : ""}`} style={{ ["--accent" as string]: group.color }}>
       <button className="budget-main" onClick={onClick} type="button">
         <div className="budget-card-header compact-budget-head start-budget-head">
           <p className="card-title">{group.name}</p>
-          <strong>{formatEuro(spent)} / {formatEuro(budget.plan)}</strong>
+          <strong>{formatEuro(spent)} / {formatEuro(budget.plan)} · {formatNumber(planUsagePercent)}%</strong>
         </div>
 
         <div className="budget-bar" aria-label={`${group.name} Budgetfortschritt`}>

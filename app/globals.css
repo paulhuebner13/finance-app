@@ -1290,3 +1290,125 @@ html { scrollbar-color: rgba(117, 107, 93, 0.42) transparent; }
 .bottom-nav { grid-template-columns: repeat(11, minmax(78px, 1fr)) !important; overflow-x: auto; }
 @media (min-width: 521px) { .bottom-nav { grid-template-columns: repeat(11, minmax(84px, 1fr)) !important; } }
 @media (max-width: 520px) { .bottom-nav { grid-template-columns: repeat(11, minmax(76px, 1fr)) !important; } }
+
+/* Patch: debtors module, compact accounts, slimmer start bars */
+.start-total-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.82rem 0.95rem;
+  border-radius: 20px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 28px rgba(92, 73, 49, 0.08);
+}
+.start-total-card span { color: var(--muted); font-weight: 850; }
+.start-total-card strong { white-space: nowrap; font-size: 1rem; letter-spacing: -0.02em; }
+.compact-cards .budget-bar {
+  height: 10px !important;
+  border-radius: 6px !important;
+  margin-top: 0.48rem !important;
+}
+.budget-fill, .mini-bar > div { border-radius: 6px !important; }
+.budget-marker, .mini-bar > i {
+  width: 2px !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: #2c261e !important;
+}
+.mini-bar { height: 8px !important; border-radius: 6px !important; }
+.start-budget-head strong { font-size: 0.9rem !important; }
+
+.debt-action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+}
+.debt-action-grid .primary {
+  min-height: 3.35rem;
+  padding-inline: 0.8rem;
+}
+.secondary-add { opacity: 0.92; }
+.debt-form-card { gap: 0.65rem; }
+.debt-person-card {
+  background: var(--panel);
+  border: 1.8px solid color-mix(in srgb, var(--accent) 44%, var(--border));
+  border-radius: 22px;
+  box-shadow: 0 12px 30px rgba(92, 73, 49, 0.09);
+  overflow: hidden;
+}
+.debt-person-summary {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.85rem 0.95rem;
+  text-align: left;
+}
+.debt-person-summary span { font-weight: 900; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.debt-person-summary b { color: var(--accent); white-space: nowrap; }
+.debt-person-body {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0 0.95rem 0.95rem;
+}
+.debt-person-settings { display: grid; grid-template-columns: 1fr 132px; gap: 0.55rem; }
+.left-row { justify-content: flex-start; }
+.debt-entry-list { display: grid; gap: 0.45rem; }
+.debt-entry-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 104px auto;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.55rem;
+  border-radius: 16px;
+  background: rgba(255,253,248,0.72);
+  border: 1px solid rgba(44,38,30,0.10);
+}
+.debt-entry-row div { min-width: 0; display: grid; gap: 0.1rem; }
+.debt-entry-row strong { font-size: 0.82rem; }
+.debt-entry-row span { color: var(--muted); font-size: 0.78rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.debt-entry-row input { text-align: right; padding: 0.55rem 0.6rem; border-radius: 13px; }
+.standalone-debt-card .debt-person-body { padding-top: 0.1rem; }
+
+.account-collapsible-card {
+  padding: 0 !important;
+  overflow: hidden;
+}
+.account-summary-button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.9rem 1rem;
+  text-align: left;
+}
+.account-summary-button strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-summary-button span { color: var(--text) !important; font-weight: 900; white-space: nowrap; }
+.account-detail-panel {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0 1rem 1rem;
+}
+.account-detail-panel label { gap: 0.35rem; }
+.account-detail-panel .inline-toggle { display: flex; }
+
+@media (max-width: 520px) {
+  .start-total-card { grid-template-columns: 1fr; gap: 0.25rem; }
+  .start-total-card strong { font-size: 0.92rem; }
+  .debt-action-grid { grid-template-columns: 1fr; }
+  .debt-person-settings { grid-template-columns: 1fr; }
+  .debt-entry-row { grid-template-columns: 1fr 96px; }
+  .debt-entry-row .mini-button { grid-column: 1 / -1; justify-self: start; }
+}

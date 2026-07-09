@@ -7,9 +7,9 @@ import { useEffect, useRef } from "react";
 const nav = [
   { href: "/", label: "Start" },
   { href: "/accounts", label: "Konten" },
-  { href: "/transactions", label: "Buchungen" },
-  { href: "/wealth", label: "Geld" },
   { href: "/debts", label: "Schulden" },
+  { href: "/wealth", label: "Geld" },
+  { href: "/transactions", label: "Buchungen" },
   { href: "/closings", label: "Abrechnung" },
   { href: "/recurring", label: "Regeln" },
   { href: "/categories", label: "Budgets" },

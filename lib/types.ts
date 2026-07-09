@@ -19,12 +19,24 @@ export type Account = {
   created_at: string;
 };
 
+export type Debtor = {
+  id: string;
+  user_id: string;
+  name: string;
+  kind: DebtKind;
+  is_default: boolean;
+  is_active: boolean;
+  created_at: string;
+};
+
 export type Debt = {
   id: string;
   user_id: string;
+  debtor_id: string | null;
   person: string;
   kind: DebtKind;
   amount: number;
+  date: string;
   note: string | null;
   is_active: boolean;
   created_at: string;

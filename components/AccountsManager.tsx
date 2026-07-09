@@ -15,6 +15,7 @@ export function AccountsManager() {
   const [name, setName] = useState("");
   const [type, setType] = useState<AccountType>("active");
   const [balance, setBalance] = useState("");
+  const [expanded, setExpanded] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!session?.user.id) return;
@@ -44,7 +45,7 @@ export function AccountsManager() {
       balance: parseAmount(balance),
       cost_basis: 0,
       tax_reserve: 0,
-      color: type === "active" ? "#38BDF8" : type === "bound" ? "#F59E0B" : "#A855F7"
+      color: type === "active" ? "#315FBD" : type === "bound" ? "#B7791F" : "#6D5BD0"
     });
     setName("");
     setBalance("");
@@ -65,23 +66,16 @@ export function AccountsManager() {
     await load();
   }
 
-  async function renameAccount(account: Account) {
-    const next = window.prompt("Konto umbenennen", account.name);
-    if (!next?.trim()) return;
-    await updateAccount(account, { name: next.trim() });
-  }
-
   async function deactivateAccount(account: Account) {
     await updateAccount(account, { is_active: false });
   }
-
 
   if (loading) return <main className="loading-page">Laden...</main>;
   if (!session) return <AuthGate />;
 
   return (
     <AppShell>
-      <main className="dashboard">
+      <main className="dashboard accounts-page">
         <section className="hero-card compact">
           <h1>{formatEuro(sums.available)}</h1>
           <div className="summary-grid">
@@ -90,45 +84,61 @@ export function AccountsManager() {
           </div>
         </section>
 
+        <section className="cards-stack account-stack-collapsible">
+          {accounts.map((account) => {
+            const isOpen = expanded === account.id;
+            return (
+              <article className={`account-card account-collapsible-card ${isOpen ? "expanded" : ""}`} key={account.id} style={{ ["--accent" as string]: account.color }}>
+                <button className="account-summary-button" onClick={() => setExpanded(isOpen ? null : account.id)}>
+                  <strong>{account.name}</strong>
+                  <span>{formatEuro(Number(account.balance))}</span>
+                </button>
 
-        <section className="cards-stack">
-          {accounts.map((account) => (
-            <article className="account-card" key={account.id} style={{ ["--accent" as string]: account.color }}>
-              <div>
-                <strong>{account.name}</strong>
-                <span>{account.type === "active" ? "Aktiv" : account.type === "bound" ? "Gebunden" : "Depot"}{!account.is_active ? " · inaktiv" : ""}</span>
-              </div>
-              <input
-                defaultValue={formatNumber(Number(account.balance))}
-                inputMode="decimal"
-                onChange={(e) => updateAccount(account, { balance: parseAmount(e.target.value) })}
-              />
-              <label className="inline-toggle">
-                <input
-                  type="checkbox"
-                  checked={account.include_in_available_net_worth}
-                  onChange={(e) => updateAccount(account, { include_in_available_net_worth: e.target.checked })}
-                />
-                verfügbar
-              </label>
-              {account.type === "active" && (
-                <label className="inline-toggle">
-                  <input
-                    type="checkbox"
-                    checked={account.is_default}
-                    onChange={(e) => { if (e.target.checked) setDefaultAccount(account); }}
-                  />
-                  Standardkonto
-                </label>
-              )}
-              <div className="button-row">
-                <button className="mini-button" onClick={() => renameAccount(account)}>umbenennen</button>
-                <button className="mini-button" onClick={() => updateAccount(account, { is_active: !account.is_active })}>{account.is_active ? "pausieren" : "aktivieren"}</button>
-                <button className="mini-button danger" onClick={() => deactivateAccount(account)}>deaktivieren</button>
-              </div>
-            </article>
-          ))}
+                {isOpen && (
+                  <div className="account-detail-panel">
+                    <label>
+                      Betrag
+                      <input
+                        defaultValue={formatNumber(Number(account.balance))}
+                        inputMode="decimal"
+                        onChange={(e) => updateAccount(account, { balance: parseAmount(e.target.value) })}
+                      />
+                    </label>
+                    <select value={account.type} onChange={(e) => updateAccount(account, { type: e.target.value as AccountType, include_in_available_net_worth: e.target.value === "active" })}>
+                      <option value="active">Aktiv</option>
+                      <option value="bound">Gebunden</option>
+                      <option value="investment">Depot</option>
+                    </select>
+                    <label className="inline-toggle">
+                      <input
+                        type="checkbox"
+                        checked={account.include_in_available_net_worth}
+                        onChange={(e) => updateAccount(account, { include_in_available_net_worth: e.target.checked })}
+                      />
+                      verfügbar
+                    </label>
+                    {account.type === "active" && (
+                      <label className="inline-toggle">
+                        <input
+                          type="checkbox"
+                          checked={account.is_default}
+                          onChange={(e) => { if (e.target.checked) setDefaultAccount(account); }}
+                        />
+                        Standardkonto
+                      </label>
+                    )}
+                    <input value={account.name} onChange={(e) => updateAccount(account, { name: e.target.value })} />
+                    <div className="button-row">
+                      <button className="mini-button" onClick={() => updateAccount(account, { is_active: !account.is_active })}>{account.is_active ? "pausieren" : "aktivieren"}</button>
+                      <button className="mini-button danger" onClick={() => deactivateAccount(account)}>löschen</button>
+                    </div>
+                  </div>
+                )}
+              </article>
+            );
+          })}
         </section>
+
         <section className="form-card add-account-card">
           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Neues Konto" />
           <select value={type} onChange={(e) => setType(e.target.value as AccountType)}>
