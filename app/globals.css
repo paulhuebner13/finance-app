@@ -1694,3 +1694,287 @@ textarea,
     font-size: 0.78rem !important;
   }
 }
+
+/* Patch: accounts usability, professional aqua UI, analysis chart, clean depot */
+:root {
+  --bg: #f7fafb;
+  --surface: #ffffff;
+  --surface-soft: #f3f9fb;
+  --panel: #ffffff;
+  --panel-strong: #ffffff;
+  --border: rgba(35, 70, 125, 0.14);
+  --text: #142033;
+  --muted: #617084;
+  --accent-main: #256f84;
+  --accent-main-dark: #174f61;
+  --button-top: #2f8296;
+  --button-bottom: #1f6678;
+  --button-border: #174f61;
+}
+
+body::before {
+  background:
+    radial-gradient(circle at 10% -8%, rgba(37, 111, 132, 0.10), transparent 24rem),
+    radial-gradient(circle at 92% 0%, rgba(50, 88, 168, 0.07), transparent 24rem),
+    linear-gradient(180deg, #fbfdfe 0%, #f7fafb 48%, #eef8fa 100%) !important;
+}
+
+/* One consistent non-beige surface system */
+.auth-card,
+.hero-card,
+.form-card,
+.list-card,
+.filters-card,
+.budget-card,
+.account-card,
+.category-edit-card,
+.debt-card,
+.depot-card,
+.rule-card,
+.debt-card-collapsible,
+.closing-card,
+.notice-card,
+.debt-person-card,
+.start-total-card,
+.summary-grid div,
+.debt-entry-row,
+.budget-edit-card,
+.money-total-card,
+.clean-money-row,
+.transaction-card,
+.monthly-chart-card,
+.depot-create-card,
+.depot-value-tile {
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdfe 100%) !important;
+  border-color: rgba(35, 70, 125, 0.14) !important;
+  box-shadow: 0 12px 28px rgba(37, 111, 132, 0.07) !important;
+}
+
+input,
+select,
+textarea,
+.debt-amount-input,
+.subedit-amount,
+.budget-input,
+.account-quick-balance,
+.depot-value-tile input {
+  background: #ffffff !important;
+  border-color: rgba(35, 70, 125, 0.18) !important;
+  color: var(--text) !important;
+}
+
+/* Professional button system: calmer teal, no amateur-blue/rainbow/beige */
+.primary,
+.big-add,
+.floating-booking-button {
+  color: #ffffff !important;
+  background: linear-gradient(180deg, var(--button-top) 0%, var(--button-bottom) 100%) !important;
+  border: 1.6px solid var(--button-border) !important;
+  box-shadow: 0 12px 26px rgba(31, 102, 120, 0.20), inset 0 1px 0 rgba(255,255,255,0.20) !important;
+}
+.primary:hover,
+.big-add:hover,
+.floating-booking-button:hover {
+  background: linear-gradient(180deg, #2a788b 0%, #1b5969 100%) !important;
+}
+.secondary-add,
+.ghost,
+.mini-button,
+.subchips button,
+.text-button {
+  background: #ffffff !important;
+  border: 1px solid rgba(35, 70, 125, 0.16) !important;
+  color: var(--text) !important;
+}
+
+/* Konten: amount editable directly, expansion never overlaps */
+.account-collapsible-card {
+  padding: 0 !important;
+  overflow: hidden;
+  border-radius: 22px !important;
+}
+.account-summary-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(112px, 132px);
+  gap: 0.72rem;
+  align-items: center;
+  padding: 0.82rem 0.9rem;
+}
+.account-name-button {
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  padding: 0.2rem 0;
+}
+.account-name-button strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.account-quick-balance {
+  width: 100%;
+  min-width: 0;
+  text-align: right;
+  font-weight: 900;
+  border-radius: 14px;
+  padding: 0.62rem 0.68rem;
+}
+.compact-account-panel {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0 0.9rem 0.9rem;
+}
+.account-detail-line {
+  display: grid;
+  grid-template-columns: 5.8rem minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: center;
+}
+.account-detail-line span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+.account-detail-line input,
+.account-detail-line select {
+  min-width: 0;
+}
+.account-toggle-stack {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+}
+.account-toggle-stack .inline-toggle {
+  min-width: 0;
+  background: rgba(37,111,132,0.07);
+  border: 1px solid rgba(37,111,132,0.13);
+  border-radius: 16px;
+  padding: 0.62rem 0.7rem;
+}
+.account-action-row {
+  justify-content: flex-start;
+}
+@media (max-width: 420px) {
+  .account-summary-line { grid-template-columns: minmax(0, 1fr) minmax(96px, 116px); gap: 0.55rem; }
+  .account-detail-line { grid-template-columns: 1fr; gap: 0.32rem; }
+  .account-toggle-stack { grid-template-columns: 1fr; }
+}
+
+/* Geld/Buchungen: explicitly neutral/offwhite, no beige remnants */
+.money-stack .clean-money-row,
+.list-card:has(.transaction-card),
+.transaction-card {
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdfe 100%) !important;
+}
+.transaction-card {
+  border-color: rgba(35,70,125,0.13) !important;
+  box-shadow: 0 8px 18px rgba(37,111,132,0.06) !important;
+}
+
+/* Analyse: real chart with axes, month x-axis, amount y-axis, dashed average */
+.monthly-chart-card {
+  border-radius: 24px;
+  padding: 0.95rem;
+  border: 1.7px solid color-mix(in srgb, var(--accent, var(--accent-main)) 36%, rgba(35,70,125,0.14)) !important;
+}
+.analysis-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.chart-axis {
+  stroke: rgba(20,32,51,0.24);
+  stroke-width: 1;
+}
+.chart-bar {
+  fill: var(--accent, var(--accent-main));
+  opacity: 0.88;
+}
+.chart-average {
+  stroke: #142033;
+  stroke-width: 1.4;
+  stroke-dasharray: 5 5;
+  opacity: 0.68;
+}
+.chart-average-label,
+.chart-y-label,
+.chart-x-label {
+  fill: var(--muted);
+  font-size: 9px;
+  font-weight: 750;
+}
+.chart-average-label { fill: #142033; opacity: 0.76; }
+
+/* Depot: create form separated, name first, no duplicated loose numbers, no investment list */
+.investments-page .hero-card .summary-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.depot-create-card {
+  border-radius: 24px;
+  border: 1px solid rgba(35,70,125,0.14);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.65rem;
+  align-items: center;
+}
+.clean-depot-card {
+  display: grid;
+  gap: 0.82rem;
+  padding: 0.95rem;
+  border-radius: 24px;
+}
+.depot-card-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.7rem;
+  align-items: center;
+}
+.depot-card-head strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1.05rem;
+}
+.depot-value-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.62rem;
+}
+.depot-value-tile {
+  display: grid;
+  gap: 0.42rem;
+  border: 1px solid rgba(35,70,125,0.13);
+  border-radius: 18px;
+  padding: 0.72rem;
+}
+.depot-value-tile span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+.depot-value-tile strong {
+  font-size: 1rem;
+  white-space: nowrap;
+}
+.depot-value-tile input {
+  padding: 0.54rem 0.55rem;
+  border-radius: 12px;
+  font-weight: 850;
+}
+.depot-value-tile.readonly {
+  align-content: center;
+}
+@media (max-width: 560px) {
+  .investments-page .hero-card .summary-grid,
+  .depot-value-grid,
+  .depot-create-card {
+    grid-template-columns: 1fr;
+  }
+  .depot-card-head { grid-template-columns: 1fr; }
+  .depot-card-head .button-row { justify-content: flex-start; }
+}

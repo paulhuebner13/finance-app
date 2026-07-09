@@ -21,6 +21,15 @@ function shortMonth(key: string) {
   return new Intl.DateTimeFormat("de-AT", { month: "short" }).format(new Date(year, month - 1, 1));
 }
 
+const chart = {
+  width: 340,
+  height: 172,
+  left: 46,
+  right: 12,
+  top: 14,
+  bottom: 34
+};
+
 export function AnalysisPage() {
   const { session, loading } = useSession();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -62,8 +71,9 @@ export function AnalysisPage() {
         return { month, spent };
       });
       const max = Math.max(1, ...values.map((value) => value.spent));
+      const average = values.reduce((sum, value) => sum + value.spent, 0) / values.length;
       const total = values.reduce((sum, value) => sum + value.spent, 0);
-      return { group, values, max, total };
+      return { group, values, max, average, total };
     });
   }, [groups, transactions, months]);
 
@@ -86,25 +96,41 @@ export function AnalysisPage() {
         </section>
 
         <section className="cards-stack monthly-analysis-stack">
-          {rows.map(({ group, values, max, total }) => (
-            <article className="monthly-group-card" key={group.id} style={{ ["--accent" as string]: group.color }}>
-              <div className="monthly-group-head">
-                <strong>{group.name}</strong>
-                <b>{formatEuro(total)}</b>
-              </div>
-              <div className="month-bars">
-                {values.map((value) => (
-                  <div className="month-bar-row" key={value.month}>
-                    <span>{shortMonth(value.month)}</span>
-                    <div className="month-bar-track">
-                      <div style={{ width: `${Math.min(100, (value.spent / max) * 100)}%` }} />
-                    </div>
-                    <b>{formatEuro(value.spent)}</b>
-                  </div>
-                ))}
-              </div>
-            </article>
-          ))}
+          {rows.map(({ group, values, max, average, total }) => {
+            const plotWidth = chart.width - chart.left - chart.right;
+            const plotHeight = chart.height - chart.top - chart.bottom;
+            const barGap = 8;
+            const barWidth = (plotWidth - barGap * (values.length - 1)) / values.length;
+            const valueToY = (value: number) => chart.top + plotHeight - (value / max) * plotHeight;
+            const averageY = valueToY(average);
+            return (
+              <article className="monthly-chart-card" key={group.id} style={{ ["--accent" as string]: group.color }}>
+                <div className="monthly-group-head">
+                  <strong>{group.name}</strong>
+                  <b>{formatEuro(total)}</b>
+                </div>
+                <svg className="analysis-chart" viewBox={`0 0 ${chart.width} ${chart.height}`} role="img" aria-label={`${group.name} Ausgabenverlauf`}>
+                  <line className="chart-axis" x1={chart.left} y1={chart.top} x2={chart.left} y2={chart.top + plotHeight} />
+                  <line className="chart-axis" x1={chart.left} y1={chart.top + plotHeight} x2={chart.width - chart.right} y2={chart.top + plotHeight} />
+                  <text className="chart-y-label" x={chart.left - 8} y={chart.top + 6} textAnchor="end">{formatEuro(max)}</text>
+                  <text className="chart-y-label" x={chart.left - 8} y={chart.top + plotHeight} textAnchor="end">€ 0,00</text>
+                  <line className="chart-average" x1={chart.left} y1={averageY} x2={chart.width - chart.right} y2={averageY} />
+                  <text className="chart-average-label" x={chart.width - chart.right} y={Math.max(chart.top + 10, averageY - 5)} textAnchor="end">Ø {formatEuro(average)}</text>
+                  {values.map((value, index) => {
+                    const x = chart.left + index * (barWidth + barGap);
+                    const y = valueToY(value.spent);
+                    const height = chart.top + plotHeight - y;
+                    return (
+                      <g key={value.month}>
+                        <rect className="chart-bar" x={x} y={y} width={barWidth} height={Math.max(2, height)} rx="4" />
+                        <text className="chart-x-label" x={x + barWidth / 2} y={chart.height - 12} textAnchor="middle">{shortMonth(value.month)}</text>
+                      </g>
+                    );
+                  })}
+                </svg>
+              </article>
+            );
+          })}
           {!rows.length && <p className="muted center">Keine Daten.</p>}
         </section>
       </main>

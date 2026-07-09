@@ -12,6 +12,7 @@ import { useSession } from "@/lib/useSession";
 export function AccountsManager() {
   const { session, loading } = useSession();
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const [accountInputs, setAccountInputs] = useState<Record<string, string>>({});
   const [name, setName] = useState("");
   const [type, setType] = useState<AccountType>("active");
   const [balance, setBalance] = useState("");
@@ -19,8 +20,15 @@ export function AccountsManager() {
 
   const load = useCallback(async () => {
     if (!session?.user.id) return;
-    const { data } = await supabase.from("accounts").select("*").eq("user_id", session.user.id).eq("is_active", true).order("created_at");
-    setAccounts(sortAccountsStable((data ?? []) as Account[]));
+    const { data } = await supabase
+      .from("accounts")
+      .select("*")
+      .eq("user_id", session.user.id)
+      .eq("is_active", true)
+      .order("created_at");
+    const rows = sortAccountsStable((data ?? []) as Account[]);
+    setAccounts(rows);
+    setAccountInputs(Object.fromEntries(rows.map((account) => [account.id, formatNumber(Number(account.balance))])));
   }, [session?.user.id]);
 
   useEffect(() => { load(); }, [load]);
@@ -45,7 +53,7 @@ export function AccountsManager() {
       balance: parseAmount(balance),
       cost_basis: 0,
       tax_reserve: 0,
-      color: type === "active" ? "#315FBD" : type === "bound" ? "#B7791F" : "#6D5BD0"
+      color: type === "active" ? "#315FBD" : type === "bound" ? "#1F8A8A" : "#6D5BD0"
     });
     setName("");
     setBalance("");
@@ -57,6 +65,11 @@ export function AccountsManager() {
     if (!session?.user.id) return;
     setAccounts((current) => sortAccountsStable(current.map((item) => item.id === account.id ? { ...item, ...patch } : item)));
     await supabase.from("accounts").update(patch).eq("id", account.id).eq("user_id", session.user.id);
+  }
+
+  async function updateBalance(account: Account, nextValue: string) {
+    setAccountInputs((current) => ({ ...current, [account.id]: nextValue }));
+    await updateAccount(account, { balance: parseAmount(nextValue) });
   }
 
   async function setDefaultAccount(account: Account) {
@@ -89,32 +102,39 @@ export function AccountsManager() {
             const isOpen = expanded === account.id;
             return (
               <article className={`account-card account-collapsible-card ${isOpen ? "expanded" : ""}`} key={account.id} style={{ ["--accent" as string]: account.color }}>
-                <button className="account-summary-button" onClick={() => setExpanded(isOpen ? null : account.id)}>
-                  <strong>{account.name}</strong>
-                  <span>{formatEuro(Number(account.balance))}</span>
-                </button>
+                <div className="account-summary-line">
+                  <button className="account-name-button" onClick={() => setExpanded(isOpen ? null : account.id)}>
+                    <strong>{account.name}</strong>
+                  </button>
+                  <input
+                    className="account-quick-balance"
+                    value={accountInputs[account.id] ?? formatNumber(Number(account.balance))}
+                    inputMode="decimal"
+                    aria-label={`Kontostand ${account.name}`}
+                    onClick={(event) => event.stopPropagation()}
+                    onChange={(e) => updateBalance(account, e.target.value)}
+                  />
+                </div>
 
                 {isOpen && (
                   <div className="account-detail-panel compact-account-panel">
-                    <div className="account-detail-row two-fields">
-                      <label>
-                        Betrag
-                        <input
-                          defaultValue={formatNumber(Number(account.balance))}
-                          inputMode="decimal"
-                          onChange={(e) => updateAccount(account, { balance: parseAmount(e.target.value) })}
-                        />
-                      </label>
-                      <label>
-                        Typ
-                        <select value={account.type} onChange={(e) => updateAccount(account, { type: e.target.value as AccountType, include_in_available_net_worth: e.target.value === "active" })}>
-                          <option value="active">Aktiv</option>
-                          <option value="bound">Gebunden</option>
-                          <option value="investment">Depot</option>
-                        </select>
-                      </label>
+                    <div className="account-detail-line">
+                      <span>Betrag</span>
+                      <input
+                        value={accountInputs[account.id] ?? formatNumber(Number(account.balance))}
+                        inputMode="decimal"
+                        onChange={(e) => updateBalance(account, e.target.value)}
+                      />
                     </div>
-                    <div className="account-detail-row toggle-row">
+                    <div className="account-detail-line">
+                      <span>Typ</span>
+                      <select value={account.type} onChange={(e) => updateAccount(account, { type: e.target.value as AccountType, include_in_available_net_worth: e.target.value === "active" })}>
+                        <option value="active">Aktiv</option>
+                        <option value="bound">Gebunden</option>
+                        <option value="investment">Depot</option>
+                      </select>
+                    </div>
+                    <div className="account-toggle-stack">
                       <label className="inline-toggle">
                         <input
                           type="checkbox"
@@ -134,8 +154,11 @@ export function AccountsManager() {
                         </label>
                       )}
                     </div>
-                    <input value={account.name} onChange={(e) => updateAccount(account, { name: e.target.value })} />
-                    <div className="button-row">
+                    <div className="account-detail-line">
+                      <span>Name</span>
+                      <input value={account.name} onChange={(e) => updateAccount(account, { name: e.target.value })} />
+                    </div>
+                    <div className="button-row account-action-row">
                       <button className="mini-button" onClick={() => updateAccount(account, { is_active: !account.is_active })}>{account.is_active ? "pausieren" : "aktivieren"}</button>
                       <button className="mini-button danger" onClick={() => deactivateAccount(account)}>löschen</button>
                     </div>
