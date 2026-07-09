@@ -1512,3 +1512,185 @@ input:focus, select:focus, textarea:focus, .debt-amount-input:focus, .subedit-am
   .plan-percent { font-size: 0.72rem; }
   .account-detail-row.two-fields { grid-template-columns: 1fr; }
 }
+
+/* Final offwhite/aqua cleanup: remove remaining beige surfaces and keep start percentages visible */
+:root {
+  --bg: #f7fafb;
+  --surface: #ffffff;
+  --surface-2: #f1f8fa;
+  --panel: rgba(255, 255, 255, 0.96);
+  --panel-strong: #ffffff;
+  --border: rgba(35, 70, 125, 0.14);
+  --text: #142033;
+  --muted: #617084;
+  --accent-main: #3258a8;
+  --accent-main-dark: #203f82;
+}
+
+html,
+body {
+  background-color: var(--bg) !important;
+  background: var(--bg) !important;
+  color: var(--text) !important;
+}
+
+body::before {
+  background:
+    radial-gradient(circle at 12% -10%, rgba(50, 88, 168, 0.10), transparent 23rem),
+    radial-gradient(circle at 92% 0%, rgba(24, 150, 166, 0.08), transparent 24rem),
+    linear-gradient(180deg, #fbfdfe 0%, #f7fafb 44%, #eef7fa 100%) !important;
+}
+
+.auth-card,
+.hero-card,
+.form-card,
+.list-card,
+.filters-card,
+.budget-card,
+.account-card,
+.category-edit-card,
+.debt-card,
+.depot-card,
+.rule-card,
+.debt-card-collapsible,
+.closing-card,
+.notice-card,
+.debt-person-card,
+.start-total-card,
+.summary-grid div,
+.debt-entry-row,
+.budget-edit-card,
+.wealth-row,
+.analysis-card,
+.stat-card {
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdfe 100%) !important;
+  border-color: rgba(35, 70, 125, 0.14) !important;
+  box-shadow: 0 12px 28px rgba(50, 88, 168, 0.07) !important;
+}
+
+.budget-card,
+.category-edit-card,
+.account-card,
+.debt-person-card,
+.depot-card,
+.rule-card,
+.debt-card,
+.closing-card {
+  border-color: color-mix(in srgb, var(--accent, var(--accent-main)) 30%, rgba(35, 70, 125, 0.14)) !important;
+}
+
+input,
+select,
+textarea,
+.debt-amount-input,
+.subedit-amount,
+.budget-input {
+  background: #ffffff !important;
+  border-color: rgba(35, 70, 125, 0.18) !important;
+  color: var(--text) !important;
+}
+
+.bottom-nav,
+.topbar {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-color: rgba(35, 70, 125, 0.13) !important;
+  box-shadow: 0 14px 32px rgba(50, 88, 168, 0.11) !important;
+}
+
+.bottom-nav a.active {
+  background: rgba(50, 88, 168, 0.11) !important;
+  color: var(--accent-main-dark) !important;
+}
+
+.primary,
+.big-add,
+.floating-booking-button {
+  background: linear-gradient(180deg, #3f6bbb 0%, #3258a8 100%) !important;
+  border-color: #203f82 !important;
+  color: #ffffff !important;
+  box-shadow: 0 12px 26px rgba(50, 88, 168, 0.18) !important;
+}
+
+.secondary-add,
+.ghost,
+.mini-button,
+.subchips button,
+.text-button {
+  background: #ffffff !important;
+  border-color: rgba(35, 70, 125, 0.16) !important;
+  color: var(--text) !important;
+}
+
+.booking-modal,
+.closing-modal {
+  background: #ffffff !important;
+  color: var(--text) !important;
+  box-shadow: 0 18px 54px rgba(20, 32, 51, 0.18) !important;
+}
+
+.budget-bar,
+.mini-bar {
+  background: rgba(50, 88, 168, 0.10) !important;
+  box-shadow: inset 0 0 0 1px rgba(35, 70, 125, 0.08) !important;
+}
+
+.budget-marker,
+.mini-bar > i {
+  background: #142033 !important;
+  box-shadow: none !important;
+}
+
+.debt-entry-row {
+  border-color: rgba(35, 70, 125, 0.12) !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(50, 88, 168, 0.34) !important;
+}
+
+/* Ensure long category names never hide the percentage badge on Start */
+.start-budget-head {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  min-width: 0 !important;
+}
+
+.start-card-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.45rem !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.start-card-title .card-name {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.start-card-title .plan-percent {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+}
+
+.start-budget-head > strong {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+}
+
+@media (max-width: 420px) {
+  .start-budget-head {
+    gap: 0.45rem !important;
+  }
+  .start-card-title {
+    gap: 0.32rem !important;
+  }
+  .start-card-title .plan-percent {
+    font-size: 0.68rem !important;
+    padding: 0.12rem 0.34rem !important;
+  }
+  .start-budget-head > strong {
+    font-size: 0.78rem !important;
+  }
+}

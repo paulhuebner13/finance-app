@@ -4,8 +4,8 @@
   "description": "Mobile-first Finanztracking",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F6EFE2",
-  "theme_color": "#F6EFE2",
+  "background_color": "#F7FAFB",
+  "theme_color": "#F7FAFB",
   "icons": [
     {
       "src": "/icon.svg",

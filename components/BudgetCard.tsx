@@ -50,8 +50,8 @@ export function BudgetCard({ group, transactions, daysInMonth, currentDay, expan
     <article className={`budget-card ${expanded ? "expanded" : ""}`} style={{ ["--accent" as string]: group.color }}>
       <button className="budget-main" onClick={onClick} type="button">
         <div className="budget-card-header compact-budget-head start-budget-head">
-          <p className="card-title">
-            {group.name}
+          <p className="card-title start-card-title">
+            <span className="card-name">{group.name}</span>
             <span className={isOverPlan ? "plan-percent over" : "plan-percent"}>{planUsagePercent}%</span>
           </p>
           <strong>{formatEuro(spent)} / {formatEuro(budget.plan)}</strong>
