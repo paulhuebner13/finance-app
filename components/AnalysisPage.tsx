@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { AuthGate } from "@/components/AuthGate";
 import { formatEuro, getMonthRange, monthKey } from "@/lib/date";
-import { accountComparableTotal, calculateOutingValue, comparableValue, debtValue } from "@/lib/finance";
+import { accountComparableTotal, calculateOutingValue, comparableValue, debtValue, trackedComparableChange } from "@/lib/finance";
 import { supabase } from "@/lib/supabase";
 import type { Account, CategoryGroup, Debt, MonthClosing, Transaction } from "@/lib/types";
 import { useSession } from "@/lib/useSession";
@@ -140,24 +140,21 @@ export function AnalysisPage() {
   function outingForMonth(month: string, outingGroupId: string | null) {
     const range = getMonthRange(month);
     const monthTransactions = transactions.filter((tx) => tx.date >= range.start && tx.date <= range.end);
-    const income = monthTransactions.filter((tx) => tx.type === "income").reduce((sum, tx) => sum + Number(tx.amount), 0);
-    const investments = monthTransactions.filter((tx) => tx.type === "investment").reduce((sum, tx) => sum + Number(tx.amount), 0);
-    const trackedExpensesWithoutOuting = monthTransactions
-      .filter((tx) => tx.type === "expense" && tx.group_id !== outingGroupId)
-      .reduce((sum, tx) => sum + Number(tx.amount), 0);
-
     const openingComparable = comparableForClosing(closings.find((closing) => closing.month === previousMonthFromKey(month)));
     const currentComparable = month === monthKey()
       ? comparableValue(accounts, debts)
       : comparableForClosing(closings.find((closing) => closing.month === month));
 
-    if (currentComparable === null) return 0;
+    const trackedChange = trackedComparableChange({
+      transactions: monthTransactions,
+      accounts,
+      outingGroupId
+    });
+
     return calculateOutingValue({
       openingComparable,
       currentComparable,
-      income,
-      investments,
-      trackedExpensesWithoutOuting
+      trackedComparableChange: trackedChange
     });
   }
 

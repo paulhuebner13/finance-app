@@ -9,7 +9,7 @@ import { BookingModal } from "@/components/BookingModal";
 import { BudgetCard } from "@/components/BudgetCard";
 import { MonthClosingModal } from "@/components/MonthClosingModal";
 import { defaultAccounts, defaultCategoryGroups } from "@/lib/defaults";
-import { accountComparableTotal, applyDeltas, calculateOutingValue, comparableValue, debtValue, invertDeltas, mergeDeltas, sortAccountsStable, transactionDeltas } from "@/lib/finance";
+import { accountComparableTotal, applyDeltas, calculateOutingValue, comparableValue, debtValue, invertDeltas, mergeDeltas, sortAccountsStable, trackedComparableChange, transactionDeltas } from "@/lib/finance";
 import { dateForMonthDay, dayOfMonth, daysInMonth, formatEuro, getMonthRange, monthKey, plannedUntilCurrentDay, previousMonthKey, todayISO } from "@/lib/date";
 import type { Account, Category, CategoryGroup, CategoryWithChildren, Debt, RecurringTransaction, Transaction } from "@/lib/types";
 
@@ -266,12 +266,15 @@ export function FinanceApp() {
     const outingTracked = outingGroup ? transactions.filter((t) => t.type === "expense" && t.group_id === outingGroup.id).reduce((sum, t) => sum + Number(t.amount), 0) : 0;
     const trackedExpensesWithoutOuting = expenses - outingTracked;
     const currentComparableValue = comparableValue(accounts, debts);
+    const trackedChange = trackedComparableChange({
+      transactions,
+      accounts,
+      outingGroupId: outingGroup?.id ?? null
+    });
     const outingValue = calculateOutingValue({
       openingComparable: openingAvailable,
       currentComparable: currentComparableValue,
-      income,
-      investments,
-      trackedExpensesWithoutOuting
+      trackedComparableChange: trackedChange
     });
     const effectiveExpenses = trackedExpensesWithoutOuting + outingValue;
     return { expenses, income, investments, outingValue, effectiveExpenses };

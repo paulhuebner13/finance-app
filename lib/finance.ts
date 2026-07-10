@@ -78,19 +78,52 @@ export function accountComparableTotal(accounts: Pick<Account, "type" | "include
     .reduce((sum, account) => sum + Number(account.balance || 0), 0);
 }
 
+export function accountIsComparable(account: Pick<Account, "type" | "include_in_available_net_worth"> | null | undefined) {
+  return !!account && account.type === "active" && account.include_in_available_net_worth;
+}
+
+export function transactionComparableEffect(
+  tx: Pick<Transaction, "type" | "amount" | "account_id" | "from_account_id" | "to_account_id" | "group_id">,
+  accounts: Pick<Account, "id" | "type" | "include_in_available_net_worth">[],
+  outingGroupId?: string | null
+) {
+  if (tx.type === "expense" && outingGroupId && tx.group_id === outingGroupId) return 0;
+  const amount = Number(tx.amount) || 0;
+  const accountById = new Map(accounts.map((account) => [account.id, account]));
+  const isComparable = (id: string | null | undefined) => accountIsComparable(id ? accountById.get(id) : null);
+
+  if (tx.type === "income") return isComparable(tx.account_id) ? amount : 0;
+  if (tx.type === "expense") return isComparable(tx.account_id) ? -amount : 0;
+  if (tx.type === "transfer") {
+    return (isComparable(tx.to_account_id) ? amount : 0) - (isComparable(tx.from_account_id) ? amount : 0);
+  }
+  if (tx.type === "investment") {
+    return (isComparable(tx.to_account_id) ? amount : 0) - (isComparable(tx.from_account_id ?? tx.account_id) ? amount : 0);
+  }
+  return 0;
+}
+
+export function trackedComparableChange(input: {
+  transactions: Pick<Transaction, "type" | "amount" | "account_id" | "from_account_id" | "to_account_id" | "group_id">[];
+  accounts: Pick<Account, "id" | "type" | "include_in_available_net_worth">[];
+  outingGroupId?: string | null;
+}) {
+  return input.transactions.reduce(
+    (sum, tx) => sum + transactionComparableEffect(tx, input.accounts, input.outingGroupId),
+    0
+  );
+}
+
 export function calculateOutingValue(input: {
   openingComparable: number | null | undefined;
-  currentComparable: number;
-  income: number;
-  investments: number;
-  trackedExpensesWithoutOuting: number;
+  currentComparable: number | null | undefined;
+  trackedComparableChange: number;
 }) {
   if (input.openingComparable === null || input.openingComparable === undefined) return 0;
+  if (input.currentComparable === null || input.currentComparable === undefined) return 0;
   return (
     Number(input.openingComparable || 0)
-    + Number(input.income || 0)
-    - Number(input.investments || 0)
-    - Number(input.trackedExpensesWithoutOuting || 0)
+    + Number(input.trackedComparableChange || 0)
     - Number(input.currentComparable || 0)
   );
 }

@@ -18,14 +18,17 @@ type Props = {
 
 export function MonthClosingModal({ open, month, userId, accounts, debts, onClose, onSaved }: Props) {
   const [accountValues, setAccountValues] = useState<Record<string, string>>({});
-  const [debtValues, setDebtValues] = useState<Record<string, string>>({});
+  const [debtNetInput, setDebtNetInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (!open) return;
     setAccountValues(Object.fromEntries(accounts.filter((a) => a.is_active).map((a) => [a.id, formatNumber(Number(a.balance))] )));
-    setDebtValues(Object.fromEntries(debts.filter((d) => d.is_active).map((d) => [d.id, formatNumber(Number(d.amount))] )));
+    const activeDebtNet = debts
+      .filter((d) => d.is_active)
+      .reduce((sum, debt) => sum + debtValue({ amount: Number(debt.amount), kind: debt.kind }), 0);
+    setDebtNetInput(formatNumber(activeDebtNet));
     setError("");
   }, [open, accounts, debts]);
 
@@ -40,12 +43,8 @@ export function MonthClosingModal({ open, month, userId, accounts, debts, onClos
         include_in_available_net_worth: account.include_in_available_net_worth,
         balance: parseAmount(accountValues[account.id] ?? "0")
       }));
-      const closingDebtsForComparable = activeDebts.map((debt) => ({
-        kind: debt.kind,
-        amount: parseAmount(debtValues[debt.id] ?? "0")
-      }));
-      const debtNetValue = closingDebtsForComparable.reduce((sum, debt) => sum + debtValue(debt), 0);
-      const comparableTotal = comparableValue(closingAccountsForComparable, closingDebtsForComparable);
+      const debtNetValue = parseAmount(debtNetInput);
+      const comparableTotal = comparableValue(closingAccountsForComparable, [{ kind: "owed_to_me", amount: debtNetValue }]);
 
       const { data: closing, error: closingError } = await supabase
         .from("month_closings")
@@ -73,18 +72,8 @@ export function MonthClosingModal({ open, month, userId, accounts, debts, onClos
         await supabase.from("month_closing_debts").insert(activeDebts.map((debt) => ({
           closing_id: closing.id,
           debt_id: debt.id,
-          actual_amount: parseAmount(debtValues[debt.id] ?? "0")
+          actual_amount: Number(debt.amount) || 0
         })));
-
-        for (const debt of activeDebts) {
-          const actual = parseAmount(debtValues[debt.id] ?? "0");
-          const { error: debtError } = await supabase
-            .from("debts")
-            .update({ amount: actual })
-            .eq("id", debt.id)
-            .eq("user_id", userId);
-          if (debtError) throw debtError;
-        }
       }
 
       onSaved();
@@ -96,7 +85,7 @@ export function MonthClosingModal({ open, month, userId, accounts, debts, onClos
   }
 
   const activeDebts = debts.filter((d) => d.is_active);
-  const debtNet = activeDebts.reduce((sum, debt) => sum + debtValue({ amount: parseAmount(debtValues[debt.id] ?? String(debt.amount)), kind: debt.kind }), 0);
+  const debtNet = parseAmount(debtNetInput);
 
   if (!open) return null;
 
@@ -116,19 +105,15 @@ export function MonthClosingModal({ open, month, userId, accounts, debts, onClos
             </label>
           ))}
 
-          {activeDebts.length > 0 && (
-            <div className="closing-debt-total">
-              <span>Schulden</span>
-              <strong>{debtNet >= 0 ? "+" : ""}{formatEuro(debtNet)}</strong>
-            </div>
-          )}
+          <label>
+            Schulden
+            <input inputMode="decimal" value={debtNetInput} onChange={(e) => setDebtNetInput(e.target.value)} />
+          </label>
 
-          {activeDebts.map((debt) => (
-            <label key={debt.id}>
-              {debt.kind === "i_owe" ? "Schuld" : "Offen"}: {debt.person}
-              <input inputMode="decimal" value={debtValues[debt.id] ?? ""} onChange={(e) => setDebtValues((old) => ({ ...old, [debt.id]: e.target.value }))} />
-            </label>
-          ))}
+          <div className="closing-debt-total">
+            <span>Schuldenwert</span>
+            <strong>{debtNet >= 0 ? "+" : ""}{formatEuro(debtNet)}</strong>
+          </div>
         </div>
 
         {error && <p className="error">{error}</p>}
