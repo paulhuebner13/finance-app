@@ -104,6 +104,8 @@ create table if not exists public.month_closings (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   month text not null,
+  debt_net_value numeric(12,2) not null default 0,
+  comparable_value numeric(12,2) not null default 0,
   closed_at timestamptz not null default now(),
   unique(user_id, month)
 );
@@ -278,3 +280,8 @@ create policy "closing_debts_update_own" on public.month_closing_debts for updat
 create policy "closing_debts_delete_own" on public.month_closing_debts for delete using (
   exists (select 1 from public.month_closings c where c.id = closing_id and c.user_id = auth.uid())
 );
+
+
+alter table public.month_closings
+  add column if not exists debt_net_value numeric(12,2) not null default 0,
+  add column if not exists comparable_value numeric(12,2) not null default 0;

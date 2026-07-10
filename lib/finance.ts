@@ -67,6 +67,38 @@ export function debtNetValue(debts: { amount: number | string; kind: string }[])
   return debts.reduce((sum, debt) => sum + debtValue(debt), 0);
 }
 
+
+export function accountCountsForAusgehen(account: Pick<Account, "type" | "include_in_available_net_worth">) {
+  return account.type === "active" && account.include_in_available_net_worth;
+}
+
+export function accountComparableTotal(accounts: Pick<Account, "type" | "include_in_available_net_worth" | "balance">[]) {
+  return accounts
+    .filter(accountCountsForAusgehen)
+    .reduce((sum, account) => sum + Number(account.balance || 0), 0);
+}
+
+export function calculateOutingValue(input: {
+  openingComparable: number | null | undefined;
+  currentComparable: number;
+  income: number;
+  investments: number;
+  trackedExpensesWithoutOuting: number;
+}) {
+  if (input.openingComparable === null || input.openingComparable === undefined) return 0;
+  return (
+    Number(input.openingComparable || 0)
+    + Number(input.income || 0)
+    - Number(input.investments || 0)
+    - Number(input.trackedExpensesWithoutOuting || 0)
+    - Number(input.currentComparable || 0)
+  );
+}
+
+export function comparableValue(accounts: Pick<Account, "type" | "include_in_available_net_worth" | "balance">[], debts: { amount: number | string; kind: string }[]) {
+  return accountComparableTotal(accounts) + debtNetValue(debts);
+}
+
 export function entryTypeLabel(type: string) {
   if (type === "expense") return "Ausgabe";
   if (type === "income") return "Einnahme";

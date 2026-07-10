@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { formatEuro, formatMonthTitle, formatNumber } from "@/lib/date";
-import { debtValue, depotTax, parseAmount } from "@/lib/finance";
+import { comparableValue, debtValue, depotTax, parseAmount } from "@/lib/finance";
 import { supabase } from "@/lib/supabase";
 import type { Account, Debt } from "@/lib/types";
 
@@ -33,14 +33,26 @@ export function MonthClosingModal({ open, month, userId, accounts, debts, onClos
     setSaving(true);
     setError("");
     try {
+      const activeAccounts = accounts.filter((a) => a.is_active);
+      const activeDebts = debts.filter((d) => d.is_active);
+      const closingAccountsForComparable = activeAccounts.map((account) => ({
+        type: account.type,
+        include_in_available_net_worth: account.include_in_available_net_worth,
+        balance: parseAmount(accountValues[account.id] ?? "0")
+      }));
+      const closingDebtsForComparable = activeDebts.map((debt) => ({
+        kind: debt.kind,
+        amount: parseAmount(debtValues[debt.id] ?? "0")
+      }));
+      const debtNetValue = closingDebtsForComparable.reduce((sum, debt) => sum + debtValue(debt), 0);
+      const comparableTotal = comparableValue(closingAccountsForComparable, closingDebtsForComparable);
+
       const { data: closing, error: closingError } = await supabase
         .from("month_closings")
-        .insert({ user_id: userId, month })
+        .insert({ user_id: userId, month, debt_net_value: debtNetValue, comparable_value: comparableTotal })
         .select("id")
         .single();
       if (closingError) throw closingError;
-
-      const activeAccounts = accounts.filter((a) => a.is_active);
       await supabase.from("month_closing_balances").insert(activeAccounts.map((account) => ({
         closing_id: closing.id,
         account_id: account.id,
@@ -57,7 +69,6 @@ export function MonthClosingModal({ open, month, userId, accounts, debts, onClos
         if (accountError) throw accountError;
       }
 
-      const activeDebts = debts.filter((d) => d.is_active);
       if (activeDebts.length) {
         await supabase.from("month_closing_debts").insert(activeDebts.map((debt) => ({
           closing_id: closing.id,

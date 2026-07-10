@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { AuthGate } from "@/components/AuthGate";
 import { formatEuro, formatMonthTitle, formatNumber } from "@/lib/date";
-import { debtValue, parseAmount, sortAccountsStable } from "@/lib/finance";
+import { accountComparableTotal, debtValue, parseAmount, sortAccountsStable } from "@/lib/finance";
 import { supabase } from "@/lib/supabase";
 import type { Account, Debt, MonthClosing } from "@/lib/types";
 import { useSession } from "@/lib/useSession";
@@ -13,6 +13,8 @@ type ClosingBalance = { id: string; closing_id: string; account_id: string; actu
 type ClosingDebt = { id: string; closing_id: string; debt_id: string; actual_amount: number };
 
 type ClosingBundle = MonthClosing & {
+  debt_net_value?: number | null;
+  comparable_value?: number | null;
   balances: ClosingBalance[];
   debtValues: ClosingDebt[];
 };
@@ -54,30 +56,66 @@ export function ClosingsManager() {
 
   useEffect(() => { load(); }, [load]);
 
-  async function updateBalance(balance: ClosingBalance, value: string) {
-    const nextAmount = parseAmount(value);
-    setClosings((current) => current.map((closing) => ({
-      ...closing,
-      balances: closing.balances.map((item) => item.id === balance.id ? { ...item, actual_balance: nextAmount } : item)
-    })));
-    await supabase.from("month_closing_balances").update({ actual_balance: nextAmount }).eq("id", balance.id);
-  }
-
-  async function updateDebtValue(value: ClosingDebt, amount: string) {
-    const nextAmount = parseAmount(amount);
-    setClosings((current) => current.map((closing) => ({
-      ...closing,
-      debtValues: closing.debtValues.map((item) => item.id === value.id ? { ...item, actual_amount: nextAmount } : item)
-    })));
-    await supabase.from("month_closing_debts").update({ actual_amount: nextAmount }).eq("id", value.id);
-  }
-
-  function debtTotalFor(closing: ClosingBundle) {
+  function debtTotalForClosingValues(closing: ClosingBundle) {
+    if (!closing.debtValues.length && closing.debt_net_value !== null && closing.debt_net_value !== undefined) {
+      return Number(closing.debt_net_value);
+    }
     return closing.debtValues.reduce((sum, item) => {
       const debt = debts.find((debtRow) => debtRow.id === item.debt_id);
       if (!debt) return sum;
       return sum + debtValue({ amount: Number(item.actual_amount), kind: debt.kind });
     }, 0);
+  }
+
+  function comparableTotalForClosingValues(closing: ClosingBundle) {
+    const accountComparable = closing.balances.reduce((sum, balance) => {
+      const account = accounts.find((item) => item.id === balance.account_id);
+      if (!account) return sum;
+      return sum + accountComparableTotal([{
+        type: account.type,
+        include_in_available_net_worth: account.include_in_available_net_worth,
+        balance: Number(balance.actual_balance)
+      }]);
+    }, 0);
+    return accountComparable + debtTotalForClosingValues(closing);
+  }
+
+  async function saveClosingSnapshotTotals(closing: ClosingBundle) {
+    await supabase
+      .from("month_closings")
+      .update({
+        debt_net_value: debtTotalForClosingValues(closing),
+        comparable_value: comparableTotalForClosingValues(closing)
+      })
+      .eq("id", closing.id);
+  }
+
+  async function updateBalance(closingId: string, balance: ClosingBalance, value: string) {
+    const nextAmount = parseAmount(value);
+    const nextClosing = closings.find((closing) => closing.id === closingId);
+    const updatedClosing = nextClosing
+      ? { ...nextClosing, balances: nextClosing.balances.map((item) => item.id === balance.id ? { ...item, actual_balance: nextAmount } : item) }
+      : null;
+
+    setClosings((current) => current.map((closing) => closing.id === closingId && updatedClosing ? updatedClosing : closing));
+    await supabase.from("month_closing_balances").update({ actual_balance: nextAmount }).eq("id", balance.id);
+    if (updatedClosing) await saveClosingSnapshotTotals(updatedClosing);
+  }
+
+  async function updateDebtValue(closingId: string, value: ClosingDebt, amount: string) {
+    const nextAmount = parseAmount(amount);
+    const nextClosing = closings.find((closing) => closing.id === closingId);
+    const updatedClosing = nextClosing
+      ? { ...nextClosing, debtValues: nextClosing.debtValues.map((item) => item.id === value.id ? { ...item, actual_amount: nextAmount } : item) }
+      : null;
+
+    setClosings((current) => current.map((closing) => closing.id === closingId && updatedClosing ? updatedClosing : closing));
+    await supabase.from("month_closing_debts").update({ actual_amount: nextAmount }).eq("id", value.id);
+    if (updatedClosing) await saveClosingSnapshotTotals(updatedClosing);
+  }
+
+  function debtTotalFor(closing: ClosingBundle) {
+    return debtTotalForClosingValues(closing);
   }
 
   function totalFor(closing: ClosingBundle) {
@@ -120,11 +158,11 @@ export function ClosingsManager() {
                       return (
                         <label key={balance.id}>
                           {account.name}
-                          <input inputMode="decimal" defaultValue={formatNumber(Number(balance.actual_balance))} onChange={(e) => updateBalance(balance, e.target.value)} />
+                          <input inputMode="decimal" defaultValue={formatNumber(Number(balance.actual_balance))} onChange={(e) => updateBalance(closing.id, balance, e.target.value)} />
                         </label>
                       );
                     })}
-                    {closing.debtValues.length > 0 && (
+                    {(closing.debtValues.length > 0 || closing.debt_net_value !== null && closing.debt_net_value !== undefined) && (
                       <div className="closing-section-total">
                         <span>Schulden</span>
                         <strong>{debtTotalFor(closing) >= 0 ? "+" : ""}{formatEuro(debtTotalFor(closing))}</strong>
@@ -137,7 +175,7 @@ export function ClosingsManager() {
                       return (
                         <label key={value.id}>
                           {debt.person}
-                          <input inputMode="decimal" defaultValue={formatNumber(Number(value.actual_amount))} onChange={(e) => updateDebtValue(value, e.target.value)} />
+                          <input inputMode="decimal" defaultValue={formatNumber(Number(value.actual_amount))} onChange={(e) => updateDebtValue(closing.id, value, e.target.value)} />
                         </label>
                       );
                     })}

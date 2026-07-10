@@ -105,6 +105,8 @@ export type MonthClosing = {
   user_id: string;
   month: string;
   closed_at: string;
+  debt_net_value?: number | null;
+  comparable_value?: number | null;
 };
 
 export type CategoryWithChildren = CategoryGroup & {

@@ -9,7 +9,7 @@ import { BookingModal } from "@/components/BookingModal";
 import { BudgetCard } from "@/components/BudgetCard";
 import { MonthClosingModal } from "@/components/MonthClosingModal";
 import { defaultAccounts, defaultCategoryGroups } from "@/lib/defaults";
-import { applyDeltas, debtNetValue, debtValue, invertDeltas, mergeDeltas, sortAccountsStable, transactionDeltas } from "@/lib/finance";
+import { accountComparableTotal, applyDeltas, calculateOutingValue, comparableValue, debtValue, invertDeltas, mergeDeltas, sortAccountsStable, transactionDeltas } from "@/lib/finance";
 import { dateForMonthDay, dayOfMonth, daysInMonth, formatEuro, getMonthRange, monthKey, plannedUntilCurrentDay, previousMonthKey, todayISO } from "@/lib/date";
 import type { Account, Category, CategoryGroup, CategoryWithChildren, Debt, RecurringTransaction, Transaction } from "@/lib/types";
 
@@ -23,16 +23,6 @@ function categoriesPlanSum(group: CategoryWithChildren, currentDay: number) {
   const active = group.categories.filter((category) => category.is_active);
   if (!active.length) return plannedUntilCurrentDay(Number(group.average_monthly_budget), currentDay, group.budget_period);
   return active.reduce((sum, category) => sum + plannedUntilCurrentDay(Number(category.average_monthly_budget), currentDay, category.budget_period), 0);
-}
-
-function accountCountsForAusgehen(account: Account) {
-  return account.type === "active" && account.include_in_available_net_worth;
-}
-
-function availableAccountTotal(accounts: Account[]) {
-  return accounts
-    .filter(accountCountsForAusgehen)
-    .reduce((sum, account) => sum + Number(account.balance), 0);
 }
 
 export function FinanceApp() {
@@ -72,7 +62,7 @@ export function FinanceApp() {
 
     const { data: prevClosing } = await supabase
       .from("month_closings")
-      .select("id")
+      .select("id, debt_net_value, comparable_value")
       .eq("user_id", userId)
       .eq("month", prevMonth)
       .maybeSingle();
@@ -88,17 +78,28 @@ export function FinanceApp() {
           .select("debt_id, actual_amount")
           .eq("closing_id", prevClosing.id)
       ]);
-      const openingAccounts = (closingBalanceRes.data ?? []).reduce((sum, balance) => {
-        const account = accountRows.find((item) => item.id === balance.account_id);
-        if (!account || !accountCountsForAusgehen(account)) return sum;
-        return sum + Number(balance.actual_balance);
-      }, 0);
-      const openingDebts = (closingDebtRes.data ?? []).reduce((sum, item) => {
-        const debt = debtRows.find((debtRow) => debtRow.id === item.debt_id);
-        if (!debt) return sum;
-        return sum + debtValue({ amount: Number(item.actual_amount), kind: debt.kind });
-      }, 0);
-      setOpeningAvailable(openingAccounts + openingDebts);
+      const closingAny = prevClosing as { id: string; comparable_value?: number | null; debt_net_value?: number | null };
+      if (closingAny.comparable_value !== null && closingAny.comparable_value !== undefined) {
+        setOpeningAvailable(Number(closingAny.comparable_value));
+      } else {
+        const openingAccounts = (closingBalanceRes.data ?? []).reduce((sum, balance) => {
+          const account = accountRows.find((item) => item.id === balance.account_id);
+          if (!account) return sum;
+          return sum + accountComparableTotal([{
+            type: account.type,
+            include_in_available_net_worth: account.include_in_available_net_worth,
+            balance: Number(balance.actual_balance)
+          }]);
+        }, 0);
+        const openingDebts = closingAny.debt_net_value !== null && closingAny.debt_net_value !== undefined
+          ? Number(closingAny.debt_net_value)
+          : (closingDebtRes.data ?? []).reduce((sum, item) => {
+            const debt = debtRows.find((debtRow) => debtRow.id === item.debt_id);
+            if (!debt) return sum;
+            return sum + debtValue({ amount: Number(item.actual_amount), kind: debt.kind });
+          }, 0);
+        setOpeningAvailable(openingAccounts + openingDebts);
+      }
     } else {
       setOpeningAvailable(null);
     }
@@ -264,10 +265,14 @@ export function FinanceApp() {
     const outingGroup = groups.find((g) => g.name.toLowerCase() === "ausgehen");
     const outingTracked = outingGroup ? transactions.filter((t) => t.type === "expense" && t.group_id === outingGroup.id).reduce((sum, t) => sum + Number(t.amount), 0) : 0;
     const trackedExpensesWithoutOuting = expenses - outingTracked;
-    const currentComparableValue = availableAccountTotal(accounts) + debtNetValue(debts);
-    const outingValue = openingAvailable === null
-      ? income - trackedExpensesWithoutOuting - investments
-      : openingAvailable + income - investments - trackedExpensesWithoutOuting - currentComparableValue;
+    const currentComparableValue = comparableValue(accounts, debts);
+    const outingValue = calculateOutingValue({
+      openingComparable: openingAvailable,
+      currentComparable: currentComparableValue,
+      income,
+      investments,
+      trackedExpensesWithoutOuting
+    });
     const effectiveExpenses = trackedExpensesWithoutOuting + outingValue;
     return { expenses, income, investments, outingValue, effectiveExpenses };
   }, [transactions, groups, accounts, debts, openingAvailable]);
