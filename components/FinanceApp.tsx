@@ -9,7 +9,7 @@ import { BookingModal } from "@/components/BookingModal";
 import { BudgetCard } from "@/components/BudgetCard";
 import { MonthClosingModal } from "@/components/MonthClosingModal";
 import { defaultAccounts, defaultCategoryGroups } from "@/lib/defaults";
-import { applyDeltas, invertDeltas, mergeDeltas, sortAccountsStable, transactionDeltas } from "@/lib/finance";
+import { applyDeltas, debtNetValue, debtValue, invertDeltas, mergeDeltas, sortAccountsStable, transactionDeltas } from "@/lib/finance";
 import { dateForMonthDay, dayOfMonth, daysInMonth, formatEuro, getMonthRange, monthKey, plannedUntilCurrentDay, previousMonthKey, todayISO } from "@/lib/date";
 import type { Account, Category, CategoryGroup, CategoryWithChildren, Debt, RecurringTransaction, Transaction } from "@/lib/types";
 
@@ -68,6 +68,7 @@ export function FinanceApp() {
     const categoryRows = (categoriesRes.data ?? []) as Category[];
     const groupRows = (groupsRes.data ?? []) as CategoryGroup[];
     const accountRows = sortAccountsStable((accountsRes.data ?? []) as Account[]);
+    const debtRows = (debtsRes.data ?? []) as Debt[];
 
     const { data: prevClosing } = await supabase
       .from("month_closings")
@@ -77,22 +78,33 @@ export function FinanceApp() {
       .maybeSingle();
 
     if (prevClosing?.id) {
-      const { data: closingBalances } = await supabase
-        .from("month_closing_balances")
-        .select("account_id, actual_balance")
-        .eq("closing_id", prevClosing.id);
-      const opening = (closingBalances ?? []).reduce((sum, balance) => {
+      const [closingBalanceRes, closingDebtRes] = await Promise.all([
+        supabase
+          .from("month_closing_balances")
+          .select("account_id, actual_balance")
+          .eq("closing_id", prevClosing.id),
+        supabase
+          .from("month_closing_debts")
+          .select("debt_id, actual_amount")
+          .eq("closing_id", prevClosing.id)
+      ]);
+      const openingAccounts = (closingBalanceRes.data ?? []).reduce((sum, balance) => {
         const account = accountRows.find((item) => item.id === balance.account_id);
         if (!account || !accountCountsForAusgehen(account)) return sum;
         return sum + Number(balance.actual_balance);
       }, 0);
-      setOpeningAvailable(opening);
+      const openingDebts = (closingDebtRes.data ?? []).reduce((sum, item) => {
+        const debt = debtRows.find((debtRow) => debtRow.id === item.debt_id);
+        if (!debt) return sum;
+        return sum + debtValue({ amount: Number(item.actual_amount), kind: debt.kind });
+      }, 0);
+      setOpeningAvailable(openingAccounts + openingDebts);
     } else {
       setOpeningAvailable(null);
     }
 
     setAccounts(accountRows);
-    setDebts((debtsRes.data ?? []) as Debt[]);
+    setDebts(debtRows);
     setGroups(groupRows.map((group) => ({ ...group, categories: categoryRows.filter((category) => category.group_id === group.id) })));
     setTransactions((transactionsRes.data ?? []) as Transaction[]);
   }, [currentMonth, prevMonth]);
@@ -252,13 +264,13 @@ export function FinanceApp() {
     const outingGroup = groups.find((g) => g.name.toLowerCase() === "ausgehen");
     const outingTracked = outingGroup ? transactions.filter((t) => t.type === "expense" && t.group_id === outingGroup.id).reduce((sum, t) => sum + Number(t.amount), 0) : 0;
     const trackedExpensesWithoutOuting = expenses - outingTracked;
-    const currentAvailable = availableAccountTotal(accounts);
+    const currentComparableValue = availableAccountTotal(accounts) + debtNetValue(debts);
     const outingValue = openingAvailable === null
       ? income - trackedExpensesWithoutOuting - investments
-      : openingAvailable + income - investments - trackedExpensesWithoutOuting - currentAvailable;
+      : openingAvailable + income - investments - trackedExpensesWithoutOuting - currentComparableValue;
     const effectiveExpenses = trackedExpensesWithoutOuting + outingValue;
     return { expenses, income, investments, outingValue, effectiveExpenses };
-  }, [transactions, groups, accounts, openingAvailable]);
+  }, [transactions, groups, accounts, debts, openingAvailable]);
 
   const expenseGroups = groups.filter((g) => g.kind === "expense");
   const currentDay = dayOfMonth();

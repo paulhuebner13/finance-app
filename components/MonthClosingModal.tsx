@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { formatMonthTitle, formatNumber } from "@/lib/date";
-import { depotTax, parseAmount } from "@/lib/finance";
+import { formatEuro, formatMonthTitle, formatNumber } from "@/lib/date";
+import { debtValue, depotTax, parseAmount } from "@/lib/finance";
 import { supabase } from "@/lib/supabase";
 import type { Account, Debt } from "@/lib/types";
 
@@ -84,6 +84,9 @@ export function MonthClosingModal({ open, month, userId, accounts, debts, onClos
     }
   }
 
+  const activeDebts = debts.filter((d) => d.is_active);
+  const debtNet = activeDebts.reduce((sum, debt) => sum + debtValue({ amount: parseAmount(debtValues[debt.id] ?? String(debt.amount)), kind: debt.kind }), 0);
+
   if (!open) return null;
 
   return (
@@ -102,7 +105,14 @@ export function MonthClosingModal({ open, month, userId, accounts, debts, onClos
             </label>
           ))}
 
-          {debts.filter((d) => d.is_active).map((debt) => (
+          {activeDebts.length > 0 && (
+            <div className="closing-debt-total">
+              <span>Schulden</span>
+              <strong>{debtNet >= 0 ? "+" : ""}{formatEuro(debtNet)}</strong>
+            </div>
+          )}
+
+          {activeDebts.map((debt) => (
             <label key={debt.id}>
               {debt.kind === "i_owe" ? "Schuld" : "Offen"}: {debt.person}
               <input inputMode="decimal" value={debtValues[debt.id] ?? ""} onChange={(e) => setDebtValues((old) => ({ ...old, [debt.id]: e.target.value }))} />

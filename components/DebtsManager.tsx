@@ -4,16 +4,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { AuthGate } from "@/components/AuthGate";
 import { formatEuro, formatNumber, todayISO } from "@/lib/date";
-import { parseAmount } from "@/lib/finance";
+import { debtValue, parseAmount } from "@/lib/finance";
 import { supabase } from "@/lib/supabase";
 import type { Account, Debt, DebtKind, Debtor } from "@/lib/types";
 import { useSession } from "@/lib/useSession";
 
 type Mode = "none" | "debt" | "debtor";
-
-function debtValue(debt: Pick<Debt, "amount" | "kind">) {
-  return debt.kind === "owed_to_me" ? Number(debt.amount) : -Number(debt.amount);
-}
 
 function dateLabel(value: string) {
   if (!value) return "";
@@ -70,14 +66,7 @@ export function DebtsManager() {
     setDebtors(nextDebtors);
     setDebts(nextDebts);
 
-    if (!selectedDebtorId) {
-      const defaultDebtor = nextDebtors.find((debtor) => debtor.is_default);
-      if (defaultDebtor) {
-        setSelectedDebtorId(defaultDebtor.id);
-        setNewDebtKind(defaultDebtor.kind);
-      }
-    }
-  }, [session?.user.id, selectedDebtorId]);
+  }, [session?.user.id]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -251,10 +240,6 @@ export function DebtsManager() {
           <h1>{formatEuro(net)}</h1>
         </section>
 
-        <section className="debt-action-grid single-action">
-          <button className="primary" onClick={startDebtForm}>Schulden hinzufügen</button>
-        </section>
-
         {mode === "debt" && (
           <section className="form-card debt-form-card">
             <select
@@ -379,6 +364,10 @@ export function DebtsManager() {
           </section>
         )}
       </main>
+
+      <button className="floating-debt-button" onClick={startDebtForm}>
+        {mode === "debt" ? "Schließen" : "Schulden hinzufügen"}
+      </button>
     </AppShell>
   );
 }

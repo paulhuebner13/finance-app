@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { AuthGate } from "@/components/AuthGate";
 import { formatEuro, formatMonthTitle, formatNumber } from "@/lib/date";
-import { parseAmount, sortAccountsStable } from "@/lib/finance";
+import { debtValue, parseAmount, sortAccountsStable } from "@/lib/finance";
 import { supabase } from "@/lib/supabase";
 import type { Account, Debt, MonthClosing } from "@/lib/types";
 import { useSession } from "@/lib/useSession";
@@ -72,17 +72,21 @@ export function ClosingsManager() {
     await supabase.from("month_closing_debts").update({ actual_amount: nextAmount }).eq("id", value.id);
   }
 
+  function debtTotalFor(closing: ClosingBundle) {
+    return closing.debtValues.reduce((sum, item) => {
+      const debt = debts.find((debtRow) => debtRow.id === item.debt_id);
+      if (!debt) return sum;
+      return sum + debtValue({ amount: Number(item.actual_amount), kind: debt.kind });
+    }, 0);
+  }
+
   function totalFor(closing: ClosingBundle) {
     const accountTotal = closing.balances.reduce((sum, balance) => {
       const account = accounts.find((item) => item.id === balance.account_id);
       if (!account || account.type === "bound") return sum;
       return sum + Number(balance.actual_balance);
     }, 0);
-    const debtTotal = closing.debtValues.reduce((sum, item) => {
-      const debt = debts.find((debtRow) => debtRow.id === item.debt_id);
-      if (!debt) return sum;
-      return sum + (debt.kind === "owed_to_me" ? Number(item.actual_amount) : -Number(item.actual_amount));
-    }, 0);
+    const debtTotal = debtTotalFor(closing);
     return accountTotal + debtTotal;
   }
 
@@ -120,6 +124,13 @@ export function ClosingsManager() {
                         </label>
                       );
                     })}
+                    {closing.debtValues.length > 0 && (
+                      <div className="closing-section-total">
+                        <span>Schulden</span>
+                        <strong>{debtTotalFor(closing) >= 0 ? "+" : ""}{formatEuro(debtTotalFor(closing))}</strong>
+                      </div>
+                    )}
+
                     {closing.debtValues.map((value) => {
                       const debt = debts.find((item) => item.id === value.debt_id);
                       if (!debt) return null;

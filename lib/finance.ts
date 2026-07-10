@@ -58,6 +58,15 @@ export async function applyDeltas(userId: string, accounts: Account[], deltas: M
   }
 }
 
+export function debtValue(debt: { amount: number | string; kind: string }) {
+  const amount = Number(debt.amount) || 0;
+  return debt.kind === "owed_to_me" ? amount : -amount;
+}
+
+export function debtNetValue(debts: { amount: number | string; kind: string }[]) {
+  return debts.reduce((sum, debt) => sum + debtValue(debt), 0);
+}
+
 export function entryTypeLabel(type: string) {
   if (type === "expense") return "Ausgabe";
   if (type === "income") return "Einnahme";
