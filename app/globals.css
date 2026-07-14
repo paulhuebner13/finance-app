@@ -2369,3 +2369,67 @@ textarea,
   border-color: rgba(124, 58, 237, 0.45) !important;
   background: linear-gradient(180deg, rgba(124, 58, 237, 0.07), rgba(255,255,255,0.96)) !important;
 }
+
+/* Patch: 12-month analysis, projection card, and stronger rule colors */
+.projection-card {
+  display: grid;
+  gap: 0.85rem;
+}
+.projection-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.projection-head h2 {
+  margin: 0 0 0.25rem;
+}
+.projection-head > strong {
+  white-space: nowrap;
+  font-size: 1.15rem;
+}
+.projection-kpis {
+  display: grid;
+  gap: 0.5rem;
+}
+.projection-kpis span {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+.projection-kpis b {
+  color: var(--text);
+  white-space: nowrap;
+}
+.monthly-group-head b {
+  white-space: nowrap;
+}
+.analysis-chart {
+  overflow: visible;
+}
+.chart-average {
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+  stroke: color-mix(in srgb, var(--accent) 72%, #0f172a);
+}
+.rule-card.rule-income {
+  --accent: #16a34a !important;
+  border-color: color-mix(in srgb, #16a34a 55%, var(--border)) !important;
+  background: color-mix(in srgb, #16a34a 10%, var(--panel)) !important;
+}
+.rule-card.rule-expense {
+  --accent: #dc2626 !important;
+  border-color: color-mix(in srgb, #dc2626 55%, var(--border)) !important;
+  background: color-mix(in srgb, #dc2626 10%, var(--panel)) !important;
+}
+.rule-card.rule-income .rule-summary strong,
+.rule-card.rule-income .rule-summary b { color: #15803d !important; }
+.rule-card.rule-expense .rule-summary strong,
+.rule-card.rule-expense .rule-summary b { color: #b91c1c !important; }
+@media (max-width: 520px) {
+  .analysis-chart { width: 100%; min-height: 190px; }
+  .projection-head { align-items: stretch; }
+  .projection-head > strong { align-self: flex-start; }
+}

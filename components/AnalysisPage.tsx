@@ -4,12 +4,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { AuthGate } from "@/components/AuthGate";
 import { formatEuro, getMonthRange, monthKey } from "@/lib/date";
-import { accountComparableTotal, calculateOutingValue, categoryAccent, comparableValue, debtValue, trackedComparableChange } from "@/lib/finance";
+import { accountComparableTotal, calculateOutingValue, categoryAccent, comparableValue, debtValue, depotNetValue, trackedComparableChange } from "@/lib/finance";
 import { supabase } from "@/lib/supabase";
 import type { Account, Category, CategoryGroup, Debt, MonthClosing, RecurringTransaction, Transaction } from "@/lib/types";
 import { useSession } from "@/lib/useSession";
 
-function lastMonthKeys(count = 6) {
+function lastMonthKeys(count = 12) {
   const now = new Date();
   return Array.from({ length: count }, (_, index) => {
     const date = new Date(now.getFullYear(), now.getMonth() - (count - 1 - index), 1);
@@ -17,7 +17,7 @@ function lastMonthKeys(count = 6) {
   });
 }
 
-function nextMonthKeys(count = 6) {
+function nextMonthKeys(count = 12) {
   const now = new Date();
   return Array.from({ length: count }, (_, index) => {
     const date = new Date(now.getFullYear(), now.getMonth() + index + 1, 1);
@@ -36,12 +36,12 @@ function shortMonth(key: string) {
 }
 
 const chart = {
-  width: 340,
-  height: 172,
-  left: 46,
-  right: 12,
-  top: 14,
-  bottom: 34
+  width: 372,
+  height: 182,
+  left: 52,
+  right: 14,
+  top: 18,
+  bottom: 36
 };
 
 type ClosingBalance = { closing_id: string; account_id: string; actual_balance: number };
@@ -52,6 +52,88 @@ type ClosingBundle = MonthClosing & {
   debtValues: ClosingDebt[];
 };
 
+type ChartPointValue = { month: string; spent: number };
+
+type ChartRow = {
+  id: string;
+  name: string;
+  accent: string;
+  values: ChartPointValue[];
+  average: number;
+  budget?: number;
+  delta?: number;
+  isDifference?: boolean;
+};
+
+function average(values: number[]) {
+  if (!values.length) return 0;
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function clampChartRange(values: number[], avg: number) {
+  const rawMin = Math.min(0, avg, ...values);
+  const rawMax = Math.max(0, avg, ...values);
+  if (rawMin === rawMax) return { min: 0, max: Math.max(1, rawMax || 1) };
+  const padding = (rawMax - rawMin) * 0.14;
+  return { min: rawMin - padding, max: rawMax + padding };
+}
+
+function currentNetWorth(accounts: Account[], debts: Debt[]) {
+  const active = accounts
+    .filter((account) => account.type === "active" && account.include_in_available_net_worth)
+    .reduce((sum, account) => sum + Number(account.balance || 0), 0);
+  const depot = accounts
+    .filter((account) => account.type === "investment")
+    .reduce((sum, account) => sum + depotNetValue(Number(account.balance || 0), Number(account.cost_basis || 0)), 0);
+  const debt = debts.reduce((sum, item) => sum + debtValue(item), 0);
+  return active + depot + debt;
+}
+
+function ChartCard({ row }: { row: ChartRow }) {
+  const values = row.values.map((value) => value.spent);
+  const { min, max } = clampChartRange(values, row.average);
+  const plotWidth = chart.width - chart.left - chart.right;
+  const plotHeight = chart.height - chart.top - chart.bottom;
+  const pointStep = row.values.length > 1 ? plotWidth / (row.values.length - 1) : plotWidth;
+  const valueToY = (value: number) => {
+    const ratio = (value - min) / Math.max(1, max - min);
+    return chart.top + plotHeight - ratio * plotHeight;
+  };
+  const zeroY = valueToY(0);
+  const averageY = valueToY(row.average);
+  const points = row.values.map((value, index) => ({
+    ...value,
+    x: chart.left + index * pointStep,
+    y: valueToY(value.spent)
+  }));
+  const linePoints = points.map((point) => `${point.x},${point.y}`).join(" ");
+
+  return (
+    <article className="monthly-chart-card" style={{ ["--accent" as string]: row.accent }}>
+      <div className="monthly-group-head">
+        <strong>{row.name}</strong>
+        <b>Ø {formatEuro(row.average)}</b>
+      </div>
+      <svg className="analysis-chart" viewBox={`0 0 ${chart.width} ${chart.height}`} role="img" aria-label={`${row.name} Verlauf`}>
+        <line className="chart-axis" x1={chart.left} y1={chart.top} x2={chart.left} y2={chart.top + plotHeight} />
+        <line className="chart-axis" x1={chart.left} y1={zeroY} x2={chart.width - chart.right} y2={zeroY} />
+        <text className="chart-y-label" x={chart.left - 8} y={chart.top + 6} textAnchor="end">{formatEuro(max)}</text>
+        <text className="chart-y-label" x={chart.left - 8} y={chart.top + plotHeight} textAnchor="end">{formatEuro(min)}</text>
+        <polyline className="chart-line" points={linePoints} />
+        {points.map((point) => (
+          <g key={point.month}>
+            <text className="chart-value-label" x={point.x} y={Math.max(chart.top + 10, point.y - 8)} textAnchor="middle">{formatEuro(point.spent)}</text>
+            <circle className="chart-point" cx={point.x} cy={point.y} r="3.6" />
+            <text className="chart-x-label" x={point.x} y={chart.height - 12} textAnchor="middle">{shortMonth(point.month)}</text>
+          </g>
+        ))}
+        <line className="chart-average" x1={chart.left} y1={averageY} x2={chart.width - chart.right} y2={averageY} />
+        <text className="chart-average-label" x={chart.width - chart.right} y={Math.max(chart.top + 10, averageY - 5)} textAnchor="end">Ø {formatEuro(row.average)}</text>
+      </svg>
+    </article>
+  );
+}
+
 export function AnalysisPage() {
   const { session, loading } = useSession();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -61,8 +143,8 @@ export function AnalysisPage() {
   const [debts, setDebts] = useState<Debt[]>([]);
   const [recurring, setRecurring] = useState<RecurringTransaction[]>([]);
   const [closings, setClosings] = useState<ClosingBundle[]>([]);
-  const months = useMemo(() => lastMonthKeys(6), []);
-  const futureMonths = useMemo(() => nextMonthKeys(6), []);
+  const months = useMemo(() => lastMonthKeys(12), []);
+  const futureMonths = useMemo(() => nextMonthKeys(12), []);
 
   const load = useCallback(async () => {
     if (!session?.user.id) return;
@@ -161,9 +243,13 @@ export function AnalysisPage() {
     return accountTotal + debtTotal;
   }
 
-  function outingForMonth(month: string, outingGroupId: string | null) {
+  function transactionsForMonth(month: string) {
     const range = getMonthRange(month);
-    const monthTransactions = transactions.filter((tx) => tx.date >= range.start && tx.date <= range.end);
+    return transactions.filter((tx) => tx.date >= range.start && tx.date <= range.end);
+  }
+
+  function outingForMonth(month: string, outingGroupId: string | null) {
+    const monthTransactions = transactionsForMonth(month);
     const openingComparable = comparableForClosing(closings.find((closing) => closing.month === previousMonthFromKey(month)));
     const currentComparable = month === monthKey()
       ? comparableValue(accounts, debts)
@@ -182,9 +268,36 @@ export function AnalysisPage() {
     });
   }
 
-  const rows = useMemo(() => {
+  function incomeForMonth(month: string) {
+    return transactionsForMonth(month)
+      .filter((tx) => tx.type === "income")
+      .reduce((sum, tx) => sum + Number(tx.amount), 0);
+  }
+
+  function expensesForMonth(month: string, outingGroupId: string | null) {
+    const tracked = transactionsForMonth(month)
+      .filter((tx) => tx.type === "expense" && tx.group_id !== outingGroupId)
+      .reduce((sum, tx) => sum + Number(tx.amount), 0);
+    const outing = outingGroupId ? outingForMonth(month, outingGroupId) : 0;
+    return tracked + outing;
+  }
+
+  const chartRows = useMemo(() => {
     const outingGroup = groups.find((group) => group.name.toLowerCase() === "ausgehen");
-    return groups.map((group) => {
+    const incomeValues = months.map((month) => ({ month, spent: incomeForMonth(month) }));
+    const expenseValues = months.map((month) => ({ month, spent: expensesForMonth(month, outingGroup?.id ?? null) }));
+    const diffValues = months.map((month, index) => ({
+      month,
+      spent: incomeValues[index].spent - expenseValues[index].spent
+    }));
+
+    const introRows: ChartRow[] = [
+      { id: "income", name: "Einnahmen", accent: "#16a34a", values: incomeValues, average: average(incomeValues.map((value) => value.spent)) },
+      { id: "expenses", name: "Ausgaben gesamt", accent: "#ef4444", values: expenseValues, average: average(expenseValues.map((value) => value.spent)) },
+      { id: "difference", name: "Differenz", accent: "#3258a8", values: diffValues, average: average(diffValues.map((value) => value.spent)), isDifference: true }
+    ];
+
+    const detailRows: ChartRow[] = groups.map((group) => {
       const values = months.map((month) => {
         const range = getMonthRange(month);
         const spent = group.id === outingGroup?.id
@@ -194,46 +307,34 @@ export function AnalysisPage() {
             .reduce((sum, tx) => sum + Number(tx.amount), 0);
         return { month, spent };
       });
-      const max = Math.max(1, ...values.map((value) => Math.abs(value.spent)));
-      const average = values.reduce((sum, value) => sum + value.spent, 0) / values.length;
-      const total = values.reduce((sum, value) => sum + value.spent, 0);
+      const avg = average(values.map((value) => value.spent));
       const childBudget = categories.filter((category) => category.group_id === group.id).reduce((sum, category) => sum + Number(category.average_monthly_budget), 0);
       const budget = childBudget || Number(group.average_monthly_budget) || 0;
-      return { group, values, max, average, total, budget, delta: average - budget };
+      return {
+        id: group.id,
+        name: group.name,
+        accent: categoryAccent(group.name, group.color),
+        values,
+        average: avg,
+        budget,
+        delta: avg - budget
+      };
     });
+
+    return { introRows, detailRows, allRows: [...introRows, ...detailRows] };
   }, [groups, categories, transactions, months, accounts, debts, closings]);
 
-  const totalCurrentMonth = useMemo(() => {
-    const current = months[months.length - 1];
-    return rows.reduce((sum, row) => sum + (row.values.find((value) => value.month === current)?.spent ?? 0), 0);
-  }, [rows, months]);
-
   const projection = useMemo(() => {
-    const currentOuting = groups.find((group) => group.name.toLowerCase() === "ausgehen");
-    const monthlyIncome = months.map((month) => {
-      const range = getMonthRange(month);
-      return transactions.filter((tx) => tx.type === "income" && tx.date >= range.start && tx.date <= range.end).reduce((sum, tx) => sum + Number(tx.amount), 0);
-    });
-    const monthlyExpenses = months.map((month) => {
-      const range = getMonthRange(month);
-      const monthTransactions = transactions.filter((tx) => tx.date >= range.start && tx.date <= range.end);
-      const tracked = monthTransactions.filter((tx) => tx.type === "expense" && tx.group_id !== currentOuting?.id).reduce((sum, tx) => sum + Number(tx.amount), 0);
-      const outing = currentOuting ? outingForMonth(month, currentOuting.id) : 0;
-      return tracked + outing;
-    });
-    const avgIncome = monthlyIncome.reduce((sum, value) => sum + value, 0) / Math.max(1, monthlyIncome.length);
-    const avgExpenses = monthlyExpenses.reduce((sum, value) => sum + value, 0) / Math.max(1, monthlyExpenses.length);
     const fixedIncome = recurring.filter((item) => item.type === "income").reduce((sum, item) => sum + Number(item.amount), 0);
-    const fixedExpenses = recurring.filter((item) => item.type === "expense").reduce((sum, item) => sum + Number(item.amount), 0);
-    const expectedIncome = Math.max(avgIncome, fixedIncome);
-    const expectedExpenses = Math.max(avgExpenses, fixedExpenses);
-    return futureMonths.map((month, index) => ({
+    const avgExpenses = average(chartRows.introRows.find((row) => row.id === "expenses")?.values.map((value) => value.spent) ?? []);
+    const monthlyDelta = fixedIncome - avgExpenses;
+    const startValue = currentNetWorth(accounts, debts);
+    const values = futureMonths.map((month, index) => ({
       month,
-      income: expectedIncome,
-      expenses: expectedExpenses,
-      balance: (expectedIncome - expectedExpenses) * (index + 1)
+      spent: startValue + monthlyDelta * (index + 1)
     }));
-  }, [transactions, recurring, months, futureMonths, groups, accounts, debts, closings]);
+    return { fixedIncome, avgExpenses, monthlyDelta, startValue, values, average: average(values.map((value) => value.spent)) };
+  }, [recurring, chartRows.introRows, futureMonths, accounts, debts]);
 
   if (loading) return <main className="loading-page">Laden...</main>;
   if (!session) return <AuthGate />;
@@ -241,76 +342,42 @@ export function AnalysisPage() {
   return (
     <AppShell>
       <main className="dashboard analysis-page">
-        <section className="hero-card compact">
-          <h1>{formatEuro(totalCurrentMonth)}</h1>
+        <section className="cards-stack monthly-analysis-stack">
+          {chartRows.introRows.map((row) => <ChartCard key={row.id} row={row} />)}
         </section>
 
-        <section className="cards-stack monthly-analysis-stack">
-          {rows.map(({ group, values, max, average, total }) => {
-            const accent = categoryAccent(group.name, group.color);
-            const plotWidth = chart.width - chart.left - chart.right;
-            const plotHeight = chart.height - chart.top - chart.bottom;
-            const pointStep = values.length > 1 ? plotWidth / (values.length - 1) : plotWidth;
-            const valueToY = (value: number) => chart.top + plotHeight - (Math.max(0, value) / max) * plotHeight;
-            const averageY = valueToY(Math.max(0, average));
-            const points = values.map((value, index) => ({
-              ...value,
-              x: chart.left + index * pointStep,
-              y: valueToY(value.spent)
-            }));
-            const linePoints = points.map((point) => `${point.x},${point.y}`).join(" ");
-            return (
-              <article className="monthly-chart-card" key={group.id} style={{ ["--accent" as string]: accent }}>
-                <div className="monthly-group-head">
-                  <strong>{group.name}</strong>
-                  <b>{formatEuro(total)}</b>
-                </div>
-                <svg className="analysis-chart" viewBox={`0 0 ${chart.width} ${chart.height}`} role="img" aria-label={`${group.name} Ausgabenverlauf`}>
-                  <line className="chart-axis" x1={chart.left} y1={chart.top} x2={chart.left} y2={chart.top + plotHeight} />
-                  <line className="chart-axis" x1={chart.left} y1={chart.top + plotHeight} x2={chart.width - chart.right} y2={chart.top + plotHeight} />
-                  <text className="chart-y-label" x={chart.left - 8} y={chart.top + 6} textAnchor="end">{formatEuro(max)}</text>
-                  <text className="chart-y-label" x={chart.left - 8} y={chart.top + plotHeight} textAnchor="end">€ 0,00</text>
-                  <polyline className="chart-line" points={linePoints} />
-                  {points.map((point) => (
-                    <g key={point.month}>
-                      <text className="chart-value-label" x={point.x} y={Math.max(chart.top + 9, point.y - 8)} textAnchor="middle">{formatEuro(point.spent)}</text>
-                      <circle className="chart-point" cx={point.x} cy={point.y} r="4" />
-                      <text className="chart-x-label" x={point.x} y={chart.height - 12} textAnchor="middle">{shortMonth(point.month)}</text>
-                    </g>
-                  ))}
-                  <line className="chart-average" x1={chart.left} y1={averageY} x2={chart.width - chart.right} y2={averageY} />
-                  <text className="chart-average-label" x={chart.width - chart.right} y={Math.max(chart.top + 10, averageY - 5)} textAnchor="end">Ø {formatEuro(average)}</text>
-                </svg>
-              </article>
-            );
-          })}
-          {!rows.length && <p className="muted center">Keine Daten.</p>}
+        <section className="analysis-summary-card projection-card">
+          <div className="projection-head">
+            <div>
+              <h2>Projektion</h2>
+              <p className="muted">Fixe Einnahmen aus Regeln gegen Ø Ausgaben.</p>
+            </div>
+            <strong className={projection.monthlyDelta >= 0 ? "under" : "over"}>{projection.monthlyDelta >= 0 ? "+" : ""}{formatEuro(projection.monthlyDelta)}</strong>
+          </div>
+          <div className="projection-kpis">
+            <span>Fixe Einnahmen <b>{formatEuro(projection.fixedIncome)}</b></span>
+            <span>Ø Ausgaben <b>{formatEuro(projection.avgExpenses)}</b></span>
+            <span>Startwert <b>{formatEuro(projection.startValue)}</b></span>
+          </div>
+          <ChartCard row={{ id: "net-worth-projection", name: "Net Worth nächste 12 Monate", accent: "#14b8a6", values: projection.values, average: projection.average }} />
         </section>
 
         <section className="analysis-summary-card">
           <h2>Durchschnitt vs. Budget</h2>
           <div className="analysis-summary-list">
-            {rows.map(({ group, average, budget, delta }) => (
-              <div key={group.id} className="analysis-summary-row" style={{ ["--accent" as string]: categoryAccent(group.name, group.color) }}>
-                <span>{group.name}</span>
-                <strong>{formatEuro(average)} / {formatEuro(budget)}</strong>
-                <b className={delta > 0 ? "over" : "under"}>{delta > 0 ? "+" : ""}{formatEuro(delta)}</b>
+            {chartRows.detailRows.map(({ id, name, average: avg, budget, delta, accent }) => (
+              <div key={id} className="analysis-summary-row" style={{ ["--accent" as string]: accent }}>
+                <span>{name}</span>
+                <strong>{formatEuro(avg)} / {formatEuro(budget ?? 0)}</strong>
+                <b className={(delta ?? 0) > 0 ? "over" : "under"}>{(delta ?? 0) > 0 ? "+" : ""}{formatEuro(delta ?? 0)}</b>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="analysis-summary-card">
-          <h2>Projektion</h2>
-          <div className="analysis-summary-list">
-            {projection.map((item) => (
-              <div key={item.month} className="projection-row">
-                <span>{shortMonth(item.month)}</span>
-                <strong>{formatEuro(item.income)} / {formatEuro(item.expenses)}</strong>
-                <b className={item.balance >= 0 ? "under" : "over"}>{item.balance >= 0 ? "+" : ""}{formatEuro(item.balance)}</b>
-              </div>
-            ))}
-          </div>
+        <section className="cards-stack monthly-analysis-stack">
+          {chartRows.detailRows.map((row) => <ChartCard key={row.id} row={row} />)}
+          {!chartRows.allRows.length && <p className="muted center">Keine Daten.</p>}
         </section>
       </main>
     </AppShell>
