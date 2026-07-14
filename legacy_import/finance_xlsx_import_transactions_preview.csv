@@ -1,0 +1,546 @@
+date,type,amount,group,category,account,from_account,to_account,note
+2022-06-01,investment,150.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2022-07-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2022-07-01,income,300.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2022-07-01,income,50.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2022-07-01,income,50.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2022-07-01,expense,9.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-07-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-07-01,expense,19.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-07-01,expense,43.84,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-07-01,investment,250.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2022-08-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2022-08-01,income,96.66,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · bets
+2022-08-01,expense,9.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-08-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-08-01,expense,19.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-08-01,expense,9.0,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-09-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2022-09-01,income,1449.2,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2022-09-01,income,54.84,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2022-09-01,income,500.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2022-09-01,expense,70.01,Leben,Essen,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-09-01,expense,57.0,Mobilität,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-09-01,expense,9.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-09-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-09-01,expense,19.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-09-01,expense,20.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-09-01,investment,525.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2022-10-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2022-10-01,income,725.72,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2022-10-01,income,1000.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · sonstiges
+2022-10-01,expense,30.81,Leben,Essen,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-10-01,expense,9.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-10-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-10-01,expense,64.99,Kommunikation & Abos,F1,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-10-01,expense,19.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-10-01,expense,60.73,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-10-01,expense,28.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-10-01,investment,455.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2022-11-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2022-11-01,income,926.08,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2022-11-01,income,40.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · bets
+2022-11-01,expense,10.44,Leben,Essen,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-11-01,expense,9.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-11-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-11-01,expense,19.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-11-01,expense,32.99,Notwendigkeiten,Geschenke,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-11-01,expense,10.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-11-01,investment,485.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2022-12-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2022-12-01,income,2152.38,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2022-12-01,income,500.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · sonstiges
+2022-12-01,income,50.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2022-12-01,income,150.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2022-12-01,expense,8.18,Leben,Essen,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-12-01,expense,9.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-12-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-12-01,expense,19.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-12-01,expense,11.0,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-12-01,expense,23.45,Notwendigkeiten,Geschenke,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-12-01,expense,582.22,Freizeit,Urlaub,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-12-01,expense,30.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2022-12-01,investment,1341.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2023-01-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2023-01-01,income,725.72,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2023-01-01,expense,6.0,Leben,Essen,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-01-01,expense,13.0,Mobilität,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-01-01,expense,9.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-01-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-01-01,expense,19.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-01-01,expense,20.0,Notwendigkeiten,Geschenke,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-01-01,expense,45.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-01-01,investment,373.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2023-02-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2023-02-01,income,725.72,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2023-02-01,expense,16.39,Leben,Essen,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-02-01,expense,9.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-02-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-02-01,expense,119.85,Kommunikation & Abos,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-02-01,expense,19.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-02-01,expense,151.38,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-02-01,expense,27.4,Freizeit,Tickets,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-02-01,expense,10.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-02-01,investment,373.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2023-03-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2023-03-01,income,725.72,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2023-03-01,income,529.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2023-03-01,expense,8.42,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-03-01,expense,9.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-03-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-03-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-03-01,expense,30.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-03-01,investment,614.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2023-04-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2023-04-01,income,725.72,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2023-04-01,expense,17.64,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-04-01,expense,9.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-04-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-04-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-04-01,expense,17.0,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-04-01,investment,373.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2023-05-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2023-05-01,income,1459.99,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2023-05-01,income,64.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · bets
+2023-05-01,expense,13.74,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-05-01,expense,9.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-05-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-05-01,expense,49.4,Notwendigkeiten,Kleidung,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-05-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-05-01,expense,59.0,Freizeit,Tickets,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-05-01,investment,737.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2023-06-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2023-06-01,income,725.72,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2023-06-01,expense,9.9,Leben,Essen,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-06-01,expense,9.98,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-06-01,expense,9.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-06-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-06-01,expense,30.24,Kommunikation & Abos,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-06-01,expense,38.5,Notwendigkeiten,Kleidung,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-06-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-06-01,expense,9.0,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-06-01,expense,20.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-06-01,investment,422.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2023-07-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2023-07-01,income,725.72,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2023-07-01,income,300.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2023-07-01,income,50.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2023-07-01,expense,7.53,Leben,Essen,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-07-01,expense,13.97,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-07-01,expense,9.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-07-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-07-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-07-01,expense,244.64,Freizeit,Urlaub,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-07-01,expense,25.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-07-01,investment,533.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2023-08-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2023-08-01,income,725.72,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2023-08-01,income,1300.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · sonstiges
+2023-08-01,income,150.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · savings
+2023-08-01,expense,10.21,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-08-01,expense,9.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-08-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-08-01,expense,22.13,Kommunikation & Abos,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-08-01,expense,35.94,Notwendigkeiten,Kleidung,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-08-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-08-01,expense,39.9,Freizeit,Tickets,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-08-01,investment,955.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2023-09-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2023-09-01,income,725.72,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2023-09-01,income,110.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2023-09-01,income,29.99,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2023-09-01,expense,13.97,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-09-01,expense,9.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-09-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-09-01,expense,40.49,Notwendigkeiten,Kleidung,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-09-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-09-01,expense,401.12,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-09-01,expense,20.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-09-01,investment,625.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2023-10-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2023-10-01,income,725.72,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2023-10-01,income,43.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · bets
+2023-10-01,expense,9.98,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-10-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-10-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-10-01,expense,64.99,Kommunikation & Abos,F1,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-10-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-10-01,expense,95.0,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-10-01,investment,561.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2023-11-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2023-11-01,income,1446.64,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2023-11-01,income,119.8,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · sonstiges
+2023-11-01,expense,20.0,Leben,Essen,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-11-01,expense,13.88,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-11-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-11-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-11-01,expense,24.9,Kommunikation & Abos,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-11-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-11-01,expense,42.0,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-11-01,expense,8.99,Notwendigkeiten,Geschenke,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-11-01,expense,156.7,Freizeit,Tickets,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-11-01,investment,1080.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2023-12-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2023-12-01,income,1725.72,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2023-12-01,income,103.72,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · sonstiges
+2023-12-01,income,300.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2023-12-01,income,50.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2023-12-01,expense,5.0,Leben,Essen,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-12-01,expense,13.88,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-12-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-12-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-12-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-12-01,expense,643.0,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-12-01,expense,58.95,Notwendigkeiten,Geschenke,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-12-01,expense,6.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2023-12-01,investment,796.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2024-01-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2024-01-01,income,763.92,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2024-01-01,income,100.88,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · sonstiges
+2024-01-01,expense,9.98,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-01-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-01-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-01-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-01-01,expense,15.0,Notwendigkeiten,Geschenke,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-01-01,investment,336.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2024-02-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2024-02-01,income,763.92,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2024-02-01,income,74.39,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · sonstiges
+2024-02-01,expense,145.7,Mobilität,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-02-01,expense,9.98,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-02-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-02-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-02-01,expense,32.99,Notwendigkeiten,Kleidung,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-02-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-02-01,expense,15.0,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-02-01,expense,37.4,Freizeit,Tickets,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-02-01,expense,10.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-02-01,investment,337.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2024-03-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2024-03-01,income,763.92,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2024-03-01,income,109.96,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · sonstiges
+2024-03-01,expense,9.98,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-03-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-03-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-03-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-03-01,expense,18.0,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-03-01,expense,100.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-03-01,investment,339.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2024-04-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2024-04-01,income,1289.41,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2024-04-01,income,46.26,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · sonstiges
+2024-04-01,expense,9.98,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-04-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-04-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-04-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-04-01,expense,73.22,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-05-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2024-05-01,income,30.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · bets
+2024-05-01,expense,9.98,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-05-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-05-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-05-01,expense,15.58,Kommunikation & Abos,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-05-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-05-01,expense,19.21,Notwendigkeiten,Geschenke,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-05-01,expense,70.98,Freizeit,Urlaub,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-06-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2024-06-01,income,101.76,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2024-06-01,income,45.69,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · bets
+2024-06-01,income,150.0,Einnahmen,Rückzahlung,N26,,,Legacy Import finance.xlsx · Einkommen · tax
+2024-06-01,expense,9.98,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-06-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-06-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-06-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-06-01,expense,40.0,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-06-01,expense,40.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-07-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2024-07-01,income,50.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2024-07-01,income,115.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2024-07-01,income,340.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2024-07-01,expense,9.98,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-07-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-07-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-07-01,expense,39.31,Kommunikation & Abos,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-07-01,expense,55.0,Notwendigkeiten,Kleidung,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-07-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-07-01,expense,32.0,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-07-01,expense,512.11,Freizeit,Urlaub,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-07-01,expense,30.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-08-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2024-08-01,expense,31.87,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-08-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-08-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-08-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-08-01,expense,81.8,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-08-01,expense,10.0,Notwendigkeiten,TC,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-09-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2024-09-01,income,1304.89,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2024-09-01,income,145.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2024-09-01,income,993.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2024-09-01,income,300.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2024-09-01,expense,127.74,Leben,Essen,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-09-01,expense,9.98,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-09-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-09-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-09-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-09-01,expense,56.0,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-09-01,expense,55.96,Notwendigkeiten,Geschenke,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-09-01,expense,20.0,Notwendigkeiten,TC,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-10-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2024-10-01,income,128.25,Einnahmen,Nebenjob,N26,,,Legacy Import finance.xlsx · Einkommen · Arbeit
+2024-10-01,expense,9.98,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-10-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-10-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-10-01,expense,74.99,Kommunikation & Abos,F1,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-10-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-10-01,expense,144.99,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-11-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2024-11-01,income,560.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · sonstiges
+2024-11-01,expense,9.98,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-11-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-11-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-11-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-11-01,expense,30.0,Notwendigkeiten,TC,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-12-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2024-12-01,income,5000.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · sonstiges
+2024-12-01,income,69.34,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2024-12-01,income,300.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2024-12-01,income,50.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2024-12-01,income,55.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · bets
+2024-12-01,expense,9.98,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-12-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-12-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-12-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-12-01,expense,10.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2024-12-01,investment,1069.34,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2025-01-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2025-01-01,income,104.22,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · sonstiges
+2025-01-01,expense,9.98,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-01-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-01-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-01-01,expense,23.09,Kommunikation & Abos,ChatGPT,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-01-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-01-01,expense,40.0,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-01-01,expense,95.0,Notwendigkeiten,TC,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-02-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2025-02-01,income,300.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · bets
+2025-02-01,expense,14.99,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-02-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-02-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-02-01,expense,22.97,Kommunikation & Abos,ChatGPT,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-02-01,expense,58.93,Kommunikation & Abos,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-02-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-02-01,expense,10.0,Notwendigkeiten,TC,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-02-01,expense,588.69,Freizeit,Urlaub,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-02-01,expense,10.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-03-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2025-03-01,expense,14.99,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-03-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-03-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-03-01,expense,22.23,Kommunikation & Abos,ChatGPT,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-03-01,expense,247.8,Kommunikation & Abos,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-03-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-03-01,investment,2000.0,Investieren,ETF,,N26,Scalable Capital,Legacy Import finance.xlsx · Investition
+2025-04-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2025-04-01,expense,14.99,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-04-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-04-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-04-01,expense,20.95,Kommunikation & Abos,ChatGPT,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-04-01,expense,56.29,Kommunikation & Abos,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-04-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-04-01,expense,46.0,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-04-01,expense,16.0,Notwendigkeiten,Geschenke,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-04-01,expense,25.0,Notwendigkeiten,TC,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-05-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2025-05-01,income,200.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · bets
+2025-05-01,expense,14.99,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-05-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-05-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-05-01,expense,21.31,Kommunikation & Abos,ChatGPT,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-05-01,expense,157.97,Kommunikation & Abos,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-05-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-05-01,expense,30.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-06-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2025-06-01,expense,14.99,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-06-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-06-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-06-01,expense,20.96,Kommunikation & Abos,ChatGPT,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-06-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-06-01,expense,40.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-07-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2025-07-01,income,488.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · sonstiges
+2025-07-01,income,350.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2025-07-01,income,61.75,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · bets
+2025-07-01,expense,14.99,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-07-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-07-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-07-01,expense,20.55,Kommunikation & Abos,ChatGPT,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-07-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-07-01,expense,220.0,Freizeit,Tickets,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-07-01,expense,40.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-08-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2025-08-01,expense,481.99,Kommunikation & Abos,Handy,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-08-01,expense,14.99,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-08-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-08-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-08-01,expense,20.72,Kommunikation & Abos,ChatGPT,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-08-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-08-01,expense,125.55,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-08-01,expense,48.85,Freizeit,Urlaub,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-08-01,expense,25.0,Freizeit,Tickets,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-09-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2025-09-01,income,115.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · sonstiges
+2025-09-01,income,200.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2025-09-01,income,60.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2025-09-01,expense,14.99,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-09-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-09-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-09-01,expense,20.47,Kommunikation & Abos,ChatGPT,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-09-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-09-01,expense,34.99,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-09-01,expense,10.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-10-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2025-10-01,expense,14.99,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-10-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-10-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-10-01,expense,20.73,Kommunikation & Abos,ChatGPT,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-10-01,expense,74.99,Kommunikation & Abos,F1,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-10-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-10-01,expense,2325.0,Notwendigkeiten,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-10-01,expense,229.0,Freizeit,Urlaub,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-10-01,expense,20.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-11-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2025-11-01,expense,14.99,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-11-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-11-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-11-01,expense,20.89,Kommunikation & Abos,ChatGPT,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-11-01,expense,74.98,Notwendigkeiten,Kleidung,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-11-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-11-01,expense,463.75,Notwendigkeiten,Anschaffungen,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-11-01,expense,40.0,Notwendigkeiten,TC,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-11-01,expense,55.0,Notwendigkeiten,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-11-01,expense,10.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-12-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2025-12-01,income,350.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · sonstiges
+2025-12-01,expense,14.99,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-12-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-12-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-12-01,expense,20.51,Kommunikation & Abos,ChatGPT,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-12-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2025-12-01,expense,482.49,Notwendigkeiten,Anschaffungen,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-01-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2026-01-01,income,1000.0,Einnahmen,Gehalt,N26,,,Legacy Import finance.xlsx · Einkommen · geld
+2026-01-01,expense,763.21,Wohnen,Miete,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-01-01,expense,123.43,Leben,Lebensmittel,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-01-01,expense,66.4,Leben,Essen,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-01-01,expense,39.44,Leben,Drogerie,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-01-01,expense,49.1,Leben,Gesundheit,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-01-01,expense,35.15,Leben,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-01-01,expense,14.99,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-01-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-01-01,expense,1.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-01-01,expense,20.57,Kommunikation & Abos,ChatGPT,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-01-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-01-01,expense,14.0,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-01-01,expense,266.33,Notwendigkeiten,Anschaffungen,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-01-01,expense,101.6,Freizeit,Aktivitäten,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-01-01,expense,10.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-01-01,expense,75.0,Freizeit,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-02-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2026-02-01,income,1000.0,Einnahmen,Gehalt,N26,,,Legacy Import finance.xlsx · Einkommen · geld
+2026-02-01,expense,770.81,Wohnen,Miete,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-02-01,expense,83.3,Wohnen,Strom,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-02-01,expense,155.92,Leben,Lebensmittel,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-02-01,expense,52.23,Leben,Essen,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-02-01,expense,20.25,Leben,Drogerie,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-02-01,expense,35.0,Leben,Friseur,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-02-01,expense,40.7,Leben,Gesundheit,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-02-01,expense,29.48,Leben,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-02-01,expense,14.99,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-02-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-02-01,expense,3.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-02-01,expense,20.44,Kommunikation & Abos,ChatGPT,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-02-01,expense,176.37,Notwendigkeiten,Kleidung,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-02-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-02-01,expense,92.0,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-02-01,expense,34.4,Notwendigkeiten,Anschaffungen,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-02-01,expense,25.2,Notwendigkeiten,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-02-01,expense,213.62,Freizeit,Urlaub,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-02-01,expense,36.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-02-01,expense,65.0,Freizeit,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-03-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2026-03-01,income,1000.0,Einnahmen,Gehalt,N26,,,Legacy Import finance.xlsx · Einkommen · geld
+2026-03-01,income,30.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · legacy income
+2026-03-01,expense,770.81,Wohnen,Miete,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-03-01,expense,31.2,Wohnen,Strom,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-03-01,expense,302.99,Leben,Lebensmittel,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-03-01,expense,16.13,Leben,Essen,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-03-01,expense,19.95,Leben,Drogerie,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-03-01,expense,15.45,Leben,Gesundheit,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-03-01,expense,14.99,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-03-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-03-01,expense,3.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-03-01,expense,20.85,Kommunikation & Abos,ChatGPT,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-03-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-03-01,expense,11.73,Notwendigkeiten,Geschenke,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-03-01,expense,149.16,Notwendigkeiten,Anschaffungen,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-03-01,expense,40.0,Freizeit,Aktivitäten,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-04-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2026-04-01,income,1000.0,Einnahmen,Gehalt,N26,,,Legacy Import finance.xlsx · Einkommen · geld
+2026-04-01,expense,770.8,Wohnen,Miete,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-04-01,expense,31.2,Wohnen,Strom,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-04-01,expense,27.25,Wohnen,Wasser,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-04-01,expense,292.92,Leben,Lebensmittel,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-04-01,expense,12.62,Leben,Essen,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-04-01,expense,50.9,Leben,Drogerie,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-04-01,expense,27.5,Leben,Friseur,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-04-01,expense,49.8,Leben,Gesundheit,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-04-01,expense,14.99,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-04-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-04-01,expense,7.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-04-01,expense,20.49,Kommunikation & Abos,ChatGPT,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-04-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-04-01,expense,39.0,Notwendigkeiten,Anschaffungen,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-04-01,expense,20.0,Notwendigkeiten,TC,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-04-01,expense,50.0,Freizeit,Aktivitäten,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-04-01,expense,20.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-05-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2026-05-01,income,1000.0,Einnahmen,Gehalt,N26,,,Legacy Import finance.xlsx · Einkommen · geld
+2026-05-01,expense,770.81,Wohnen,Miete,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-05-01,expense,31.2,Wohnen,Strom,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-05-01,expense,274.44,Leben,Lebensmittel,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-05-01,expense,53.22,Leben,Essen,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-05-01,expense,46.05,Leben,Drogerie,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-05-01,expense,48.85,Leben,Gesundheit,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-05-01,expense,14.99,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-05-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-05-01,expense,7.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-05-01,expense,20.72,Kommunikation & Abos,ChatGPT,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-05-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-05-01,expense,65.97,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-05-01,expense,30.0,Notwendigkeiten,Geschenke,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-05-01,expense,150.49,Freizeit,Tickets,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-05-01,expense,50.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-06-01,income,95.0,Einnahmen,Taschengeld,N26,,,Legacy Import finance.xlsx · Einkommen · tg
+2026-06-01,income,1000.0,Einnahmen,Gehalt,N26,,,Legacy Import finance.xlsx · Einkommen · geld
+2026-06-01,income,500.0,Einnahmen,Sonstiges,N26,,,Legacy Import finance.xlsx · Einkommen · sonstiges
+2026-06-01,expense,770.81,Wohnen,Miete,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-06-01,expense,31.2,Wohnen,Strom,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-06-01,expense,38.43,Wohnen,Wasser,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-06-01,expense,306.29,Leben,Lebensmittel,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-06-01,expense,16.43,Leben,Essen,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-06-01,expense,48.85,Leben,Drogerie,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-06-01,expense,18.45,Leben,Gesundheit,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-06-01,expense,14.99,Kommunikation & Abos,Handyvertrag,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-06-01,expense,10.99,Kommunikation & Abos,Spotify,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-06-01,expense,7.99,Kommunikation & Abos,Google,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-06-01,expense,21.01,Kommunikation & Abos,ChatGPT,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-06-01,expense,25.09,Kommunikation & Abos,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-06-01,expense,24.9,Notwendigkeiten,Gym,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-06-01,expense,15.0,Notwendigkeiten,Sport,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-06-01,expense,27.0,Notwendigkeiten,Geschenke,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-06-01,expense,520.08,Notwendigkeiten,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-06-01,expense,12.9,Freizeit,Aktivitäten,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-06-01,expense,918.43,Freizeit,Urlaub,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-06-01,expense,60.0,Freizeit,Wetten,N26,,,Legacy Import finance.xlsx · Monatswert
+2026-06-01,expense,18.0,Freizeit,Sonstiges,N26,,,Legacy Import finance.xlsx · Monatswert
