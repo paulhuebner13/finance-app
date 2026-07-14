@@ -2512,3 +2512,162 @@ textarea,
     font-size: 6.2px !important;
   }
 }
+
+/* Patch: Buchungsauswahl als eigene schöne Kategorie-/Unterkategorie-Sheets */
+.booking-selection-stack {
+  display: grid;
+  gap: 0.55rem;
+}
+.booking-select-card {
+  --accent: var(--accent-main);
+  width: 100%;
+  border: 1.6px solid color-mix(in srgb, var(--accent) 36%, rgba(42, 77, 108, 0.18));
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), color-mix(in srgb, var(--accent) 5%, #ffffff));
+  border-radius: 18px;
+  padding: 0.78rem 0.85rem;
+  text-align: left;
+  display: grid;
+  gap: 0.22rem;
+  color: var(--text);
+  box-shadow: 0 8px 18px rgba(26, 69, 94, 0.055);
+}
+.booking-select-card span {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  font-weight: 900;
+}
+.booking-select-card strong {
+  font-size: 1.08rem;
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.booking-select-card small {
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.25;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.booking-select-card.has-value {
+  border-color: color-mix(in srgb, var(--accent) 58%, rgba(42, 77, 108, 0.16));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, #ffffff), color-mix(in srgb, var(--accent) 4%, #ffffff));
+}
+.booking-select-card.subcategory-card {
+  padding: 0.68rem 0.82rem;
+  border-style: dashed;
+}
+.booking-select-note {
+  --accent: var(--accent-main);
+  padding: 0.62rem 0.78rem;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, rgba(42, 77, 108, 0.12));
+  background: color-mix(in srgb, var(--accent) 5%, #ffffff);
+  color: var(--muted);
+  font-weight: 800;
+  font-size: 0.82rem;
+}
+.choice-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(10, 28, 42, 0.28);
+  display: grid;
+  align-items: end;
+  padding: 0.85rem;
+}
+.choice-sheet {
+  width: min(560px, 100%);
+  max-height: min(74vh, 620px);
+  margin: 0 auto;
+  overflow: auto;
+  border-radius: 28px;
+  padding: 1rem;
+  background: rgba(253, 254, 253, 0.98);
+  border: 1px solid rgba(42, 77, 108, 0.16);
+  box-shadow: 0 24px 70px rgba(10, 28, 42, 0.28);
+}
+.choice-sheet-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 0.85rem;
+}
+.choice-sheet-header div {
+  display: grid;
+  gap: 0.1rem;
+}
+.choice-sheet-header strong {
+  font-size: 1.32rem;
+  line-height: 1.05;
+}
+.choice-sheet-header span {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-weight: 800;
+}
+.choice-grid {
+  display: grid;
+  gap: 0.58rem;
+}
+.choice-grid.groups {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.choice-grid.subcategories {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.choice-card {
+  --accent: var(--accent-main);
+  border: 1.6px solid color-mix(in srgb, var(--accent) 40%, rgba(42, 77, 108, 0.14));
+  background: linear-gradient(180deg, #ffffff, color-mix(in srgb, var(--accent) 7%, #ffffff));
+  color: var(--text);
+  border-radius: 20px;
+  padding: 0.92rem 0.86rem;
+  text-align: left;
+  display: grid;
+  gap: 0.32rem;
+  box-shadow: 0 8px 18px rgba(26, 69, 94, 0.045);
+}
+.choice-card strong {
+  font-size: 1.03rem;
+  line-height: 1.1;
+}
+.choice-card small {
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.28;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.choice-card.selected {
+  border-color: var(--accent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 17%, #ffffff), color-mix(in srgb, var(--accent) 8%, #ffffff));
+  box-shadow: 0 12px 26px color-mix(in srgb, var(--accent) 17%, transparent);
+}
+.choice-card.sub {
+  min-height: 56px;
+  align-items: center;
+  justify-items: center;
+  text-align: center;
+  border-radius: 999px;
+  font-size: 1.02rem;
+  font-weight: 900;
+}
+.choice-card.sub.selected {
+  background: var(--accent);
+  color: #ffffff;
+}
+@media (max-width: 430px) {
+  .choice-sheet-backdrop { padding: 0.55rem; }
+  .choice-sheet { border-radius: 24px; padding: 0.8rem; max-height: 78vh; }
+  .choice-grid.groups, .choice-grid.subcategories { grid-template-columns: 1fr; }
+  .choice-sheet-header strong { font-size: 1.18rem; }
+}

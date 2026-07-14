@@ -43,6 +43,7 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [pickerOpen, setPickerOpen] = useState<"group" | "subcategory" | null>(null);
 
   const isEditing = Boolean(transaction?.id);
   const activeAccounts = accounts.filter((a) => a.is_active);
@@ -75,6 +76,7 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
       setToAccountId("");
       setNote("");
     }
+    setPickerOpen(null);
     setError("");
   }, [open, transaction, defaultAccount?.id]);
 
@@ -87,6 +89,7 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
 
   const selectedGroup = groups.find((g) => g.id === groupId);
   const selectedCategories = (selectedGroup?.categories ?? []).filter((category) => category.is_active);
+  const selectedCategory = selectedCategories.find((category) => category.id === categoryId);
   const hasSubcategories = selectedCategories.length > 0;
 
   function applyDefaultAccounts(nextType: EntryType) {
@@ -118,8 +121,17 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
   }
 
   function selectGroup(nextGroupId: string) {
+    const nextGroup = relevantGroups.find((group) => group.id === nextGroupId) ?? groups.find((group) => group.id === nextGroupId);
+    const nextCategories = (nextGroup?.categories ?? []).filter((category) => category.is_active);
     setGroupId(nextGroupId);
     setCategoryId("");
+    setPickerOpen(nextCategories.length ? "subcategory" : null);
+    setError("");
+  }
+
+  function selectSubcategory(nextCategoryId: string) {
+    setCategoryId(nextCategoryId);
+    setPickerOpen(null);
     setError("");
   }
 
@@ -185,42 +197,88 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
 
   if (!open) return null;
 
-  const groupPicker = (kind: "normal" | "investment" = "normal") => (
-    <section className="pretty-picker-section">
-      <div className="pretty-picker-grid">
-        {relevantGroups.map((group) => {
-          const accent = categoryAccent(group.name, group.color);
-          return (
-            <button
-              type="button"
-              key={group.id}
-              className={groupId === group.id ? "pretty-option selected" : "pretty-option"}
-              style={{ ["--accent" as string]: accent }}
-              onClick={() => selectGroup(group.id)}
-            >
-              <strong>{group.name}</strong>
-              <small>{subLabel(group)}</small>
-            </button>
-          );
-        })}
-      </div>
+  const categorySelector = (kind: "normal" | "investment" = "normal") => (
+    <section className="booking-selection-stack">
+      <button
+        type="button"
+        className={selectedGroup ? "booking-select-card has-value" : "booking-select-card"}
+        style={selectedGroup ? { ["--accent" as string]: categoryAccent(selectedGroup.name, selectedGroup.color) } : undefined}
+        onClick={() => setPickerOpen("group")}
+      >
+        <span>Kategorie</span>
+        <strong>{selectedGroup?.name ?? "Auswählen"}</strong>
+        <small>{selectedGroup ? subLabel(selectedGroup) : "Oberkategorie wählen"}</small>
+      </button>
 
       {selectedGroup && hasSubcategories && (
-        <div className="subcategory-picker" style={{ ["--accent" as string]: categoryAccent(selectedGroup.name, selectedGroup.color) }}>
-          {selectedCategories.map((category) => (
-            <button
-              type="button"
-              key={category.id}
-              className={categoryId === category.id ? "subcategory-option selected" : "subcategory-option"}
-              onClick={() => setCategoryId(category.id)}
-            >
-              {category.name}
-            </button>
-          ))}
+        <button
+          type="button"
+          className={selectedCategory ? "booking-select-card subcategory-card has-value" : "booking-select-card subcategory-card"}
+          style={{ ["--accent" as string]: categoryAccent(selectedGroup.name, selectedGroup.color) }}
+          onClick={() => setPickerOpen("subcategory")}
+        >
+          <span>Unterkategorie</span>
+          <strong>{selectedCategory?.name ?? "Auswählen"}</strong>
+          <small>antippen zum Ändern</small>
+        </button>
+      )}
+
+      {kind === "normal" && selectedGroup && !hasSubcategories && (
+        <div className="booking-select-note" style={{ ["--accent" as string]: categoryAccent(selectedGroup.name, selectedGroup.color) }}>
+          Keine Unterkategorie nötig.
         </div>
       )}
-      {kind === "normal" && selectedGroup && !hasSubcategories && <p className="muted small">Keine Unterkategorie nötig.</p>}
     </section>
+  );
+
+  const pickerSheet = pickerOpen && (
+    <div className="choice-sheet-backdrop" onClick={() => setPickerOpen(null)}>
+      <section className="choice-sheet" onClick={(event) => event.stopPropagation()}>
+        <div className="choice-sheet-header">
+          <div>
+            <strong>{pickerOpen === "group" ? "Kategorie" : selectedGroup?.name ?? "Unterkategorie"}</strong>
+            <span>{pickerOpen === "group" ? "auswählen" : "Unterkategorie auswählen"}</span>
+          </div>
+          <button type="button" className="icon-button" onClick={() => setPickerOpen(null)}>×</button>
+        </div>
+
+        {pickerOpen === "group" ? (
+          <div className="choice-grid groups">
+            {relevantGroups.map((group) => {
+              const accent = categoryAccent(group.name, group.color);
+              return (
+                <button
+                  type="button"
+                  key={group.id}
+                  className={groupId === group.id ? "choice-card selected" : "choice-card"}
+                  style={{ ["--accent" as string]: accent }}
+                  onClick={() => selectGroup(group.id)}
+                >
+                  <strong>{group.name}</strong>
+                  <small>{subLabel(group)}</small>
+                </button>
+              );
+            })}
+          </div>
+        ) : selectedGroup && hasSubcategories ? (
+          <div className="choice-grid subcategories" style={{ ["--accent" as string]: categoryAccent(selectedGroup.name, selectedGroup.color) }}>
+            {selectedCategories.map((category) => (
+              <button
+                type="button"
+                key={category.id}
+                className={categoryId === category.id ? "choice-card sub selected" : "choice-card sub"}
+                style={{ ["--accent" as string]: categoryAccent(selectedGroup.name, selectedGroup.color) }}
+                onClick={() => selectSubcategory(category.id)}
+              >
+                <strong>{category.name}</strong>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="muted small">Diese Kategorie hat keine Unterkategorien.</p>
+        )}
+      </section>
+    </div>
   );
 
   return (
@@ -275,11 +333,11 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
                 </select>
               </label>
             </div>
-            {groupPicker("investment")}
+            {categorySelector("investment")}
           </>
         ) : (
           <>
-            {groupPicker("normal")}
+            {categorySelector("normal")}
             <label>
               Konto
               <select value={accountId} onChange={(e) => setAccountId(e.target.value)}>
@@ -302,6 +360,7 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
 
         {error && <p className="error">{error}</p>}
         <button className="primary" onClick={save} disabled={saving}>{saving ? "Speichern..." : isEditing ? "Änderung speichern" : "Speichern"}</button>
+        {pickerSheet}
       </section>
     </div>
   );
