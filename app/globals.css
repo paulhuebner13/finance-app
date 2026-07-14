@@ -2433,3 +2433,82 @@ textarea,
   .projection-head { align-items: stretch; }
   .projection-head > strong { align-self: flex-start; }
 }
+
+/* Patch: compact mobile analysis charts + corrected import UI fit */
+.monthly-analysis-stack {
+  gap: 0.62rem !important;
+}
+.monthly-chart-card {
+  padding: 0.72rem !important;
+  border-radius: 18px !important;
+}
+.monthly-group-head {
+  gap: 0.55rem !important;
+  align-items: center !important;
+}
+.monthly-group-head strong {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  font-size: 0.94rem !important;
+}
+.monthly-group-head b {
+  font-size: 0.83rem !important;
+}
+.analysis-chart {
+  max-width: 100% !important;
+  min-height: 0 !important;
+  height: auto !important;
+  margin-top: 0.15rem !important;
+}
+.chart-value-label {
+  font-size: 6.3px !important;
+  opacity: 0.72 !important;
+}
+.chart-y-label,
+.chart-x-label,
+.chart-average-label {
+  font-size: 7px !important;
+}
+.chart-line {
+  stroke-width: 2px !important;
+}
+.chart-point {
+  stroke-width: 2px !important;
+}
+.projection-card {
+  padding: 0.78rem !important;
+  gap: 0.62rem !important;
+}
+.projection-kpis {
+  gap: 0.38rem !important;
+}
+.projection-kpis span {
+  font-size: 0.78rem !important;
+}
+@media (max-width: 520px) {
+  .analysis-page.dashboard {
+    padding-left: 0.7rem !important;
+    padding-right: 0.7rem !important;
+    gap: 0.72rem !important;
+  }
+  .analysis-summary-card {
+    padding: 0.76rem !important;
+    border-radius: 18px !important;
+  }
+  .analysis-chart {
+    min-height: 0 !important;
+  }
+  .monthly-chart-card {
+    padding: 0.62rem !important;
+  }
+  .chart-value-label {
+    font-size: 5.5px !important;
+  }
+  .chart-y-label,
+  .chart-x-label,
+  .chart-average-label {
+    font-size: 6.2px !important;
+  }
+}

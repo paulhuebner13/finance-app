@@ -271,11 +271,12 @@ export function FinanceApp() {
       accounts,
       outingGroupId: outingGroup?.id ?? null
     });
-    const outingValue = calculateOutingValue({
+    const calculatedOutingValue = calculateOutingValue({
       openingComparable: openingAvailable,
       currentComparable: currentComparableValue,
       trackedComparableChange: trackedChange
     });
+    const outingValue = outingTracked > 0 ? outingTracked : calculatedOutingValue;
     const effectiveExpenses = trackedExpensesWithoutOuting + outingValue;
     return { expenses, income, investments, outingValue, effectiveExpenses };
   }, [transactions, groups, accounts, debts, openingAvailable]);

@@ -36,12 +36,12 @@ function shortMonth(key: string) {
 }
 
 const chart = {
-  width: 372,
-  height: 182,
-  left: 52,
-  right: 14,
+  width: 340,
+  height: 150,
+  left: 42,
+  right: 10,
   top: 18,
-  bottom: 36
+  bottom: 26
 };
 
 type ClosingBalance = { closing_id: string; account_id: string; actual_balance: number };
@@ -117,14 +117,16 @@ function ChartCard({ row }: { row: ChartRow }) {
       <svg className="analysis-chart" viewBox={`0 0 ${chart.width} ${chart.height}`} role="img" aria-label={`${row.name} Verlauf`}>
         <line className="chart-axis" x1={chart.left} y1={chart.top} x2={chart.left} y2={chart.top + plotHeight} />
         <line className="chart-axis" x1={chart.left} y1={zeroY} x2={chart.width - chart.right} y2={zeroY} />
-        <text className="chart-y-label" x={chart.left - 8} y={chart.top + 6} textAnchor="end">{formatEuro(max)}</text>
-        <text className="chart-y-label" x={chart.left - 8} y={chart.top + plotHeight} textAnchor="end">{formatEuro(min)}</text>
+        <text className="chart-y-label" x={chart.left - 6} y={chart.top + 6} textAnchor="end">{formatEuro(max)}</text>
+        <text className="chart-y-label" x={chart.left - 6} y={chart.top + plotHeight} textAnchor="end">{formatEuro(min)}</text>
         <polyline className="chart-line" points={linePoints} />
-        {points.map((point) => (
+        {points.map((point, index) => (
           <g key={point.month}>
-            <text className="chart-value-label" x={point.x} y={Math.max(chart.top + 10, point.y - 8)} textAnchor="middle">{formatEuro(point.spent)}</text>
-            <circle className="chart-point" cx={point.x} cy={point.y} r="3.6" />
-            <text className="chart-x-label" x={point.x} y={chart.height - 12} textAnchor="middle">{shortMonth(point.month)}</text>
+            <text className="chart-value-label" x={point.x} y={Math.max(chart.top + 8, point.y - 7)} textAnchor="middle">{formatEuro(point.spent)}</text>
+            <circle className="chart-point" cx={point.x} cy={point.y} r="3.1" />
+            {index % 2 === 0 || index === points.length - 1 ? (
+              <text className="chart-x-label" x={point.x} y={chart.height - 8} textAnchor="middle">{shortMonth(point.month)}</text>
+            ) : null}
           </g>
         ))}
         <line className="chart-average" x1={chart.left} y1={averageY} x2={chart.width - chart.right} y2={averageY} />
@@ -227,6 +229,7 @@ export function AnalysisPage() {
     const accountTotal = closing.balances.reduce((sum, balance) => {
       const account = accounts.find((item) => item.id === balance.account_id);
       if (!account) return sum;
+      if (account.name?.toLowerCase().includes("kaution")) return sum;
       return sum + accountComparableTotal([{
         type: account.type,
         include_in_available_net_worth: account.include_in_available_net_worth,
@@ -250,6 +253,13 @@ export function AnalysisPage() {
 
   function outingForMonth(month: string, outingGroupId: string | null) {
     const monthTransactions = transactionsForMonth(month);
+    if (outingGroupId) {
+      const explicitOuting = monthTransactions.filter((tx) => tx.type === "expense" && tx.group_id === outingGroupId);
+      if (explicitOuting.length) {
+        return explicitOuting.reduce((sum, tx) => sum + Number(tx.amount), 0);
+      }
+    }
+
     const openingComparable = comparableForClosing(closings.find((closing) => closing.month === previousMonthFromKey(month)));
     const currentComparable = month === monthKey()
       ? comparableValue(accounts, debts)
