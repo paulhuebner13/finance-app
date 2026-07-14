@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { formatEuro, todayISO } from "@/lib/date";
-import { applyDeltas, invertDeltas, mergeDeltas, parseAmount, transactionDeltas } from "@/lib/finance";
+import { applyDeltas, categoryAccent, invertDeltas, mergeDeltas, parseAmount, transactionDeltas } from "@/lib/finance";
 import type { Account, CategoryWithChildren, EntryType, Transaction } from "@/lib/types";
 
 type Props = {
@@ -23,6 +23,13 @@ const labels: Record<EntryType, string> = {
   transfer: "Umbuchung",
   investment: "Investition"
 };
+
+function subLabel(group: CategoryWithChildren) {
+  const names = group.categories.filter((category) => category.is_active).map((category) => category.name);
+  if (!names.length) return "ohne Unterkategorien";
+  const visible = names.slice(0, 4).join(" · ");
+  return names.length > 4 ? `${visible} · …` : visible;
+}
 
 export function BookingModal({ open, onClose, onSaved, userId, accounts, groups, transaction }: Props) {
   const [type, setType] = useState<EntryType>("expense");
@@ -79,8 +86,9 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
   }, [groups, type]);
 
   const selectedGroup = groups.find((g) => g.id === groupId);
-  const selectedCategories = selectedGroup?.categories ?? [];
+  const selectedCategories = (selectedGroup?.categories ?? []).filter((category) => category.is_active);
   const hasSubcategories = selectedCategories.length > 0;
+
   function applyDefaultAccounts(nextType: EntryType) {
     if (nextType === "expense" || nextType === "income") {
       setAccountId(defaultAccount?.id ?? "");
@@ -106,6 +114,12 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
     setGroupId("");
     setCategoryId("");
     applyDefaultAccounts(next);
+    setError("");
+  }
+
+  function selectGroup(nextGroupId: string) {
+    setGroupId(nextGroupId);
+    setCategoryId("");
     setError("");
   }
 
@@ -171,6 +185,44 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
 
   if (!open) return null;
 
+  const groupPicker = (kind: "normal" | "investment" = "normal") => (
+    <section className="pretty-picker-section">
+      <div className="pretty-picker-grid">
+        {relevantGroups.map((group) => {
+          const accent = categoryAccent(group.name, group.color);
+          return (
+            <button
+              type="button"
+              key={group.id}
+              className={groupId === group.id ? "pretty-option selected" : "pretty-option"}
+              style={{ ["--accent" as string]: accent }}
+              onClick={() => selectGroup(group.id)}
+            >
+              <strong>{group.name}</strong>
+              <small>{subLabel(group)}</small>
+            </button>
+          );
+        })}
+      </div>
+
+      {selectedGroup && hasSubcategories && (
+        <div className="subcategory-picker" style={{ ["--accent" as string]: categoryAccent(selectedGroup.name, selectedGroup.color) }}>
+          {selectedCategories.map((category) => (
+            <button
+              type="button"
+              key={category.id}
+              className={categoryId === category.id ? "subcategory-option selected" : "subcategory-option"}
+              onClick={() => setCategoryId(category.id)}
+            >
+              {category.name}
+            </button>
+          ))}
+        </div>
+      )}
+      {kind === "normal" && selectedGroup && !hasSubcategories && <p className="muted small">Keine Unterkategorie nötig.</p>}
+    </section>
+  );
+
   return (
     <div className="modal-backdrop">
       <section className={`booking-modal booking-${type}`}>
@@ -223,43 +275,11 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
                 </select>
               </label>
             </div>
-            <label>
-              Kategorie
-              <select value={groupId} onChange={(e) => { setGroupId(e.target.value); setCategoryId(""); }}>
-                <option value="">Auswählen</option>
-                {relevantGroups.map((group) => <option key={group.id} value={group.id}>{group.name}</option>)}
-              </select>
-            </label>
-            {hasSubcategories && (
-              <label>
-                Unterkategorie
-                <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} disabled={!groupId}>
-                  <option value="">Sonstiges/automatisch</option>
-                  {selectedCategories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
-                </select>
-              </label>
-            )}
+            {groupPicker("investment")}
           </>
         ) : (
           <>
-            <label>
-              Kategorie
-              <select value={groupId} onChange={(e) => { setGroupId(e.target.value); setCategoryId(""); }}>
-                <option value="">Auswählen</option>
-                {relevantGroups.map((group) => <option key={group.id} value={group.id}>{group.name}</option>)}
-              </select>
-            </label>
-
-            {hasSubcategories && (
-              <label>
-                Unterkategorie
-                <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} disabled={!groupId}>
-                  <option value="">Sonstiges/automatisch</option>
-                  {selectedCategories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
-                </select>
-              </label>
-            )}
-
+            {groupPicker("normal")}
             <label>
               Konto
               <select value={accountId} onChange={(e) => setAccountId(e.target.value)}>

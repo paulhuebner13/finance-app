@@ -1,6 +1,7 @@
 "use client";
 
 import { adjustedMonthlyLimit, formatEuro, plannedUntilCurrentDay } from "@/lib/date";
+import { categoryAccent } from "@/lib/finance";
 import type { CategoryWithChildren, Transaction } from "@/lib/types";
 
 type Props = {
@@ -47,7 +48,7 @@ export function BudgetCard({ group, transactions, daysInMonth, currentDay, expan
   const isOverPlan = planUsagePercent > 100;
 
   return (
-    <article className={`budget-card ${expanded ? "expanded" : ""}`} style={{ ["--accent" as string]: group.color }}>
+    <article className={`budget-card ${expanded ? "expanded" : ""}`} style={{ ["--accent" as string]: categoryAccent(group.name, group.color) }}>
       <button className="budget-main" onClick={onClick} type="button">
         <div className="budget-card-header compact-budget-head start-budget-head">
           <p className="card-title start-card-title">

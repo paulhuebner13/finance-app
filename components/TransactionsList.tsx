@@ -19,6 +19,7 @@ export function TransactionsList() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [filter, setFilter] = useState("all");
   const [editing, setEditing] = useState<Transaction | null>(null);
+  const [bookingOpen, setBookingOpen] = useState(false);
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
@@ -122,6 +123,8 @@ export function TransactionsList() {
         </section>
       </main>
 
+      <button className="floating-booking-button" onClick={() => setBookingOpen(true)}>+ Buchung</button>
+
       <BookingModal
         open={Boolean(editing)}
         onClose={() => setEditing(null)}
@@ -130,6 +133,15 @@ export function TransactionsList() {
         accounts={accounts}
         groups={groups}
         transaction={editing}
+      />
+
+      <BookingModal
+        open={bookingOpen}
+        onClose={() => setBookingOpen(false)}
+        onSaved={load}
+        userId={session.user.id}
+        accounts={accounts}
+        groups={groups}
       />
     </AppShell>
   );

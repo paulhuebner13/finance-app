@@ -174,3 +174,22 @@ export function sortAccountsStable<T extends Pick<Account, "type" | "name" | "cr
     return a.name.localeCompare(b.name, "de");
   });
 }
+
+export function categoryAccent(name: string, fallback = "#256f84") {
+  const key = name.trim().toLowerCase();
+  if (key.includes("wohnen")) return "#f97316";
+  if (key === "leben" || key.includes("lebens")) return "#eab308";
+  if (key.includes("mobil")) return "#22c55e";
+  if (key.includes("kommunikation") || key.includes("abos")) return "#3258a8";
+  if (key.includes("versicher")) return "#8b5cf6";
+  if (key.includes("notwend")) return "#14b8a6";
+  if (key.includes("freizeit")) return "#facc15";
+  if (key.includes("ausgehen")) return "#ef4444";
+  if (key.includes("einnah")) return "#16a34a";
+  if (key.includes("invest")) return "#6254c7";
+  return fallback;
+}
+
+export function categoryAccentSoft(name: string, fallback = "#256f84") {
+  return categoryAccent(name, fallback);
+}
