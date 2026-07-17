@@ -4,19 +4,20 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { AuthGate } from "@/components/AuthGate";
 import { formatEuro } from "@/lib/date";
-import { depotNetValue, sortAccountsStable } from "@/lib/finance";
+import { depotNetValueAfterTax, depotTaxFromPositions, sortAccountsStable } from "@/lib/finance";
 import { supabase } from "@/lib/supabase";
-import type { Account, Debt } from "@/lib/types";
+import type { Account, Debt, InvestmentTaxPosition } from "@/lib/types";
 import { useSession } from "@/lib/useSession";
 
 export function WealthPage() {
   const { session, loading } = useSession();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [debts, setDebts] = useState<Debt[]>([]);
+  const [taxPositions, setTaxPositions] = useState<InvestmentTaxPosition[]>([]);
 
   const load = useCallback(async () => {
     if (!session?.user.id) return;
-    const [accountsRes, debtsRes] = await Promise.all([
+    const [accountsRes, debtsRes, taxRes] = await Promise.all([
       supabase
         .from("accounts")
         .select("*")
@@ -28,13 +29,23 @@ export function WealthPage() {
         .select("*")
         .eq("user_id", session.user.id)
         .eq("is_active", true)
-        .order("created_at")
+        .order("created_at"),
+      supabase
+        .from("investment_tax_positions")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .eq("is_active", true)
     ]);
     setAccounts(sortAccountsStable((accountsRes.data ?? []) as Account[]));
     setDebts((debtsRes.data ?? []) as Debt[]);
+    setTaxPositions(taxRes.error ? [] : ((taxRes.data ?? []) as InvestmentTaxPosition[]));
   }, [session?.user.id]);
 
   useEffect(() => { load(); }, [load]);
+
+  function positionsFor(accountId: string) {
+    return taxPositions.filter((position) => position.account_id === accountId && position.is_active);
+  }
 
   const sums = useMemo(() => {
     const active = accounts
@@ -42,7 +53,7 @@ export function WealthPage() {
       .reduce((sum, account) => sum + Number(account.balance), 0);
     const depot = accounts
       .filter((account) => account.type === "investment")
-      .reduce((sum, account) => sum + depotNetValue(Number(account.balance), Number(account.cost_basis ?? 0)), 0);
+      .reduce((sum, account) => sum + depotNetValueAfterTax(Number(account.balance), depotTaxFromPositions(positionsFor(account.id))), 0);
     const owedToMe = debts
       .filter((debt) => debt.kind === "owed_to_me")
       .reduce((sum, debt) => sum + Number(debt.amount), 0);
@@ -52,7 +63,7 @@ export function WealthPage() {
     const debtNet = owedToMe - iOwe;
     const total = active + depot + debtNet;
     return { active, depot, owedToMe, iOwe, debtNet, total };
-  }, [accounts, debts]);
+  }, [accounts, debts, taxPositions]);
 
   const activeAccounts = accounts.filter((account) => account.type === "active" && account.include_in_available_net_worth);
   const depots = accounts.filter((account) => account.type === "investment");
@@ -79,7 +90,7 @@ export function WealthPage() {
             ))}
 
             {depots.map((account) => {
-              const net = depotNetValue(Number(account.balance), Number(account.cost_basis ?? 0));
+              const net = depotNetValueAfterTax(Number(account.balance), depotTaxFromPositions(positionsFor(account.id)));
               return (
                 <article className="account-card money-row clean-money-row" key={account.id} style={{ ["--accent" as string]: account.color }}>
                   <strong>{account.name}</strong>

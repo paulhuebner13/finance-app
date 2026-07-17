@@ -152,6 +152,46 @@ export function depotNetValue(balance: number, taxBase: number) {
   return Number(balance || 0) - depotTax(balance, taxBase);
 }
 
+export function investmentCashFlowForAccount(
+  accountId: string,
+  transactions: Pick<Transaction, "type" | "amount" | "from_account_id" | "to_account_id">[]
+) {
+  return transactions.reduce((sum, tx) => {
+    const amount = Number(tx.amount) || 0;
+    if ((tx.type === "investment" || tx.type === "transfer") && tx.to_account_id === accountId) return sum + amount;
+    if ((tx.type === "investment" || tx.type === "transfer") && tx.from_account_id === accountId) return sum - amount;
+    return sum;
+  }, 0);
+}
+
+export function investmentCashFlowsByAccount(
+  transactions: Pick<Transaction, "type" | "amount" | "from_account_id" | "to_account_id">[]
+) {
+  const values = new Map<string, number>();
+  for (const tx of transactions) {
+    const amount = Number(tx.amount) || 0;
+    if (tx.type !== "investment" && tx.type !== "transfer") continue;
+    if (tx.to_account_id) values.set(tx.to_account_id, (values.get(tx.to_account_id) ?? 0) + amount);
+    if (tx.from_account_id) values.set(tx.from_account_id, (values.get(tx.from_account_id) ?? 0) - amount);
+  }
+  return values;
+}
+
+export function taxableProfitFromPositions(positions: { profit_loss: number | string; is_active?: boolean }[]) {
+  const total = positions
+    .filter((position) => position.is_active !== false)
+    .reduce((sum, position) => sum + Number(position.profit_loss || 0), 0);
+  return Math.max(0, total);
+}
+
+export function depotTaxFromPositions(positions: { profit_loss: number | string; is_active?: boolean }[]) {
+  return taxableProfitFromPositions(positions) * KEST_RATE;
+}
+
+export function depotNetValueAfterTax(balance: number, tax: number) {
+  return Number(balance || 0) - Math.max(0, Number(tax || 0));
+}
+
 export function accountSortRank(account: Pick<Account, "type" | "name" | "created_at">) {
   const name = account.name.trim().toLowerCase();
   if (account.type === "active") {

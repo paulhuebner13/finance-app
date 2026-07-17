@@ -2671,3 +2671,64 @@ textarea,
   .choice-grid.groups, .choice-grid.subcategories { grid-template-columns: 1fr; }
   .choice-sheet-header strong { font-size: 1.18rem; }
 }
+
+/* Portfolio tax positions */
+.portfolio-value-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.tax-toggle-button {
+  margin-top: 12px;
+}
+.tax-position-panel {
+  margin-top: 12px;
+  border: 1px solid var(--border, #d7e3e7);
+  border-radius: 18px;
+  background: var(--surface-soft, #f7fbfb);
+  padding: 12px;
+  display: grid;
+  gap: 12px;
+}
+.tax-panel-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+.tax-panel-head span,
+.tax-panel-summary span {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--muted, #64748b);
+  margin-top: 3px;
+}
+.tax-panel-summary {
+  text-align: right;
+  min-width: 112px;
+}
+.tax-position-list {
+  display: grid;
+  gap: 8px;
+}
+.tax-position-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(95px, 0.75fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+.tax-position-row input {
+  min-width: 0;
+}
+@media (max-width: 520px) {
+  .portfolio-value-grid {
+    grid-template-columns: 1fr;
+  }
+  .tax-panel-head {
+    display: grid;
+  }
+  .tax-panel-summary {
+    text-align: left;
+  }
+  .tax-position-row {
+    grid-template-columns: 1fr;
+  }
+}

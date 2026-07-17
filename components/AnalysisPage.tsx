@@ -4,9 +4,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { AuthGate } from "@/components/AuthGate";
 import { formatEuro, getMonthRange, monthKey } from "@/lib/date";
-import { accountComparableTotal, calculateOutingValue, categoryAccent, comparableValue, debtValue, depotNetValue, trackedComparableChange } from "@/lib/finance";
+import { accountComparableTotal, calculateOutingValue, categoryAccent, comparableValue, debtValue, depotNetValueAfterTax, depotTaxFromPositions, trackedComparableChange } from "@/lib/finance";
 import { supabase } from "@/lib/supabase";
-import type { Account, Category, CategoryGroup, Debt, MonthClosing, RecurringTransaction, Transaction } from "@/lib/types";
+import type { Account, Category, CategoryGroup, Debt, InvestmentTaxPosition, MonthClosing, RecurringTransaction, Transaction } from "@/lib/types";
 import { useSession } from "@/lib/useSession";
 
 function lastMonthKeys(count = 12) {
@@ -78,13 +78,16 @@ function clampChartRange(values: number[], avg: number) {
   return { min: rawMin - padding, max: rawMax + padding };
 }
 
-function currentNetWorth(accounts: Account[], debts: Debt[]) {
+function currentNetWorth(accounts: Account[], debts: Debt[], taxPositions: InvestmentTaxPosition[]) {
   const active = accounts
     .filter((account) => account.type === "active" && account.include_in_available_net_worth)
     .reduce((sum, account) => sum + Number(account.balance || 0), 0);
   const depot = accounts
     .filter((account) => account.type === "investment")
-    .reduce((sum, account) => sum + depotNetValue(Number(account.balance || 0), Number(account.cost_basis || 0)), 0);
+    .reduce((sum, account) => sum + depotNetValueAfterTax(
+      Number(account.balance || 0),
+      depotTaxFromPositions(taxPositions.filter((position) => position.account_id === account.id && position.is_active))
+    ), 0);
   const debt = debts.reduce((sum, item) => sum + debtValue(item), 0);
   return active + depot + debt;
 }
@@ -144,6 +147,7 @@ export function AnalysisPage() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [debts, setDebts] = useState<Debt[]>([]);
   const [recurring, setRecurring] = useState<RecurringTransaction[]>([]);
+  const [taxPositions, setTaxPositions] = useState<InvestmentTaxPosition[]>([]);
   const [closings, setClosings] = useState<ClosingBundle[]>([]);
   const months = useMemo(() => lastMonthKeys(12), []);
   const futureMonths = useMemo(() => nextMonthKeys(12), []);
@@ -153,7 +157,7 @@ export function AnalysisPage() {
     const firstRange = getMonthRange(months[0]);
     const lastRange = getMonthRange(months[months.length - 1]);
     const closingMonths = [previousMonthFromKey(months[0]), ...months];
-    const [txRes, groupRes, categoryRes, accountRes, debtRes, recurringRes, closingRes] = await Promise.all([
+    const [txRes, groupRes, categoryRes, accountRes, debtRes, recurringRes, closingRes, taxRes] = await Promise.all([
       supabase
         .from("transactions")
         .select("*")
@@ -192,7 +196,12 @@ export function AnalysisPage() {
         .from("month_closings")
         .select("*")
         .eq("user_id", session.user.id)
-        .in("month", closingMonths)
+        .in("month", closingMonths),
+      supabase
+        .from("investment_tax_positions")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .eq("is_active", true)
     ]);
 
     const closingRows = (closingRes.data ?? []) as MonthClosing[];
@@ -214,6 +223,7 @@ export function AnalysisPage() {
     setAccounts((accountRes.data ?? []) as Account[]);
     setDebts((debtRes.data ?? []) as Debt[]);
     setRecurring((recurringRes.data ?? []) as RecurringTransaction[]);
+    setTaxPositions(taxRes.error ? [] : ((taxRes.data ?? []) as InvestmentTaxPosition[]));
     setClosings(closingRows.map((closing) => ({
       ...closing,
       balances: balances.filter((balance) => balance.closing_id === closing.id),
@@ -338,13 +348,13 @@ export function AnalysisPage() {
     const fixedIncome = recurring.filter((item) => item.type === "income").reduce((sum, item) => sum + Number(item.amount), 0);
     const avgExpenses = average(chartRows.introRows.find((row) => row.id === "expenses")?.values.map((value) => value.spent) ?? []);
     const monthlyDelta = fixedIncome - avgExpenses;
-    const startValue = currentNetWorth(accounts, debts);
+    const startValue = currentNetWorth(accounts, debts, taxPositions);
     const values = futureMonths.map((month, index) => ({
       month,
       spent: startValue + monthlyDelta * (index + 1)
     }));
     return { fixedIncome, avgExpenses, monthlyDelta, startValue, values, average: average(values.map((value) => value.spent)) };
-  }, [recurring, chartRows.introRows, futureMonths, accounts, debts]);
+  }, [recurring, chartRows.introRows, futureMonths, accounts, debts, taxPositions]);
 
   if (loading) return <main className="loading-page">Laden...</main>;
   if (!session) return <AuthGate />;

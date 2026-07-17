@@ -43,6 +43,16 @@ export type Debt = {
   created_at: string;
 };
 
+export type InvestmentTaxPosition = {
+  id: string;
+  user_id: string;
+  account_id: string;
+  name: string;
+  profit_loss: number;
+  is_active: boolean;
+  created_at: string;
+};
+
 export type CategoryGroup = {
   id: string;
   user_id: string;

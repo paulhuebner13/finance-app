@@ -129,6 +129,16 @@ create table if not exists public.month_closing_debts (
   unique(closing_id, debt_id)
 );
 
+create table if not exists public.investment_tax_positions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  account_id uuid not null references public.accounts(id) on delete cascade,
+  name text not null default 'Position',
+  profit_loss numeric(12,2) not null default 0,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
 create index if not exists accounts_user_idx on public.accounts(user_id);
 create index if not exists debtors_user_idx on public.debtors(user_id);
 create index if not exists debts_user_idx on public.debts(user_id);
@@ -140,6 +150,8 @@ create index if not exists transactions_user_date_idx on public.transactions(use
 create index if not exists recurring_user_idx on public.recurring_transactions(user_id);
 create index if not exists closings_user_month_idx on public.month_closings(user_id, month);
 create index if not exists closing_debts_closing_idx on public.month_closing_debts(closing_id);
+create index if not exists investment_tax_positions_user_idx on public.investment_tax_positions(user_id);
+create index if not exists investment_tax_positions_account_idx on public.investment_tax_positions(account_id);
 
 alter table public.accounts enable row level security;
 alter table public.debtors enable row level security;
@@ -151,6 +163,7 @@ alter table public.recurring_transactions enable row level security;
 alter table public.month_closings enable row level security;
 alter table public.month_closing_balances enable row level security;
 alter table public.month_closing_debts enable row level security;
+alter table public.investment_tax_positions enable row level security;
 
 -- Drop old policies if this file is re-run.
 drop policy if exists "accounts_select_own" on public.accounts;
@@ -285,3 +298,13 @@ create policy "closing_debts_delete_own" on public.month_closing_debts for delet
 alter table public.month_closings
   add column if not exists debt_net_value numeric(12,2) not null default 0,
   add column if not exists comparable_value numeric(12,2) not null default 0;
+
+drop policy if exists "investment_tax_positions_select_own" on public.investment_tax_positions;
+drop policy if exists "investment_tax_positions_insert_own" on public.investment_tax_positions;
+drop policy if exists "investment_tax_positions_update_own" on public.investment_tax_positions;
+drop policy if exists "investment_tax_positions_delete_own" on public.investment_tax_positions;
+
+create policy "investment_tax_positions_select_own" on public.investment_tax_positions for select using (auth.uid() = user_id);
+create policy "investment_tax_positions_insert_own" on public.investment_tax_positions for insert with check (auth.uid() = user_id);
+create policy "investment_tax_positions_update_own" on public.investment_tax_positions for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "investment_tax_positions_delete_own" on public.investment_tax_positions for delete using (auth.uid() = user_id);
