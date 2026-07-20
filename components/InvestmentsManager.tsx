@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { AuthGate } from "@/components/AuthGate";
 import { formatEuro, formatMonthTitle, formatNumber, getMonthRange, monthKey } from "@/lib/date";
@@ -67,6 +67,7 @@ export function InvestmentsManager() {
   const [closings, setClosings] = useState<ClosingRow[]>([]);
   const [closingBalances, setClosingBalances] = useState<ClosingBalanceRow[]>([]);
   const [taxError, setTaxError] = useState<string | null>(null);
+  const depotSaveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   const load = useCallback(async () => {
     if (!session?.user.id) return;
@@ -149,16 +150,22 @@ export function InvestmentsManager() {
     await load();
   }
 
-  async function updateDepotValue(account: Account) {
+  function changeDepotValue(account: Account, nextValue: string) {
     if (!session?.user.id) return;
-    const current = values[account.id] ?? { balance: "0" };
-    const balance = parseAmount(current.balance);
+    const balance = parseAmount(nextValue);
     const tax = taxFor(account.id);
-    await supabase.from("accounts").update({
-      balance,
-      tax_reserve: tax
-    }).eq("id", account.id).eq("user_id", session.user.id);
-    await load();
+
+    setValues((old) => ({ ...old, [account.id]: { balance: nextValue } }));
+    setAccounts((current) => current.map((item) => (item.id === account.id ? { ...item, balance, tax_reserve: tax } : item)));
+
+    if (depotSaveTimers.current[account.id]) clearTimeout(depotSaveTimers.current[account.id]);
+    depotSaveTimers.current[account.id] = setTimeout(async () => {
+      await supabase
+        .from("accounts")
+        .update({ balance, tax_reserve: tax })
+        .eq("id", account.id)
+        .eq("user_id", session.user.id);
+    }, 450);
   }
 
   async function deleteDepot(account: Account) {
@@ -341,7 +348,6 @@ export function InvestmentsManager() {
                 <div className="depot-card-head">
                   <strong>{account.name}</strong>
                   <div className="button-row">
-                    <button type="button" className="mini-button" onClick={() => updateDepotValue(account)}>Speichern</button>
                     <button type="button" className="mini-button danger" onClick={() => deleteDepot(account)}>löschen</button>
                   </div>
                 </div>
@@ -349,7 +355,7 @@ export function InvestmentsManager() {
                 <div className="depot-value-grid portfolio-value-grid">
                   <label className="depot-value-tile">
                     <span>Depotwert</span>
-                    <input inputMode="decimal" value={current.balance} onChange={(e) => setValues((old) => ({ ...old, [account.id]: { balance: e.target.value } }))} />
+                    <input inputMode="decimal" value={current.balance} onChange={(e) => changeDepotValue(account, e.target.value)} />
                   </label>
                   <div className="depot-value-tile readonly">
                     <span>Ausgabewert</span>
@@ -390,6 +396,7 @@ export function InvestmentsManager() {
                         <article className="tax-position-row" key={position.id}>
                           <input
                             value={position.name}
+                            onFocus={(e) => { if (position.name === "Position") e.currentTarget.select(); }}
                             onChange={(e) => updateTaxPosition(position, { name: e.target.value })}
                             placeholder="Position"
                           />

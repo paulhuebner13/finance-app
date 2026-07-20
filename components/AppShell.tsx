@@ -29,6 +29,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     navEl.scrollLeft = saved;
   }, [pathname]);
 
+  useEffect(() => {
+    function selectAmountInput(event: FocusEvent) {
+      const target = event.target;
+      if (!(target instanceof HTMLInputElement)) return;
+      const isAmountInput =
+        target.inputMode === "decimal" ||
+        target.inputMode === "numeric" ||
+        target.type === "number" ||
+        target.dataset.selectAmount === "true";
+
+      if (!isAmountInput) return;
+
+      window.setTimeout(() => {
+        if (document.activeElement === target) target.select();
+      }, 0);
+    }
+
+    document.addEventListener("focusin", selectAmountInput);
+    return () => document.removeEventListener("focusin", selectAmountInput);
+  }, []);
+
   function rememberScroll() {
     const navEl = navRef.current;
     if (!navEl) return;
