@@ -2732,3 +2732,169 @@ textarea,
     grid-template-columns: 1fr;
   }
 }
+
+/* Patch: scaled budget overflow bars, polished tax positions, and depot profit chart */
+.budget-bar,
+.mini-bar {
+  overflow: visible !important;
+}
+.budget-fill,
+.mini-bar > div {
+  max-width: none !important;
+  box-shadow: none !important;
+}
+.budget-bar.over-plan .budget-fill,
+.mini-bar .budget-fill {
+  filter: saturate(1.05);
+}
+.budget-marker.plan-marker,
+.mini-bar i.plan-marker {
+  width: 2px !important;
+  background: #111827 !important;
+  border-radius: 999px !important;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.78) !important;
+  z-index: 4;
+}
+.budget-marker.total-marker,
+.mini-bar i.total-marker {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px !important;
+  background: rgba(239, 68, 68, 0.92) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.7) !important;
+  z-index: 5;
+}
+.budget-bar.over-total {
+  box-shadow: inset 0 0 0 1px rgba(239,68,68,0.18) !important;
+}
+.budget-bar.over-total .budget-fill,
+.mini-bar.over-total > div {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 72%, #fff 8%), color-mix(in srgb, #ef4444 34%, var(--accent))) !important;
+}
+
+.tax-toggle-button,
+.tax-add-row-button {
+  width: 100%;
+  border: 1.5px solid rgba(37, 99, 235, 0.34);
+  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(232, 246, 250, 0.92));
+  color: #173b59;
+  border-radius: 16px;
+  padding: 0.78rem 0.95rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  box-shadow: 0 8px 18px rgba(31, 105, 124, 0.08);
+}
+.tax-toggle-button {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.45rem;
+}
+.tax-toggle-button::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+  opacity: 0.65;
+}
+.tax-position-panel {
+  background: rgba(255,255,255,0.82) !important;
+  border: 1px solid rgba(42, 77, 108, 0.13) !important;
+  box-shadow: 0 10px 26px rgba(26,69,94,0.055) !important;
+}
+.tax-position-row {
+  background: rgba(248, 252, 252, 0.92);
+  border: 1px solid rgba(42, 77, 108, 0.11);
+  border-radius: 16px;
+  padding: 0.55rem;
+}
+.tax-position-row input {
+  background: #ffffff !important;
+  border-color: rgba(42, 77, 108, 0.14) !important;
+  min-height: 42px;
+}
+.tax-position-row .mini-button.danger {
+  min-height: 42px;
+  border-radius: 13px;
+}
+.depot-profit-chart-card {
+  background: rgba(255,255,255,0.84);
+  border: 1px solid rgba(42,77,108,0.13);
+  border-radius: 24px;
+  padding: 0.9rem;
+  box-shadow: 0 12px 30px rgba(26,69,94,0.06);
+  display: grid;
+  gap: 0.62rem;
+}
+.depot-section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+.depot-section-head strong {
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+}
+.depot-section-head span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+.depot-profit-chart {
+  width: 100%;
+  height: auto;
+  min-height: 150px;
+  display: block;
+}
+.chart-zero-line {
+  stroke: rgba(42, 77, 108, 0.18);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+.depot-profit-line {
+  fill: none;
+  stroke: #1f7a8c;
+  stroke-width: 2.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.profit-point {
+  stroke: #ffffff;
+  stroke-width: 1.7;
+}
+.profit-point.positive { fill: #16a34a; }
+.profit-point.negative { fill: #ef4444; }
+.profit-value-label {
+  fill: #315067;
+  font-size: 7px;
+  font-weight: 800;
+  opacity: 0.78;
+}
+.profit-month-label {
+  fill: #6b7f90;
+  font-size: 7px;
+  font-weight: 800;
+}
+@media (max-width: 520px) {
+  .tax-position-row {
+    grid-template-columns: 1fr !important;
+  }
+  .tax-toggle-button,
+  .tax-add-row-button {
+    padding: 0.74rem 0.85rem;
+  }
+  .depot-profit-chart-card {
+    padding: 0.74rem;
+    border-radius: 20px;
+  }
+  .profit-value-label,
+  .profit-month-label {
+    font-size: 6.2px;
+  }
+}
