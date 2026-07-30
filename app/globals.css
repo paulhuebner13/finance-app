@@ -2924,3 +2924,96 @@ textarea,
   font-size: 0.78rem;
   font-weight: 750;
 }
+
+/* Patch: Sportwetten alltime as separate expandable card */
+.betting-detail-card {
+  display: grid;
+  gap: 0.78rem;
+  border: 1.5px solid color-mix(in srgb, #14b8a6 32%, var(--border));
+  background: color-mix(in srgb, #ffffff 92%, #14b8a6 8%);
+}
+.betting-detail-toggle {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.8rem;
+  text-align: left;
+  cursor: pointer;
+}
+.betting-detail-toggle span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.92rem;
+  font-weight: 900;
+  color: var(--muted);
+}
+.betting-detail-toggle strong {
+  white-space: nowrap;
+  font-size: clamp(1.55rem, 7vw, 2.25rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.betting-detail-toggle strong.under { color: var(--success); }
+.betting-detail-toggle strong.over { color: var(--danger); }
+.betting-detail-body {
+  display: grid;
+  gap: 0.7rem;
+  padding-top: 0.72rem;
+  border-top: 1px solid var(--border);
+}
+.betting-total-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+}
+.betting-total-row span {
+  display: grid;
+  gap: 0.12rem;
+  padding: 0.62rem 0.7rem;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.74);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 850;
+}
+.betting-total-row b {
+  color: var(--text);
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+.betting-bars-chart {
+  width: 100%;
+  height: auto;
+  min-height: 158px;
+  overflow: visible;
+}
+.betting-zero-line {
+  stroke: rgba(15, 23, 42, 0.32);
+  stroke-width: 1.2;
+}
+.betting-income-bar { fill: color-mix(in srgb, var(--success) 82%, #ffffff); }
+.betting-expense-bar { fill: color-mix(in srgb, var(--danger) 82%, #ffffff); }
+.betting-net-label {
+  fill: #334155;
+  font-size: 6.6px;
+  font-weight: 850;
+}
+.betting-month-label,
+.betting-axis-label {
+  fill: var(--muted);
+  font-size: 7px;
+  font-weight: 800;
+}
+@media (max-width: 520px) {
+  .betting-total-row { grid-template-columns: 1fr; }
+  .betting-detail-toggle strong { font-size: 1.55rem; }
+  .betting-bars-chart { min-height: 150px; }
+}

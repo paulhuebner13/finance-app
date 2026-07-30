@@ -139,6 +139,65 @@ function ChartCard({ row }: { row: ChartRow }) {
   );
 }
 
+
+function BettingAllTimeCard({
+  allTime,
+  monthly
+}: {
+  allTime: { income: number; expenses: number; net: number };
+  monthly: { month: string; income: number; expenses: number; net: number }[];
+}) {
+  const [open, setOpen] = useState(false);
+  const maxValue = Math.max(1, ...monthly.flatMap((item) => [item.income, item.expenses]));
+  const chartHeight = 148;
+  const halfHeight = 58;
+  const topPad = 20;
+  const zeroY = topPad + halfHeight;
+  const barWidth = 12;
+  const step = monthly.length > 1 ? 280 / (monthly.length - 1) : 280;
+
+  return (
+    <section className={`analysis-summary-card betting-detail-card ${open ? "is-open" : ""}`}>
+      <button className="betting-detail-toggle" type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open}>
+        <span>Sportwetten alltime</span>
+        <strong className={allTime.net >= 0 ? "under" : "over"}>{allTime.net >= 0 ? "+" : ""}{formatEuro(allTime.net)}</strong>
+      </button>
+      {open && (
+        <div className="betting-detail-body">
+          <div className="betting-total-row">
+            <span>Einnahmen <b>{formatEuro(allTime.income)}</b></span>
+            <span>Ausgaben <b>{formatEuro(allTime.expenses)}</b></span>
+          </div>
+          <svg className="betting-bars-chart" viewBox="0 0 340 170" role="img" aria-label="Sportwetten letzte 12 Monate">
+            <line className="betting-zero-line" x1="34" y1={zeroY} x2="326" y2={zeroY} />
+            {monthly.map((item, index) => {
+              const x = 34 + index * step;
+              const incomeHeight = Math.max(0, (item.income / maxValue) * halfHeight);
+              const expenseHeight = Math.max(0, (item.expenses / maxValue) * halfHeight);
+              return (
+                <g key={item.month}>
+                  <rect className="betting-income-bar" x={x - barWidth - 1} y={zeroY - incomeHeight} width={barWidth} height={incomeHeight} rx="2" />
+                  <rect className="betting-expense-bar" x={x + 1} y={zeroY} width={barWidth} height={expenseHeight} rx="2" />
+                  {(item.income || item.expenses) ? (
+                    <text className="betting-net-label" x={x} y={item.net >= 0 ? Math.max(9, zeroY - incomeHeight - 5) : Math.min(chartHeight - 14, zeroY + expenseHeight + 11)} textAnchor="middle">
+                      {item.net >= 0 ? "+" : ""}{formatEuro(item.net)}
+                    </text>
+                  ) : null}
+                  {(index % 2 === 0 || index === monthly.length - 1) && (
+                    <text className="betting-month-label" x={x} y="164" textAnchor="middle">{shortMonth(item.month)}</text>
+                  )}
+                </g>
+              );
+            })}
+            <text className="betting-axis-label" x="326" y={zeroY - 6} textAnchor="end">Einnahmen</text>
+            <text className="betting-axis-label" x="326" y={zeroY + 15} textAnchor="end">Ausgaben</text>
+          </svg>
+        </div>
+      )}
+    </section>
+  );
+}
+
 export function AnalysisPage() {
   const { session, loading } = useSession();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -354,7 +413,7 @@ export function AnalysisPage() {
     return { fixedIncome, avgExpenses, monthlyDelta, startValue, values, average: average(values.map((value) => value.spent)) };
   }, [recurring, chartRows.introRows, futureMonths, accounts, debts, taxPositions]);
 
-  const bettingAllTime = useMemo(() => {
+  const betting = useMemo(() => {
     const categoryNameById = new Map(categories.map((category) => [category.id, category.name.toLowerCase()]));
     const isBettingIncome = (tx: Transaction) => {
       const categoryName = tx.category_id ? categoryNameById.get(tx.category_id) : "";
@@ -367,8 +426,15 @@ export function AnalysisPage() {
     };
     const income = transactions.filter(isBettingIncome).reduce((sum, tx) => sum + Number(tx.amount), 0);
     const expenses = transactions.filter(isBettingExpense).reduce((sum, tx) => sum + Number(tx.amount), 0);
-    return { income, expenses, net: income - expenses };
-  }, [transactions, categories]);
+    const monthly = months.map((month) => {
+      const range = getMonthRange(month);
+      const monthTransactions = transactions.filter((tx) => tx.date >= range.start && tx.date <= range.end);
+      const monthIncome = monthTransactions.filter(isBettingIncome).reduce((sum, tx) => sum + Number(tx.amount), 0);
+      const monthExpenses = monthTransactions.filter(isBettingExpense).reduce((sum, tx) => sum + Number(tx.amount), 0);
+      return { month, income: monthIncome, expenses: monthExpenses, net: monthIncome - monthExpenses };
+    });
+    return { allTime: { income, expenses, net: income - expenses }, monthly };
+  }, [transactions, categories, months]);
 
   if (loading) return <main className="loading-page">Laden...</main>;
   if (!session) return <AuthGate />;
@@ -393,13 +459,10 @@ export function AnalysisPage() {
             <span>Ø Ausgaben <b>{formatEuro(projection.avgExpenses)}</b></span>
             <span>Startwert <b>{formatEuro(projection.startValue)}</b></span>
           </div>
-          <div className="betting-alltime-card">
-            <span>Sportwetten alltime</span>
-            <strong className={bettingAllTime.net >= 0 ? "under" : "over"}>{bettingAllTime.net >= 0 ? "+" : ""}{formatEuro(bettingAllTime.net)}</strong>
-            <small>Einnahmen {formatEuro(bettingAllTime.income)} · Ausgaben {formatEuro(bettingAllTime.expenses)}</small>
-          </div>
           <ChartCard row={{ id: "net-worth-projection", name: "Net Worth nächste 12 Monate", accent: "#14b8a6", values: projection.values, average: projection.average }} />
         </section>
+
+        <BettingAllTimeCard allTime={betting.allTime} monthly={betting.monthly} />
 
         <section className="analysis-summary-card">
           <h2>Durchschnitt vs. Budget</h2>
