@@ -92,11 +92,27 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
   const selectedCategory = selectedCategories.find((category) => category.id === categoryId);
   const hasSubcategories = selectedCategories.length > 0;
 
+  function defaultIncomeSelection() {
+    const incomeGroup = groups.find((group) => group.kind === "income" && group.name.toLowerCase() === "einnahmen") ?? groups.find((group) => group.kind === "income");
+    const defaultIncomeCategory = incomeGroup?.categories.find((category) => category.name.toLowerCase() === "unkategorisiert")
+      ?? incomeGroup?.categories.find((category) => category.name.toLowerCase() === "sonstiges")
+      ?? incomeGroup?.categories[0];
+    return { incomeGroup, defaultIncomeCategory };
+  }
+
   function applyDefaultAccounts(nextType: EntryType) {
-    if (nextType === "expense" || nextType === "income") {
+    if (nextType === "expense") {
       setAccountId(defaultAccount?.id ?? "");
       setFromAccountId("");
       setToAccountId("");
+    }
+    if (nextType === "income") {
+      const { incomeGroup, defaultIncomeCategory } = defaultIncomeSelection();
+      setAccountId(defaultAccount?.id ?? "");
+      setFromAccountId("");
+      setToAccountId("");
+      setGroupId(incomeGroup?.id ?? "");
+      setCategoryId(defaultIncomeCategory?.id ?? "");
     }
     if (nextType === "transfer") {
       setAccountId("");
@@ -114,8 +130,10 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
     const index = cycle.indexOf(type);
     const next = cycle[(index + 1) % cycle.length];
     setType(next);
-    setGroupId("");
-    setCategoryId("");
+    if (next !== "income") {
+      setGroupId("");
+      setCategoryId("");
+    }
     applyDefaultAccounts(next);
     setError("");
   }

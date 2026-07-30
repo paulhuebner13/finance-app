@@ -161,9 +161,7 @@ export function AnalysisPage() {
       supabase
         .from("transactions")
         .select("*")
-        .eq("user_id", session.user.id)
-        .gte("date", firstRange.start)
-        .lte("date", lastRange.end),
+        .eq("user_id", session.user.id),
       supabase
         .from("category_groups")
         .select("*")
@@ -356,6 +354,22 @@ export function AnalysisPage() {
     return { fixedIncome, avgExpenses, monthlyDelta, startValue, values, average: average(values.map((value) => value.spent)) };
   }, [recurring, chartRows.introRows, futureMonths, accounts, debts, taxPositions]);
 
+  const bettingAllTime = useMemo(() => {
+    const categoryNameById = new Map(categories.map((category) => [category.id, category.name.toLowerCase()]));
+    const isBettingIncome = (tx: Transaction) => {
+      const categoryName = tx.category_id ? categoryNameById.get(tx.category_id) : "";
+      const note = (tx.note ?? "").toLowerCase();
+      return tx.type === "income" && (categoryName === "wetten" || note.includes("einkommen · bets") || note.includes("einkommen · wetten"));
+    };
+    const isBettingExpense = (tx: Transaction) => {
+      const categoryName = tx.category_id ? categoryNameById.get(tx.category_id) : "";
+      return tx.type === "expense" && categoryName === "wetten";
+    };
+    const income = transactions.filter(isBettingIncome).reduce((sum, tx) => sum + Number(tx.amount), 0);
+    const expenses = transactions.filter(isBettingExpense).reduce((sum, tx) => sum + Number(tx.amount), 0);
+    return { income, expenses, net: income - expenses };
+  }, [transactions, categories]);
+
   if (loading) return <main className="loading-page">Laden...</main>;
   if (!session) return <AuthGate />;
 
@@ -378,6 +392,11 @@ export function AnalysisPage() {
             <span>Fixe Einnahmen <b>{formatEuro(projection.fixedIncome)}</b></span>
             <span>Ø Ausgaben <b>{formatEuro(projection.avgExpenses)}</b></span>
             <span>Startwert <b>{formatEuro(projection.startValue)}</b></span>
+          </div>
+          <div className="betting-alltime-card">
+            <span>Sportwetten alltime</span>
+            <strong className={bettingAllTime.net >= 0 ? "under" : "over"}>{bettingAllTime.net >= 0 ? "+" : ""}{formatEuro(bettingAllTime.net)}</strong>
+            <small>Einnahmen {formatEuro(bettingAllTime.income)} · Ausgaben {formatEuro(bettingAllTime.expenses)}</small>
           </div>
           <ChartCard row={{ id: "net-worth-projection", name: "Net Worth nächste 12 Monate", accent: "#14b8a6", values: projection.values, average: projection.average }} />
         </section>

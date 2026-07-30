@@ -37,3 +37,6 @@ v_user_email text := 'paul.huebner13@gmail.com';
 Wenn du in der App eine andere Login-Mail verwendest, diese Zeile anpassen.
 
 Der Import ändert keine aktuellen Kontostände.
+
+## Betting income categories
+After importing legacy data, also run `supabase/migrations_add_income_betting_categories.sql` once. It adds `Unkategorisiert` and `Wetten` to income categories and moves legacy `Einkommen · bets` rows into income → Wetten.

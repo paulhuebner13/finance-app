@@ -2898,3 +2898,29 @@ textarea,
     font-size: 6.2px;
   }
 }
+
+/* Patch: betting alltime KPI under projection */
+.betting-alltime-card {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.72rem 0.78rem;
+  border-radius: 18px;
+  background: color-mix(in srgb, #14b8a6 8%, var(--panel));
+  border: 1.5px solid color-mix(in srgb, #14b8a6 28%, var(--border));
+}
+.betting-alltime-card span {
+  font-size: 0.82rem;
+  font-weight: 850;
+  color: var(--muted);
+}
+.betting-alltime-card strong {
+  font-size: 1.15rem;
+  line-height: 1.1;
+}
+.betting-alltime-card strong.under { color: var(--success); }
+.betting-alltime-card strong.over { color: var(--danger); }
+.betting-alltime-card small {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
