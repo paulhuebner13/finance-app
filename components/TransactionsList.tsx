@@ -18,6 +18,8 @@ export function TransactionsList() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [filter, setFilter] = useState("all");
+  const [groupFilter, setGroupFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
   const [editing, setEditing] = useState<Transaction | null>(null);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [error, setError] = useState("");
@@ -41,10 +43,37 @@ export function TransactionsList() {
 
   useEffect(() => { load(); }, [load]);
 
-  const filtered = useMemo(() => {
-    if (filter === "all") return transactions;
-    return transactions.filter((tx) => tx.type === filter);
-  }, [transactions, filter]);
+  const filterGroups = useMemo(() => {
+    if (filter === "transfer") return [];
+    if (filter === "all") return groups;
+    return groups.filter((group) => group.kind === filter);
+  }, [groups, filter]);
+
+  const selectedGroup = useMemo(() => groups.find((group) => group.id === groupFilter) ?? null, [groups, groupFilter]);
+  const filterCategories = useMemo(() => selectedGroup?.categories ?? [], [selectedGroup]);
+
+  useEffect(() => {
+    if (groupFilter === "all") {
+      if (categoryFilter !== "all") setCategoryFilter("all");
+      return;
+    }
+    const stillAvailable = filterGroups.some((group) => group.id === groupFilter);
+    if (!stillAvailable) {
+      setGroupFilter("all");
+      setCategoryFilter("all");
+      return;
+    }
+    if (categoryFilter !== "all" && !filterCategories.some((category) => category.id === categoryFilter)) {
+      setCategoryFilter("all");
+    }
+  }, [categoryFilter, filterCategories, filterGroups, groupFilter]);
+
+  const filtered = useMemo(() => transactions.filter((tx) => {
+    if (filter !== "all" && tx.type !== filter) return false;
+    if (groupFilter !== "all" && tx.group_id !== groupFilter) return false;
+    if (categoryFilter !== "all" && tx.category_id !== categoryFilter) return false;
+    return true;
+  }), [transactions, filter, groupFilter, categoryFilter]);
 
   async function deleteTransaction(tx: Transaction) {
     if (!session?.user.id) return;
@@ -85,14 +114,37 @@ export function TransactionsList() {
           </div>
         </section>
 
-        <section className="filters-card">
-          <input type="month" value={month} onChange={(e) => setMonth(e.target.value)} />
-          <select value={filter} onChange={(e) => setFilter(e.target.value)}>
-            <option value="all">Alle</option>
+        <section className="filters-card transaction-filter-card">
+          <input className="filter-compact" type="month" value={month} onChange={(e) => setMonth(e.target.value)} aria-label="Monat" />
+          <select className="filter-compact" value={filter} onChange={(e) => setFilter(e.target.value)} aria-label="Typ">
+            <option value="all">Alle Typen</option>
             <option value="expense">Ausgaben</option>
             <option value="income">Einnahmen</option>
             <option value="transfer">Umbuchungen</option>
             <option value="investment">Investieren</option>
+          </select>
+          <select
+            className="filter-compact"
+            value={groupFilter}
+            onChange={(e) => { setGroupFilter(e.target.value); setCategoryFilter("all"); }}
+            aria-label="Kategorie"
+          >
+            <option value="all">Alle Kategorien</option>
+            {filterGroups.map((group) => (
+              <option value={group.id} key={group.id}>{group.name}</option>
+            ))}
+          </select>
+          <select
+            className="filter-compact"
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            disabled={groupFilter === "all" || filterCategories.length === 0}
+            aria-label="Unterkategorie"
+          >
+            <option value="all">Alle Unterkat.</option>
+            {filterCategories.map((category) => (
+              <option value={category.id} key={category.id}>{category.name}</option>
+            ))}
           </select>
         </section>
 

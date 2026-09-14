@@ -3037,3 +3037,42 @@ textarea,
 .rule-card.rule-refund .rule-summary b { color: #b45309 !important; }
 .tx-transfer { border-left-color: var(--transfer) !important; }
 .tx-refund { border-left: 3px solid var(--refund) !important; padding-left: 0.7rem; }
+
+/* Patch: compact category filters in Buchungen */
+.transaction-filter-card {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 0.45rem !important;
+  padding: 0.65rem !important;
+  align-items: center !important;
+}
+
+.transaction-filter-card .filter-compact {
+  min-width: 0 !important;
+  height: 2.25rem !important;
+  padding: 0.4rem 0.52rem !important;
+  border-radius: 14px !important;
+  font-size: 0.78rem !important;
+  font-weight: 720 !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+  border: 1px solid rgba(35, 70, 125, 0.16) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+.transaction-filter-card .filter-compact:disabled {
+  opacity: 0.48 !important;
+  color: var(--muted) !important;
+}
+
+@media (max-width: 720px) {
+  .transaction-filter-card {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .transaction-filter-card .filter-compact {
+    font-size: 0.72rem !important;
+    padding-inline: 0.42rem !important;
+  }
+}
