@@ -3,7 +3,7 @@ import { supabase } from "./supabase";
 
 export function parseAmount(value: string | number) {
   if (typeof value === "number") return Number.isFinite(value) ? value : 0;
-  const raw = value.trim().replace(/\s/g, "").replace(/€/g, "");
+  const raw = value.trim().replace(/[−–—]/g, "-").replace(/\s/g, "").replace(/€/g, "");
   const normalized = raw.includes(",")
     ? raw.replace(/\./g, "").replace(",", ".")
     : raw;
@@ -138,6 +138,30 @@ export function entryTypeLabel(type: string) {
   if (type === "transfer") return "Umbuchung";
   if (type === "investment") return "Investition";
   return type;
+}
+
+export function isRefundTransaction(tx: Pick<Transaction, "type" | "amount">) {
+  return (tx.type === "expense" || tx.type === "investment") && Number(tx.amount) < 0;
+}
+
+export function transactionTone(tx: Pick<Transaction, "type" | "amount">) {
+  if (isRefundTransaction(tx)) return "refund";
+  return tx.type;
+}
+
+export function entryTypeLabelForTransaction(tx: Pick<Transaction, "type" | "amount">) {
+  if (tx.type === "expense" && Number(tx.amount) < 0) return "Rückerstattung";
+  if (tx.type === "investment" && Number(tx.amount) < 0) return "Investition zurück";
+  return entryTypeLabel(tx.type);
+}
+
+export function formatTransactionAmount(tx: Pick<Transaction, "type" | "amount">, format: (value: number) => string) {
+  const amount = Number(tx.amount) || 0;
+  const abs = Math.abs(amount);
+  if (tx.type === "income") return `${amount >= 0 ? "+" : "−"}${format(abs)}`;
+  if (tx.type === "expense" || tx.type === "investment") return `${amount >= 0 ? "−" : "+"}${format(abs)}`;
+  if (amount < 0) return `−${format(abs)}`;
+  return format(abs);
 }
 
 

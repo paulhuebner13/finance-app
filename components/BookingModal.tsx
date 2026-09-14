@@ -160,7 +160,7 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
   }
 
   function validate(numericAmount: number) {
-    if (!numericAmount || numericAmount <= 0) return "Bitte Betrag eingeben.";
+    if (!numericAmount) return "Bitte Betrag eingeben.";
     if (type === "transfer" && (!fromAccountId || !toAccountId || fromAccountId === toAccountId)) return "Bitte zwei unterschiedliche Konten auswählen.";
     if (type === "investment" && (!groupId || !fromAccountId || !toAccountId || fromAccountId === toAccountId)) return "Bitte Kategorie, Zahlungskonto und Depot auswählen.";
     if ((type === "expense" || type === "income") && (!groupId || !accountId)) return "Bitte Kategorie und Konto auswählen.";
@@ -214,6 +214,9 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
   }
 
   if (!open) return null;
+
+  const parsedAmount = parseAmount(amount);
+  const isRefundAmount = (type === "expense" || type === "investment") && parsedAmount < 0;
 
   const categorySelector = (kind: "normal" | "investment" = "normal") => (
     <section className="booking-selection-stack">
@@ -301,10 +304,10 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
 
   return (
     <div className="modal-backdrop">
-      <section className={`booking-modal booking-${type}`}>
+      <section className={`booking-modal booking-${type} ${isRefundAmount ? "booking-refund" : ""}`}>
         <div className="modal-header">
           <div>
-            <button className="type-pill" onClick={nextType}>{labels[type]}</button>
+            <button className="type-pill" onClick={nextType}>{isRefundAmount ? "Rückerstattung" : labels[type]}</button>
             <p className="muted small modal-subtitle">{isEditing ? "Buchung bearbeiten" : "Neue Buchung"}</p>
           </div>
           <button className="icon-button" onClick={onClose}>×</button>
@@ -313,7 +316,7 @@ export function BookingModal({ open, onClose, onSaved, userId, accounts, groups,
         <label className="amount-label">
           Betrag
           <input inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0,00" autoFocus />
-          {parseAmount(amount) > 0 && <small>{formatEuro(parseAmount(amount))}</small>}
+          {parsedAmount !== 0 && <small className={isRefundAmount ? "refund-preview" : undefined}>{isRefundAmount ? `+${formatEuro(Math.abs(parsedAmount))}` : formatEuro(parsedAmount)}</small>}
         </label>
 
         {type === "transfer" ? (

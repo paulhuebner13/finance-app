@@ -3017,3 +3017,23 @@ textarea,
   .betting-detail-toggle strong { font-size: 1.55rem; }
   .betting-bars-chart { min-height: 150px; }
 }
+
+
+/* Patch: negative amounts / refunds */
+:root {
+  --transfer: #2563eb;
+  --refund: #f59e0b;
+}
+.booking-transfer { border-color: var(--transfer) !important; }
+.booking-transfer .type-pill { color: var(--transfer) !important; }
+.booking-refund { border-color: var(--refund) !important; }
+.booking-refund .type-pill { color: #b45309 !important; }
+.refund-preview { color: #b45309 !important; font-weight: 850; }
+.transaction-card.tx-transfer { --tx: var(--transfer) !important; }
+.transaction-card.tx-refund { --tx: var(--refund) !important; }
+.rule-card.rule-transfer { --accent: var(--transfer) !important; }
+.rule-card.rule-refund { --accent: var(--refund) !important; }
+.rule-card.rule-refund .rule-summary strong,
+.rule-card.rule-refund .rule-summary b { color: #b45309 !important; }
+.tx-transfer { border-left-color: var(--transfer) !important; }
+.tx-refund { border-left: 3px solid var(--refund) !important; padding-left: 0.7rem; }

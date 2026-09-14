@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { AuthGate } from "@/components/AuthGate";
 import { formatEuro, formatNumber } from "@/lib/date";
-import { entryTypeLabel, parseAmount, sortAccountsStable } from "@/lib/finance";
+import { entryTypeLabelForTransaction, formatTransactionAmount, parseAmount, sortAccountsStable, transactionTone } from "@/lib/finance";
 import { supabase } from "@/lib/supabase";
 import type { Account, Category, CategoryGroup, CategoryWithChildren, EntryType, RecurringTransaction } from "@/lib/types";
 import { useSession } from "@/lib/useSession";
@@ -153,7 +153,7 @@ export function RecurringManager() {
     const categories = selectedGroup?.categories ?? [];
     const numericAmount = parseAmount(form.amount);
     const dayNumber = Math.min(31, Math.max(1, Number(form.day) || 1));
-    if (!numericAmount || numericAmount <= 0) throw new Error("Betrag fehlt.");
+    if (!numericAmount) throw new Error("Betrag fehlt.");
     if ((form.type === "expense" || form.type === "income") && (!form.accountId || !form.groupId)) throw new Error("Konto/Kategorie fehlt.");
     if (form.type === "transfer" && (!form.fromAccountId || !form.toAccountId || form.fromAccountId === form.toAccountId)) throw new Error("Umbuchung braucht zwei Konten.");
     if (form.type === "investment" && (!form.fromAccountId || !form.toAccountId || !form.groupId)) throw new Error("Depot-Regel unvollständig.");
@@ -241,13 +241,13 @@ export function RecurringManager() {
             const isEditing = editing === item.id;
             const form = editForms[item.id] ?? formFromItem(item);
             return (
-              <article className={`rule-card ${typeClass(item.type)} ${!item.active ? "is-disabled" : ""}`} key={item.id}>
+              <article className={`rule-card rule-${transactionTone(item)} ${!item.active ? "is-disabled" : ""}`} key={item.id}>
                 <div className="rule-summary">
                   <div>
-                    <strong>{item.note || category?.name || group?.name || entryTypeLabel(item.type)}</strong>
-                    <span>{item.day_of_month}. · {entryTypeLabel(item.type)} · {item.type === "transfer" || item.type === "investment" ? `${from?.name ?? "?"} → ${to?.name ?? "?"}` : `${account?.name ?? "?"}`}</span>
+                    <strong>{item.note || category?.name || group?.name || entryTypeLabelForTransaction(item)}</strong>
+                    <span>{item.day_of_month}. · {entryTypeLabelForTransaction(item)} · {item.type === "transfer" || item.type === "investment" ? `${from?.name ?? "?"} → ${to?.name ?? "?"}` : `${account?.name ?? "?"}`}</span>
                   </div>
-                  <b>{formatEuro(Number(item.amount))}</b>
+                  <b>{formatTransactionAmount(item, formatEuro)}</b>
                 </div>
 
                 {isEditing && (

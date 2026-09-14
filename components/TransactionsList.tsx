@@ -5,7 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { AuthGate } from "@/components/AuthGate";
 import { BookingModal } from "@/components/BookingModal";
 import { formatEuro, getMonthRange, monthKey } from "@/lib/date";
-import { applyDeltas, entryTypeLabel, invertDeltas, sortAccountsStable, transactionDeltas } from "@/lib/finance";
+import { applyDeltas, entryTypeLabelForTransaction, formatTransactionAmount, invertDeltas, sortAccountsStable, transactionDeltas, transactionTone } from "@/lib/finance";
 import { supabase } from "@/lib/supabase";
 import type { Account, Category, CategoryGroup, CategoryWithChildren, Transaction } from "@/lib/types";
 import { useSession } from "@/lib/useSession";
@@ -106,13 +106,13 @@ export function TransactionsList() {
             const from = accounts.find((a) => a.id === tx.from_account_id);
             const to = accounts.find((a) => a.id === tx.to_account_id);
             return (
-              <article className={`transaction-card tx-${tx.type}`} key={tx.id}>
+              <article className={`transaction-card tx-${transactionTone(tx)}`} key={tx.id}>
                 <div className="transaction-main">
-                  <strong>{tx.note || category?.name || group?.name || entryTypeLabel(tx.type)}</strong>
-                  <span>{tx.date} · {entryTypeLabel(tx.type)} · {tx.type === "transfer" || tx.type === "investment" ? `${from?.name ?? "?"} → ${to?.name ?? "?"}` : `${group?.name ?? ""}${category ? ` / ${category.name}` : ""} · ${account?.name ?? ""}`}</span>
+                  <strong>{tx.note || category?.name || group?.name || entryTypeLabelForTransaction(tx)}</strong>
+                  <span>{tx.date} · {entryTypeLabelForTransaction(tx)} · {tx.type === "transfer" || tx.type === "investment" ? `${from?.name ?? "?"} → ${to?.name ?? "?"}` : `${group?.name ?? ""}${category ? ` / ${category.name}` : ""} · ${account?.name ?? ""}`}</span>
                 </div>
                 <div className="tx-actions">
-                  <b>{tx.type === "income" ? "+" : tx.type === "expense" || tx.type === "investment" ? "-" : ""}{formatEuro(Number(tx.amount))}</b>
+                  <b>{formatTransactionAmount(tx, formatEuro)}</b>
                   <button className="mini-button" onClick={() => setEditing(tx)}>bearbeiten</button>
                   <button className="mini-button danger" onClick={() => deleteTransaction(tx)}>löschen</button>
                 </div>
