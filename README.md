@@ -8,3 +8,8 @@
 - Analyse verwendet dieselbe Ausgehen-Logik wie Start.
 
 Keine neue Supabase-Migration notwendig, sofern `debt_net_value` und `comparable_value` aus dem letzten Patch bereits existieren.
+
+
+## Negative Beträge / Rückerstattungen
+
+Wenn die Datenbank noch alte CHECK-Constraints `amount > 0` hat, führe in Supabase einmal `supabase/migrations_allow_negative_transaction_amounts.sql` aus. Danach sind negative Ausgaben/Regeln als Rückerstattung möglich; `0,00` bleibt ungültig.
